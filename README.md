@@ -10,8 +10,13 @@ Twitch Clientid (Application): https://dev.twitch.tv/console/apps
 Twitch OAuth key: https://twitchapps.com/tokengen/  
 Discord bot: https://discord.com/developers/applications/
 
-## Usage
-
+## Usage  
+### Commands
+**Must be sent to bot Dm's**
+**Help** - Shows list of commands
+**Watch streamername or streamerlink** - Will get the user id and create a new list if it doesn't exist otherwise it will add the streamer to that users list  
+**Unwatch streamername or streamerlink** - Removes the streamer from that user's list  
+**Clear** - Deletes all the messages sent by the bot (1per second to avoid being rate limited)
 
 ## Changes
 ```diff
