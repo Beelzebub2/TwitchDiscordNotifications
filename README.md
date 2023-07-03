@@ -9,7 +9,7 @@ Get notifications of your favorite streamers on your discord Dm's
   
 Twitch Clientid (Application): https://dev.twitch.tv/console/apps   
 **(OAuth redirect link must be "https://twitchapps.com/tokengen/")**  
-![OAuth](OAuth.png)
+![OAuth](OAuth.png)  
 Twitch OAuth key: https://twitchapps.com/tokengen/  
 Discord bot: https://discord.com/developers/applications/
 
