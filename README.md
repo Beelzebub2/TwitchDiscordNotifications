@@ -12,7 +12,7 @@ Discord bot: https://discord.com/developers/applications/
 
 ## Usage  
 ### Commands
-**Must be sent to bot Dm's**
+**Must be sent to bot Dm's**  
 **Help** - Shows list of commands
 **Watch streamername or streamerlink** - Will get the user id and create a new list if it doesn't exist otherwise it will add the streamer to that users list  
 **Unwatch streamername or streamerlink** - Removes the streamer from that user's list  
