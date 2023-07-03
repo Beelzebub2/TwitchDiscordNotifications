@@ -21,7 +21,7 @@ Discord bot: https://discord.com/developers/applications/
 ## Changes
 ```diff
 
-v1.1 03/07
+v1.1 03/07/2023
 
 +   Added option to use watch with streamername or streamer link
 +   Made the notification embeds prettier
