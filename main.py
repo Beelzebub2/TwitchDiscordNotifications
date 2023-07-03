@@ -10,13 +10,15 @@ from discord.ext import commands
 from discord import Intents
 from configparser import ConfigParser
 
-intents = Intents.default()
+intents = Intents.all()
+"""
 intents.typing = False
 intents.presences = False
 intents.messages = True  # Enable the messages intent
 intents.guild_messages = True  # Enable the guild messages intent
 intents.dm_messages = True  # Enable the direct message messages intent
 processed_streamers = []
+"""
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Replace 'YOUR_CLIENT_ID' with your actual application id
