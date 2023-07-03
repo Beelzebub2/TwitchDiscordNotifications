@@ -1,6 +1,8 @@
 # **TwitchDiscordNotifications**
 ![Static Badge](https://img.shields.io/badge/Version-v1.1-8ebff1?style=for-the-badge&logo=v)
 ![Static Badge](https://img.shields.io/badge/Language-python-3776ab?style=for-the-badge&logo=python)  
+![Static Badge](https://img.shields.io/badge/License-GNU%20GPL%20v3-blue.svg?style=for-the-badge)
+
 Get notifications of your favorite streamers on your discord Dm's
 
 ## **Important links**
