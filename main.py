@@ -172,7 +172,8 @@ async def send_notification(streamer_name, user_notifications):
                                     + get_timestamp()
                                     + Fore.RESET
                                     + " "
-                                    + f"Notification sent successfully for {streamer_name}."
+                                    + Fore.LIGHTGREEN_EX
+                                    + f"Notification sent successfully for {Fore.CYAN + streamer_name + Fore.RESET}."
                                 )
                             except discord.errors.Forbidden:
                                 print(
@@ -221,7 +222,7 @@ async def on_resumed():
         Fore.CYAN
         + get_timestamp()
         + Fore.RESET
-        + Fore.GREEN
+        + Fore.LIGHTGREEN_EX
         + f" Running as {Fore.LIGHTCYAN_EX + bot.user.name + Fore.RESET}"
     )
     clear_console()
@@ -234,7 +235,7 @@ async def on_ready():
         Fore.CYAN
         + get_timestamp()
         + Fore.RESET
-        + Fore.GREEN
+        + Fore.LIGHTGREEN_EX
         + f" Running as {Fore.LIGHTCYAN_EX + bot.user.name + Fore.RESET}"
     )
     user_notifications = read_config()
@@ -307,7 +308,7 @@ async def on_message(message):
                         + get_timestamp()
                         + Fore.RESET
                         + " "
-                        + Fore.GREEN
+                        + Fore.LIGHTGREEN_EX
                         + f"Added {Fore.CYAN + streamer_name + Fore.RESET} to user {Fore.CYAN + message.author.name + Fore.RESET}'s watchlist."
                         + Fore.RESET
                     )
@@ -343,7 +344,7 @@ async def on_message(message):
                     + get_timestamp()
                     + Fore.RESET
                     + " "
-                    + Fore.GREEN
+                    + Fore.LIGHTGREEN_EX
                     + f"Created a new watchlist for user {Fore.CYAN + message.author.name + Fore.RESET} and added {Fore.CYAN + streamer_name + Fore.RESET}."
                     + Fore.RESET
                 )
@@ -387,7 +388,7 @@ async def on_message(message):
                         + get_timestamp()
                         + Fore.RESET
                         + " "
-                        + Fore.GREEN
+                        + Fore.LIGHTGREEN_EX
                         + f"Removed {Fore.CYAN + streamer_name + Fore.RESET} from user {Fore.CYAN + message.author.name + Fore.RESET}'s watchlist."
                         + Fore.RESET
                     )
@@ -442,7 +443,7 @@ async def on_message(message):
                         + get_timestamp()
                         + Fore.RESET
                         + " "
-                        + Fore.GREEN
+                        + Fore.LIGHTGREEN_EX
                         + f"{Fore.CYAN + message.author.name + Fore.RESET} requested their streamers: {Fore.CYAN + streamer_names + Fore.RESET}"
                         + Fore.RESET
                     )
