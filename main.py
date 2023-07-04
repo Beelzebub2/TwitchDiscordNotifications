@@ -117,10 +117,10 @@ async def check_stream(streamer_name):
     # Check if the "data" key exists in the response
     if "data" in data:
         if len(data["data"]) > 0:
-            if streamer_name not in processed_streamers:
+            if streamer_name.lower() not in processed_streamers:
                 user_notifications = read_config()
                 await send_notification(streamer_name.strip(), user_notifications)
-                processed_streamers.append(streamer_name)
+                processed_streamers.append(streamer_name.lower())
             return True
     else:
         print("Error: 'data' key not found in API response")
@@ -380,6 +380,8 @@ async def on_message(message):
                     write_config(
                         user_notifications
                     )  # Write the updated config to the file
+                    if streamer_name in processed_streamers:
+                        processed_streamers.remove(streamer_name)
                     print(
                         Fore.CYAN
                         + get_timestamp()

@@ -30,6 +30,7 @@ v1.2 04/07/2023
 +   Fixed streamers added after bot initialization not getting checked
 +   Made console interface better, showing checking when checking streamer and showing currently streaming streamers
 +   Cleaner console
++   Fixed if a streamer was removed from everybodys watchlist, it wouldn't leave the currently streaming list
 
 
 v1.1 03/07/2023
