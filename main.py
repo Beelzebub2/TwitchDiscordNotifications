@@ -1,6 +1,7 @@
 import asyncio
 import datetime
-import time
+import pytz
+import tzlocal
 import requests
 import os
 import re
@@ -148,7 +149,9 @@ async def send_notification(streamer_name, user_notifications):
                         response = requests.get(url, headers=headers)
                         data = response.json()
                         if "data" in data and len(data["data"]) > 0:
-                            user_id = data["data"][0]["user_id"]
+                            stream_data = data["data"][0]
+                            started_at = stream_data["started_at"]
+                            user_id = stream_data["user_id"]
                             user_url = f"https://api.twitch.tv/helix/users?id={user_id}"
                             user_response = requests.get(user_url, headers=headers)
                             user_data = user_response.json()
@@ -158,13 +161,56 @@ async def send_notification(streamer_name, user_notifications):
                             profile_picture_url = profile_picture_url.replace(
                                 "{width}", "300"
                             ).replace("{height}", "300")
+
+                            # Parse the starting time
+                            start_time = datetime.datetime.strptime(
+                                started_at, "%Y-%m-%dT%H:%M:%SZ"
+                            )
+
+                            # Extract the timezone offset using regular expressions
+                            timezone_offset_match = re.search(
+                                r"([+-]\d{2}):(\d{2})", started_at
+                            )
+                            if timezone_offset_match:
+                                timezone_offset_hours = int(
+                                    timezone_offset_match.group(1)
+                                )
+                                timezone_offset_minutes = int(
+                                    timezone_offset_match.group(2)
+                                )
+                                timezone_delta = datetime.timedelta(
+                                    hours=timezone_offset_hours,
+                                    minutes=timezone_offset_minutes,
+                                )
+                                start_time += timezone_delta
+
+                            # Get the computer's local timezone
+                            local_timezone = tzlocal.get_localzone()
+
+                            # Convert the start time to UTC timezone
+                            start_time = start_time.replace(tzinfo=pytz.utc)
+
+                            # Convert the start time to the computer's local timezone
+                            start_time = start_time.astimezone(local_timezone)
+
+                            # Format the start time as a string
+                            start_time_str = start_time.strftime("%H:%M:%S")
+
                             embed = discord.Embed(
                                 title=f"{streamer_name} is streaming!",
                                 description=f"Click [here](https://www.twitch.tv/{streamer_name}) to watch the stream.",
                                 color=discord.Color.green(),
                             )
                             embed.set_thumbnail(url=profile_picture_url)
-                            embed.set_footer(text=f"v1.0 | Made by Beelzebub2")
+                            embed.set_footer(text="v1.0 | Made by Beelzebub2")
+
+                            # Mention the user as a spoiler
+                            mention = f"||{member.mention}||"
+
+                            # Add starting time to the embed
+                            embed.add_field(
+                                name="Stream Start Time (local)", value=start_time_str
+                            )
                             try:
                                 await dm_channel.send(embed=embed)
                                 print(
