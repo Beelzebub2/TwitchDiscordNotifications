@@ -202,8 +202,39 @@ async def send_notification(streamer_name, user_notifications):
             )
 
 
+def clear_console():
+    if os.name == "nt":
+        os.system("cls")
+    else:
+        os.system("clear")
+
+
+@bot.event
+async def on_disconnect():
+    clear_console()
+
+
+@bot.event
+async def on_resumed():
+    print(
+        Fore.CYAN
+        + get_timestamp()
+        + Fore.RESET
+        + Fore.GREEN
+        + f" Running as {Fore.LIGHTCYAN_EX + bot.user.name + Fore.RESET}"
+    )
+    clear_console()
+
+
 @bot.event
 async def on_ready():
+    print(
+        Fore.CYAN
+        + get_timestamp()
+        + Fore.RESET
+        + Fore.GREEN
+        + f" Running as {Fore.LIGHTCYAN_EX + bot.user.name + Fore.RESET}"
+    )
     print(
         "\033[K"
         + Fore.CYAN
