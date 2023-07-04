@@ -141,8 +141,8 @@ async def send_notification(streamer_name, user_notifications):
                     if streamer_name == streamer.strip():
                         url = f"https://api.twitch.tv/helix/streams?user_login={streamer_name}"
                         headers = {
-                            "Client-ID": "rna27h4mainj8fkqrcogw37ca2d9mv",
-                            "Authorization": "Bearer yz4nmmpnkces1bat1ruscvdv8kiguc",
+                            "Client-ID": CLIENT_ID,
+                            "Authorization": f"Bearer {AUTHORIZATION}",
                         }
                         response = requests.get(url, headers=headers)
                         data = response.json()
