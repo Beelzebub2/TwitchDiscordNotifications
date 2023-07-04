@@ -228,6 +228,7 @@ async def on_resumed():
 
 @bot.event
 async def on_ready():
+    clear_console()
     print(
         Fore.CYAN
         + get_timestamp()
