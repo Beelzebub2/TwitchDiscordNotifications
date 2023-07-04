@@ -17,7 +17,6 @@ Discord bot: https://discord.com/developers/applications/
 ## Preview  
 ![notification preview](notification.png)
 
-
 ## **Usage**  
 ### **Commands**
 #### **Must be sent to bot Dm's**  
