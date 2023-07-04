@@ -20,6 +20,7 @@ intents.dm_messages = True  # Enable the direct message messages intent
 processed_streamers = []
 """
 bot = commands.Bot(command_prefix="!", intents=intents)
+processed_streamers = []
 
 # Replace 'YOUR_CLIENT_ID' with your actual application id
 CLIENT_ID = "YOUR_CLIENT_ID"
@@ -140,8 +141,8 @@ async def send_notification(streamer_name, user_notifications):
                     if streamer_name == streamer.strip():
                         url = f"https://api.twitch.tv/helix/streams?user_login={streamer_name}"
                         headers = {
-                            "Client-ID": CLIENT_ID,
-                            "Authorization": f"Bearer {AUTHORIZATION}",
+                            "Client-ID": "rna27h4mainj8fkqrcogw37ca2d9mv",
+                            "Authorization": "Bearer yz4nmmpnkces1bat1ruscvdv8kiguc",
                         }
                         response = requests.get(url, headers=headers)
                         data = response.json()
@@ -166,19 +167,25 @@ async def send_notification(streamer_name, user_notifications):
                             try:
                                 await dm_channel.send(embed=embed)
                                 print(
-                                    get_timestamp()
+                                    Fore.CYAN
+                                    + get_timestamp()
+                                    + Fore.RESET
                                     + " "
                                     + f"Notification sent successfully for {streamer_name}."
                                 )
                             except discord.errors.Forbidden:
                                 print(
-                                    get_timestamp()
+                                    Fore.CYAN
+                                    + get_timestamp()
+                                    + Fore.RESET
                                     + " "
                                     + f"Cannot send a message to user {member.name}. Missing permissions or DMs disabled."
                                 )
                         else:
                             print(
-                                get_timestamp()
+                                Fore.CYAN
+                                + get_timestamp()
+                                + Fore.RESET
                                 + " "
                                 + f"{streamer_name} is not streaming."
                             )
@@ -198,13 +205,15 @@ async def send_notification(streamer_name, user_notifications):
 @bot.event
 async def on_ready():
     print(
-        Fore.CYAN
+        "\033[K"
+        + Fore.CYAN
         + get_timestamp()
         + Fore.RESET
         + " "
-        + Fore.GREEN
-        + f"Bot connected as {bot.user}"
-        + Fore.RESET
+        + Fore.LIGHTGREEN_EX
+        + "Checking "
+        + Fore.RESET,
+        end="\r",
     )
     user_notifications = read_config()
     streamers = []
@@ -217,6 +226,18 @@ async def on_ready():
     await bot.change_presence(activity=activity)
 
     while True:
+        user_notifications = read_config()
+        print(
+            "\033[K"
+            + Fore.CYAN
+            + get_timestamp()
+            + Fore.RESET
+            + " "
+            + Fore.LIGHTYELLOW_EX
+            + "Checking"
+            + Fore.RESET,
+            end="\r",
+        )
         for streamer_list in user_notifications.values():
             for streamer_name in streamer_list:
                 await check_stream(streamer_name.strip())
@@ -226,11 +247,15 @@ async def on_ready():
                 + get_timestamp()
                 + Fore.RESET
                 + " "
+                + Fore.LIGHTGREEN_EX
+                + "Currently streaming: "
+                + Fore.RESET
                 + Fore.LIGHTWHITE_EX
                 + str(processed_streamers)
-                + Fore.RESET
+                + Fore.RESET,
+                end="\r",
             )
-        await asyncio.sleep(20)
+        await asyncio.sleep(5)
 
 
 @bot.event
@@ -256,7 +281,9 @@ async def on_message(message):
                         user_notifications
                     )  # Write the updated config to the file
                     print(
-                        get_timestamp()
+                        Fore.CYAN
+                        + get_timestamp()
+                        + Fore.RESET
                         + " "
                         + Fore.GREEN
                         + f"Added {Fore.CYAN + streamer_name + Fore.RESET} to user {Fore.CYAN + message.author.name + Fore.RESET}'s watchlist."
@@ -273,7 +300,9 @@ async def on_message(message):
                         processed_streamers.remove(streamer_name)
                 else:
                     print(
-                        get_timestamp()
+                        Fore.CYAN
+                        + get_timestamp()
+                        + Fore.RESET
                         + " "
                         + f"{Fore.CYAN + streamer_name + Fore.RESET} is already in user {Fore.CYAN + message.author.name + Fore.RESET}'s watchlist."
                     )
@@ -288,7 +317,9 @@ async def on_message(message):
                 user_notifications[user_id] = [streamer_name.strip()]
                 write_config(user_notifications)  # Write the updated config to the file
                 print(
-                    get_timestamp()
+                    Fore.CYAN
+                    + get_timestamp()
+                    + Fore.RESET
                     + " "
                     + Fore.GREEN
                     + f"Created a new watchlist for user {Fore.CYAN + message.author.name + Fore.RESET} and added {Fore.CYAN + streamer_name + Fore.RESET}."
@@ -328,7 +359,9 @@ async def on_message(message):
                         user_notifications
                     )  # Write the updated config to the file
                     print(
-                        get_timestamp()
+                        Fore.CYAN
+                        + get_timestamp()
+                        + Fore.RESET
                         + " "
                         + Fore.GREEN
                         + f"Removed {Fore.CYAN + streamer_name + Fore.RESET} from user {Fore.CYAN + message.author.name + Fore.RESET}'s watchlist."
@@ -343,7 +376,9 @@ async def on_message(message):
                     await message.channel.send(embed=embed)
                 else:
                     print(
-                        get_timestamp()
+                        Fore.CYAN
+                        + get_timestamp()
+                        + Fore.RESET
                         + " "
                         + f"{Fore.CYAN + streamer_name + Fore.RESET} is not in user {Fore.CYAN + message.author.name + Fore.RESET}'s watchlist."
                     )
@@ -379,7 +414,9 @@ async def on_message(message):
                 if streamer_list:
                     streamer_names = ", ".join(streamer_list)
                     print(
-                        get_timestamp()
+                        Fore.CYAN
+                        + get_timestamp()
+                        + Fore.RESET
                         + " "
                         + Fore.GREEN
                         + f"{Fore.CYAN + message.author.name + Fore.RESET} requested their streamers: {Fore.CYAN + streamer_names + Fore.RESET}"
@@ -396,7 +433,9 @@ async def on_message(message):
                     await message.channel.send(embed=embed)
                 else:
                     print(
-                        get_timestamp()
+                        Fore.CYAN
+                        + get_timestamp()
+                        + Fore.RESET
                         + " "
                         + Fore.YELLOW
                         + f"{Fore.CYAN + message.author.name + Fore.RESET} requested their streamers, but the watchlist is empty."
@@ -411,7 +450,9 @@ async def on_message(message):
                     await message.channel.send(embed=embed)
             else:
                 print(
-                    get_timestamp()
+                    Fore.CYAN
+                    + get_timestamp()
+                    + Fore.RESET
                     + " "
                     + Fore.RED
                     + f"{Fore.CYAN + message.author.name + Fore.RESET} requested their streamers, but they don't have a watchlist yet."

@@ -1,5 +1,5 @@
 # **TwitchDiscordNotifications**
-![Static Badge](https://img.shields.io/badge/Version-v1.1-8ebff1?style=for-the-badge&logo=v)
+![Static Badge](https://img.shields.io/badge/Version-v1.2-8ebff1?style=for-the-badge&logo=v)
 ![Static Badge](https://img.shields.io/badge/Language-python-3776ab?style=for-the-badge&logo=python)
 ![Static Badge](https://img.shields.io/badge/License-GNU%20GPL%20v3-blue.svg?style=for-the-badge)  
 
@@ -23,6 +23,12 @@ Discord bot: https://discord.com/developers/applications/
 
 ## Changes
 ```diff
+
+v1.2 04/07/2023
+
++   Fixed streamers added after bot initialization not getting checked
++   Made console interface better, showing checking when checking streamer and showing currently streaming streamers
+
 
 v1.1 03/07/2023
 
