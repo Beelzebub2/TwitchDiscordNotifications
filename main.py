@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import time
 import requests
 import os
 import re
@@ -57,6 +58,14 @@ def error_handler(func):
 def get_timestamp():
     now = datetime.datetime.now()
     return now.strftime("%Y-%m-%d %H:%M:%S")
+
+
+@error_handler
+def slow_print(text, delay=0.03, end="\n"):
+    for char in text:
+        slow_print(char, end="", flush=True)
+        time.sleep(delay)
+    slow_print(end=end, flush=True)
 
 
 @error_handler
@@ -122,7 +131,7 @@ async def check_stream(streamer_name):
                 processed_streamers.append(streamer_name)
             return True
     else:
-        print("Error: 'data' key not found in API response")
+        slow_print("Error: 'data' key not found in API response")
 
     if streamer_name in processed_streamers:
         processed_streamers.remove(streamer_name)
@@ -166,7 +175,7 @@ async def send_notification(streamer_name, user_notifications):
                             embed.set_footer(text=f"v1.0 | Made by Beelzebub2")
                             try:
                                 await dm_channel.send(embed=embed)
-                                print(
+                                slow_print(
                                     Fore.CYAN
                                     + get_timestamp()
                                     + Fore.RESET
@@ -174,7 +183,7 @@ async def send_notification(streamer_name, user_notifications):
                                     + f"Notification sent successfully for {streamer_name}."
                                 )
                             except discord.errors.Forbidden:
-                                print(
+                                slow_print(
                                     Fore.CYAN
                                     + get_timestamp()
                                     + Fore.RESET
@@ -182,7 +191,7 @@ async def send_notification(streamer_name, user_notifications):
                                     + f"Cannot send a message to user {member.name}. Missing permissions or DMs disabled."
                                 )
                         else:
-                            print(
+                            slow_print(
                                 Fore.CYAN
                                 + get_timestamp()
                                 + Fore.RESET
@@ -191,7 +200,7 @@ async def send_notification(streamer_name, user_notifications):
                             )
         except discord.errors.NotFound:
             # Handle the case where the user is not found
-            print(
+            slow_print(
                 Fore.CYAN
                 + get_timestamp()
                 + Fore.RESET
@@ -216,7 +225,7 @@ async def on_disconnect():
 
 @bot.event
 async def on_resumed():
-    print(
+    slow_print(
         Fore.CYAN
         + get_timestamp()
         + Fore.RESET
@@ -229,23 +238,12 @@ async def on_resumed():
 @bot.event
 async def on_ready():
     clear_console()
-    print(
+    slow_print(
         Fore.CYAN
         + get_timestamp()
         + Fore.RESET
         + Fore.GREEN
         + f" Running as {Fore.LIGHTCYAN_EX + bot.user.name + Fore.RESET}"
-    )
-    print(
-        "\033[K"
-        + Fore.CYAN
-        + get_timestamp()
-        + Fore.RESET
-        + " "
-        + Fore.LIGHTGREEN_EX
-        + "Checking "
-        + Fore.RESET,
-        end="\r",
     )
     user_notifications = read_config()
     streamers = []
@@ -259,7 +257,7 @@ async def on_ready():
 
     while True:
         user_notifications = read_config()
-        print(
+        slow_print(
             "\033[K"
             + Fore.CYAN
             + get_timestamp()
@@ -274,7 +272,7 @@ async def on_ready():
             for streamer_name in streamer_list:
                 await check_stream(streamer_name.strip())
         if len(processed_streamers) != 0:
-            print(
+            slow_print(
                 Fore.CYAN
                 + get_timestamp()
                 + Fore.RESET
@@ -312,7 +310,7 @@ async def on_message(message):
                     write_config(
                         user_notifications
                     )  # Write the updated config to the file
-                    print(
+                    slow_print(
                         Fore.CYAN
                         + get_timestamp()
                         + Fore.RESET
@@ -331,7 +329,7 @@ async def on_message(message):
                     if streamer_name in processed_streamers:
                         processed_streamers.remove(streamer_name)
                 else:
-                    print(
+                    slow_print(
                         Fore.CYAN
                         + get_timestamp()
                         + Fore.RESET
@@ -348,7 +346,7 @@ async def on_message(message):
             else:
                 user_notifications[user_id] = [streamer_name.strip()]
                 write_config(user_notifications)  # Write the updated config to the file
-                print(
+                slow_print(
                     Fore.CYAN
                     + get_timestamp()
                     + Fore.RESET
@@ -390,7 +388,7 @@ async def on_message(message):
                     write_config(
                         user_notifications
                     )  # Write the updated config to the file
-                    print(
+                    slow_print(
                         Fore.CYAN
                         + get_timestamp()
                         + Fore.RESET
@@ -407,7 +405,7 @@ async def on_message(message):
                     embed.set_footer(text="v1.0 | Made by Beelzebub2")
                     await message.channel.send(embed=embed)
                 else:
-                    print(
+                    slow_print(
                         Fore.CYAN
                         + get_timestamp()
                         + Fore.RESET
@@ -445,7 +443,7 @@ async def on_message(message):
                 streamer_list = user_notifications[user_id]
                 if streamer_list:
                     streamer_names = ", ".join(streamer_list)
-                    print(
+                    slow_print(
                         Fore.CYAN
                         + get_timestamp()
                         + Fore.RESET
@@ -464,7 +462,7 @@ async def on_message(message):
 
                     await message.channel.send(embed=embed)
                 else:
-                    print(
+                    slow_print(
                         Fore.CYAN
                         + get_timestamp()
                         + Fore.RESET
@@ -481,7 +479,7 @@ async def on_message(message):
                     embed.set_footer(text="v1.0 | Made by Beelzebub2")
                     await message.channel.send(embed=embed)
             else:
-                print(
+                slow_print(
                     Fore.CYAN
                     + get_timestamp()
                     + Fore.RESET
