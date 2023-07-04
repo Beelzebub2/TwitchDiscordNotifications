@@ -33,6 +33,8 @@ AUTHORIZATION = "YOUR_AUTHORIZATION"
 # Replace 'YOUR_BOT_TOKEN' with your actual discord bot token
 TOKEN = "YOUR_BOT_TOKEN"
 
+VERSION = "v1.2"
+
 
 def error_handler(func):
     def wrapper(*args, **kwargs):
@@ -202,7 +204,7 @@ async def send_notification(streamer_name, user_notifications):
                                 color=discord.Color.green(),
                             )
                             embed.set_thumbnail(url=profile_picture_url)
-                            embed.set_footer(text="v1.0 | Made by Beelzebub2")
+                            embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
 
                             # Mention the user as a spoiler
                             mention = f"||{member.mention}||"
@@ -363,7 +365,7 @@ async def on_message(message):
                         description=f"Added {streamer_name} to your watchlist.",
                         color=65280,
                     )
-                    embed.set_footer(text="v1.0 | Made by Beelzebub2")
+                    embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                     await message.channel.send(embed=embed)
                     if streamer_name in processed_streamers:
                         processed_streamers.remove(streamer_name)
@@ -380,7 +382,7 @@ async def on_message(message):
                         description=f"{streamer_name} is already in your watchlist.",
                         color=16759808,
                     )
-                    embed.set_footer(text="v1.0 | Made by Beelzebub2")
+                    embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                     await message.channel.send(embed=embed)
             else:
                 user_notifications[user_id] = [streamer_name.strip()]
@@ -399,7 +401,7 @@ async def on_message(message):
                     description=f"Created a new watchlist for you and added {streamer_name}.",
                     color=65280,
                 )
-                embed.set_footer(text="v1.0 | Made by Beelzebub2")
+                embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                 await message.channel.send(embed=embed)
 
         elif message.content.lower().startswith("unwatch"):
@@ -443,7 +445,7 @@ async def on_message(message):
                         description=f"Removed {streamer_name} from your watchlist.",
                         color=65280,
                     )
-                    embed.set_footer(text="v1.0 | Made by Beelzebub2")
+                    embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                     await message.channel.send(embed=embed)
                 else:
                     print(
@@ -458,7 +460,7 @@ async def on_message(message):
                         description=f"{streamer_name} is not in your watchlist.",
                         color=16759808,
                     )
-                    embed.set_footer(text="v1.0 | Made by Beelzebub2")
+                    embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                     await message.channel.send(embed=embed)
 
         elif message.content.lower().startswith("help"):
@@ -474,7 +476,7 @@ async def on_message(message):
                 description=help_message,
                 color=48639,
             )
-            embed.set_footer(text="v1.0 | Made by Beelzebub2")
+            embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
             await message.channel.send(embed=embed)
 
         elif message.content.lower().startswith("list"):
@@ -499,7 +501,7 @@ async def on_message(message):
                         description=f"You are currently watching the following streamers:\n{streamer_names}",
                         color=10242047,
                     )
-                    embed.set_footer(text="v1.0 | Made by Beelzebub2")
+                    embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
 
                     await message.channel.send(embed=embed)
                 else:
@@ -517,7 +519,7 @@ async def on_message(message):
                         description="Your watchlist is empty.",
                         color=16759808,
                     )
-                    embed.set_footer(text="v1.0 | Made by Beelzebub2")
+                    embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                     await message.channel.send(embed=embed)
             else:
                 print(
@@ -534,7 +536,7 @@ async def on_message(message):
                     description="You don't have a watchlist yet.",
                     color=16711680,
                 )
-                embed.set_footer(text="v1.0 | Made by Beelzebub2")
+                embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                 await message.channel.send(embed=embed)
         elif message.content.lower() == "clear":
             messages_to_remove = 1000
@@ -550,7 +552,7 @@ async def on_message(message):
                 description="All messages have been cleared.",
                 color=65280,
             )
-            embed.set_footer(text="v1.0 | Made by Beelzebub2")
+            embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
             await message.channel.send(embed=embed)
         else:
             # Handle other commands or conversations in DMs
@@ -560,7 +562,7 @@ async def on_message(message):
                 description="I'm sorry, I didn't understand that command.",
                 color=16759808,
             )
-            embed.set_footer(text="v1.0 | Made by Beelzebub2")
+            embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
             await message.channel.send(embed=embed)
 
 
