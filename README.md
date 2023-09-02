@@ -1,5 +1,5 @@
 # **TwitchDiscordNotifications**
-![Static Badge](https://img.shields.io/badge/Version-v1.2-8ebff1?style=for-the-badge&logo=v)
+![Static Badge](https://img.shields.io/badge/Version-v1.3-8ebff1?style=for-the-badge&logo=v)
 ![Static Badge](https://img.shields.io/badge/Language-python-3776ab?style=for-the-badge&logo=python)
 ![Static Badge](https://img.shields.io/badge/License-GNU%20GPL%20v3-blue.svg?style=for-the-badge)  
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/S6S8HV2DY)
@@ -27,6 +27,13 @@ Discord bot: https://discord.com/developers/applications/
 
 ## Changes
 ```diff
+
+v1.3 02/09/2023
+
++   Made list command show image of combined streamers profile pictures
++   Added amount of viewers in stream to notifications embed
++   Added stream game to notifications embed
++   Added stream title to notification embed
 
 v1.2 04/07/2023
 

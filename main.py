@@ -1,9 +1,10 @@
 import asyncio
 import datetime
+import io
 import pytz
-import tzlocal
 import requests
 import os
+from PIL import Image
 import re
 import discord
 import traceback
@@ -33,7 +34,7 @@ AUTHORIZATION = "YOUR_AUTHORIZATION"
 # Replace 'YOUR_BOT_TOKEN' with your actual discord bot token
 TOKEN = "YOUR_BOT_TOKEN"
 
-VERSION = "v1.2"
+VERSION = "v1.3"
 
 
 def error_handler(func):
@@ -66,11 +67,11 @@ def get_timestamp():
 @error_handler
 def read_config():
     PATH = os.path.dirname(os.path.realpath(__file__))
-    Config_File = os.path.join(PATH, "user-list.ini")
+    Config_File = os.path.join(PATH, "config.ini")
     Config = ConfigParser()
     Config.read(Config_File)
     user_notifications = {}
-    for user_id, streamers in Config["USER-LIST"].items():
+    for user_id, streamers in Config["CONFIG"].items():
         if user_id.lower().startswith("userid"):
             user_id = user_id.replace("userid", "").strip().lower()
             streamer_list = streamers.split(",")
@@ -100,8 +101,10 @@ def write_config(user_notifications):
 async def check_stream(streamer_name):
     if not streamer_name:
         return False
-
+    # print(streamer_name)
     endpoint = "https://api.twitch.tv/helix/streams"
+
+    # Set headers with the client ID and authorization token
     headers = {
         "Client-ID": CLIENT_ID,
         "Authorization": f"Bearer {AUTHORIZATION}",
@@ -111,7 +114,6 @@ async def check_stream(streamer_name):
     params = {
         "user_login": streamer_name,
     }
-    # Send GET request to Twitch API
     response = requests.get(endpoint, headers=headers, params=params)
 
     # Parse the JSON response
@@ -145,7 +147,7 @@ async def send_notification(streamer_name, user_notifications):
                     if streamer_name == streamer.strip():
                         url = f"https://api.twitch.tv/helix/streams?user_login={streamer_name}"
                         headers = {
-                            "Client-ID": CLIENT_ID,
+                            "Client-ID": f"{CLIENT_ID}",
                             "Authorization": f"Bearer {AUTHORIZATION}",
                         }
                         response = requests.get(url, headers=headers)
@@ -155,6 +157,10 @@ async def send_notification(streamer_name, user_notifications):
                             started_at = stream_data["started_at"]
                             user_id = stream_data["user_id"]
                             user_url = f"https://api.twitch.tv/helix/users?id={user_id}"
+                            if "game_name" in stream_data:
+                                game = stream_data["game_name"]
+                            title = stream_data["title"]
+                            viewers = stream_data["viewer_count"]
                             user_response = requests.get(user_url, headers=headers)
                             user_data = user_response.json()
                             profile_picture_url = user_data["data"][0][
@@ -203,8 +209,11 @@ async def send_notification(streamer_name, user_notifications):
                                 description=f"Click [here](https://www.twitch.tv/{streamer_name}) to watch the stream.",
                                 color=discord.Color.green(),
                             )
+                            embed.add_field(name="Game", value=game)
+                            embed.add_field(name="Stream Title", value=title)
+                            embed.add_field(name="Viewers", value=viewers)
                             embed.set_thumbnail(url=profile_picture_url)
-                            embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
+                            embed.set_footer(f"{VERSION} | Made by Beelzebub2")
 
                             # Mention the user as a spoiler
                             mention = f"||{member.mention}||"
@@ -214,7 +223,7 @@ async def send_notification(streamer_name, user_notifications):
                                 name="Stream Start Time (local)", value=start_time_str
                             )
                             try:
-                                await dm_channel.send(embed=embed)
+                                await dm_channel.send(mention, embed=embed)
                                 print(
                                     Fore.CYAN
                                     + get_timestamp()
@@ -431,6 +440,7 @@ async def on_message(message):
                     )  # Write the updated config to the file
                     if streamer_name in processed_streamers:
                         processed_streamers.remove(streamer_name)
+
                     print(
                         Fore.CYAN
                         + get_timestamp()
@@ -487,23 +497,78 @@ async def on_message(message):
                 if streamer_list:
                     streamer_names = ", ".join(streamer_list)
                     print(
-                        Fore.CYAN
+                        "\033[K"
+                        + Fore.CYAN
                         + get_timestamp()
                         + Fore.RESET
                         + " "
-                        + Fore.LIGHTGREEN_EX
-                        + f"{Fore.CYAN + message.author.name + Fore.RESET} requested their streamers: {Fore.CYAN + streamer_names + Fore.RESET}"
+                        + Fore.LIGHTYELLOW_EX
+                        + message.author.name
                         + Fore.RESET
+                        + f" requested their streamers: {streamer_names}"
                     )
 
+                    pfps = []
+                    names = []
+                    for streamer_name in streamer_list:
+                        streamer_name = streamer_name.replace(" ", "")
+                        url = f"https://api.twitch.tv/helix/users?login={streamer_name}"
+                        headers = {
+                            "Client-ID": f"{CLIENT_ID}",
+                            "Authorization": f"Bearer {AUTHORIZATION}",
+                        }
+                        response = requests.get(url, headers=headers)
+                        data = response.json()
+
+                        if "data" in data and len(data["data"]) > 0:
+                            streamer_data = data["data"][0]
+                            profile_picture_url = streamer_data.get(
+                                "profile_image_url", ""
+                            )
+                            profile_picture_url = profile_picture_url.replace(
+                                "{width}", "150"
+                            ).replace("{height}", "150")
+                            pfps.append(profile_picture_url)
+                            names.append(streamer_data["display_name"])
+                        else:
+                            print(f"No data found for streamer: {streamer_name}")
+
+                    # Combine profile pictures into one image
+                    pfp_size = (100, 100)
+                    image_width = pfp_size[0] * len(pfps)
+                    combined_image = Image.new("RGB", (image_width, pfp_size[1]))
+                    x_offset = 0
+                    for pfp_url in pfps:
+                        pfp_response = requests.get(pfp_url)
+                        pfp_image = Image.open(io.BytesIO(pfp_response.content))
+
+                        # Resize the profile picture to the desired size
+                        pfp_image = pfp_image.resize(pfp_size)
+
+                        # Calculate the centering position for the profile picture
+                        y_offset = (combined_image.height - pfp_size[1]) // 2
+
+                        combined_image.paste(pfp_image, (x_offset, y_offset))
+                        x_offset += pfp_size[0]
+
+                    # Save the combined image
+                    combined_image.save("combined_image.png")
+
+                    # Create a Discord embed with the combined image and list of streamer names
                     embed = discord.Embed(
                         title="Your Streamers",
-                        description=f"You are currently watching the following streamers:\n{streamer_names}",
+                        description=f"**You are currently watching the following streamers:\n{streamer_names}**",
                         color=10242047,
                     )
                     embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
+                    embed.set_image(url="attachment://combined_image.png")
 
-                    await message.channel.send(embed=embed)
+                    # Send the embed with the combined image
+                    with open("combined_image.png", "rb") as img_file:
+                        file = discord.File(img_file)
+                        await message.channel.send(file=file, embed=embed)
+                    os.remove("combined_image.png")
+
                 else:
                     print(
                         Fore.CYAN
