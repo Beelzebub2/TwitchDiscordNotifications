@@ -30,6 +30,7 @@ Discord bot: https://discord.com/developers/applications/
 
 v1.3 02/09/2023
 
+!   Working on better config/data handler
 +   Made list command show image of combined streamers profile pictures
 +   Added amount of viewers in stream to notifications embed
 +   Added stream game to notifications embed
