@@ -15,7 +15,7 @@ Twitch OAuth key: https://twitchapps.com/tokengen/
 Discord bot: https://discord.com/developers/applications/
 
 ## Preview  
-![notification preview](https://i.imgur.com/mTvyfF6.png)
+![notification preview](https://i.imgur.com/my3Z8ks.png)
 
 ## **Usage**  
 ### **Commands**
