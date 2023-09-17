@@ -13,8 +13,7 @@ from colorama import init, Fore, Style
 from discord.ext import commands
 from discord import Intents
 import tzlocal
-
-
+from dotenv import load_dotenv
 
 
 def error_handler(func):
@@ -37,95 +36,97 @@ def error_handler(func):
 
     return wrapper
 
+
 class ConfigHandler:
-        def __init__(self, config_file):
-            self.config_file = config_file
-            self.data = self.load_config()
+    def __init__(self, config_file):
+        self.config_file = config_file
+        self.data = self.load_config()
 
-        def load_config(self):
-            try:
-                with open(self.config_file, "r") as file:
-                    return json.load(file)
-            except FileNotFoundError:
-                return {}
+    def load_config(self):
+        try:
+            with open(self.config_file, "r") as file:
+                return json.load(file)
+        except FileNotFoundError:
+            return {}
 
-        def save_config(self):
-            with open(self.config_file, "w") as file:
-                json.dump(self.data, file, indent=4)
+    def save_config(self):
+        with open(self.config_file, "w") as file:
+            json.dump(self.data, file, indent=4)
 
-        def add_user(self, user_data):
-            self.data = self.load_config()
-            user_key = f"User{len(self.data['User-list']) + 1}"
-            self.data["User-list"][user_key] = [user_data]
-            self.save_config()
-            return user_key
+    def add_user(self, user_data):
+        self.data = self.load_config()
+        user_key = f"User{len(self.data['User-list']) + 1}"
+        self.data["User-list"][user_key] = [user_data]
+        self.save_config()
+        return user_key
 
-        def add_streamer_to_user(self, user_id, streamer):
-            self.data = self.load_config()
-            for user_data_list in self.data["User-list"].values():
-                for user_data in user_data_list:
-                    if user_data["discord_id"] == user_id:
-                        user_data["streamer_list"].append(streamer)
+    def add_streamer_to_user(self, user_id, streamer):
+        self.data = self.load_config()
+        for user_data_list in self.data["User-list"].values():
+            for user_data in user_data_list:
+                if user_data["discord_id"] == user_id:
+                    user_data["streamer_list"].append(streamer)
+                    self.save_config()
+                    return True
+        return False
+
+    def remove_streamer_from_user(self, discord_id, streamer):
+        self.data = self.load_config()
+        for user_data_list in self.data["User-list"].values():
+            for user_data in user_data_list:
+                if user_data["discord_id"] == discord_id:
+                    if streamer in user_data["streamer_list"]:
+                        user_data["streamer_list"].remove(streamer)
                         self.save_config()
                         return True
-            return False
+        return False
 
-        def remove_streamer_from_user(self, discord_id, streamer):
-            self.data = self.load_config()
-            for user_data_list in self.data["User-list"].values():
-                for user_data in user_data_list:
-                    if user_data["discord_id"] == discord_id:
-                        if streamer in user_data["streamer_list"]:
-                            user_data["streamer_list"].remove(streamer)
-                            self.save_config()
-                            return True
-            return False
+    def get_all_streamers(self):
+        self.data = self.load_config()
+        streamers = set()
+        for user_data in self.data["User-list"].values():
+            streamers.update(user_data[0]["streamer_list"])
+        return list(streamers)
 
-        def get_all_streamers(self):
-            self.data = self.load_config()
-            streamers = set()
-            for user_data in self.data["User-list"].values():
-                streamers.update(user_data[0]["streamer_list"])
-            return list(streamers)
+    def get_user_ids_with_streamers(self):
+        self.data = self.load_config()
+        user_ids_with_streamers = {}
+        for user, user_data_list in self.data["User-list"].items():
+            for user_data in user_data_list:
+                user_id = user_data["discord_id"]
+                streamer_list = user_data["streamer_list"]
+                if user_id not in user_ids_with_streamers:
+                    user_ids_with_streamers[user_id] = streamer_list
+                else:
+                    user_ids_with_streamers[user_id].extend(streamer_list)
+        return user_ids_with_streamers
 
-        def get_user_ids_with_streamers(self):
-            self.data = self.load_config()
-            user_ids_with_streamers = {}
-            for user, user_data_list in self.data["User-list"].items():
-                for user_data in user_data_list:
-                    user_id = user_data["discord_id"]
-                    streamer_list = user_data["streamer_list"]
-                    if user_id not in user_ids_with_streamers:
-                        user_ids_with_streamers[user_id] = streamer_list
-                    else:
-                        user_ids_with_streamers[user_id].extend(streamer_list)
-            return user_ids_with_streamers
+    def get_all_user_ids(self):
+        self.data = self.load_config()
+        user_ids = []
+        for user_data_list in self.data["User-list"].values():
+            for user_data in user_data_list:
+                user_id = user_data["discord_id"]
+                if user_id not in user_ids:
+                    user_ids.append(user_id)
+        return user_ids
 
-        def get_all_user_ids(self):
-            self.data = self.load_config()
-            user_ids = []
-            for user_data_list in self.data["User-list"].values():
-                for user_data in user_data_list:
-                    user_id = user_data["discord_id"]
-                    if user_id not in user_ids:
-                        user_ids.append(user_id)
-            return user_ids
+    def get_streamers_for_user(self, user_id):
+        self.data = self.load_config()
+        for user_data_list in self.data["User-list"].values():
+            for user_data in user_data_list:
+                if user_data["discord_id"] == user_id:
+                    return user_data["streamer_list"]
+        return []
 
-        def get_streamers_for_user(self, user_id):
-            self.data = self.load_config()
-            for user_data_list in self.data["User-list"].values():
-                for user_data in user_data_list:
-                    if user_data["discord_id"] == user_id:
-                        return user_data["streamer_list"]
-            return []
+    def get_version(self):
+        self.data = self.load_config()
+        return self.data.get("Config", {}).get("version")
 
-        def get_version(self):
-            self.data = self.load_config()
-            return self.data.get("Config", {}).get("version")
+    def get_prefix(self):
+        self.data = self.load_config()
+        return self.data.get("Config", {}).get("prefix")
 
-        def get_prefix(self):
-            self.data = self.load_config()
-            return self.data.get("Config", {}).get("prefix")
 
 @error_handler
 def main():
@@ -135,13 +136,11 @@ def main():
         now = datetime.datetime.now()
         return now.strftime("%Y-%m-%d %H:%M:%S")
 
-
     def clear_console():
         if os.name == "nt":
             os.system("cls")
         else:
             os.system("clear")
-
 
     @error_handler
     def create_env():
@@ -173,7 +172,6 @@ def main():
 
         if os.path.exists(".env"):
             print("Secrets missing! created successfully please change filler text")
-
 
     @error_handler
     async def check_stream(streamer_name):
@@ -257,9 +255,12 @@ def main():
                                     start_time += timezone_delta
 
                                 local_timezone = tzlocal.get_localzone()
-                                start_time = start_time.replace(tzinfo=pytz.utc)
-                                start_time = start_time.astimezone(local_timezone)
-                                start_time_str = start_time.strftime("%H:%M:%S")
+                                start_time = start_time.replace(
+                                    tzinfo=pytz.utc)
+                                start_time = start_time.astimezone(
+                                    local_timezone)
+                                start_time_str = start_time.strftime(
+                                    "%H:%M:%S")
 
                                 embed = discord.Embed(
                                     title=f"{streamer_name} is streaming!",
@@ -267,7 +268,8 @@ def main():
                                     color=discord.Color.green(),
                                 )
                                 embed.add_field(name="Game", value=game)
-                                embed.add_field(name="Stream Title", value=title)
+                                embed.add_field(
+                                    name="Stream Title", value=title)
                                 embed.add_field(name="Viewers", value=viewers)
                                 embed.set_thumbnail(url=profile_picture_url)
                                 embed.set_footer(
@@ -313,7 +315,6 @@ def main():
                     + f"User with ID {user_id} not found."
                     + Fore.RESET
                 )
-
 
     @bot.command(name="watch", aliases=["w"], help="Add a streamer to your watch list")
     async def watch(ctx, streamer_name: str):
@@ -414,7 +415,6 @@ def main():
             embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
             await ctx.send(embed=embed)
 
-
     @bot.command(name="unwatch", aliases=["u"], help="Removes the streamer from your watch list")
     async def unwatch(ctx, streamer_name: str):
         if "https://www.twitch.tv/" in streamer_name:
@@ -463,7 +463,6 @@ def main():
                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                 await ctx.channel.send(embed=embed)
 
-
     @bot.command(name="clear", aliases=["c"], help="Clears all the messages sent by the bot")
     async def clear_bot_messages(ctx):
         messages_to_remove = 1000
@@ -482,7 +481,6 @@ def main():
         )
         embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
         await ctx.send(embed=embed)
-
 
     @bot.command(name="list", aliases=["l"], help="Returns a embed with a list of all the streamers you're currently watching")
     async def list_streamers(ctx):
@@ -593,7 +591,6 @@ def main():
             embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
             await ctx.channel.send(embed=embed)
 
-
     @bot.command(name="help", aliases=["h", "commands", "command"])
     async def list_commands(ctx):
         # Create an embed to display the commands and their descriptions
@@ -622,11 +619,9 @@ def main():
 
         await ctx.send(embed=embed)
 
-
     @bot.event
     async def on_disconnect():
         clear_console()
-
 
     @bot.event
     async def on_resumed():
@@ -638,7 +633,6 @@ def main():
             + f" Running as {Fore.LIGHTCYAN_EX + bot.user.name + Fore.RESET}"
         )
         clear_console()
-
 
     @bot.event
     async def on_ready():
@@ -686,7 +680,6 @@ def main():
                 )
             await asyncio.sleep(5)
 
-
     @bot.event
     async def on_command_error(ctx, error):
         if isinstance(error, commands.CommandNotFound):
@@ -710,7 +703,6 @@ def main():
         else:
             # Handle other errors
             await ctx.send(f"An error occurred: {error}")
-
 
     @bot.event
     async def on_message(message):
@@ -737,6 +729,7 @@ def main():
 
 
 if __name__ == "__main__":
+    load_dotenv()
     ch = ConfigHandler("data.json")
     commands.when_mentioned_or(ch.get_prefix())
     intents = Intents.all()
