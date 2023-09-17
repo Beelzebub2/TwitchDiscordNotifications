@@ -697,7 +697,40 @@ def main():
         await bot.process_commands(message)
 
 
+@error_handler
+def create_env():
+    if os.path.exists(".env"):
+        return
+    if CLIENT_ID and AUTHORIZATION and TOKEN:
+        return
+
+    if "REPLIT_DB_URL" in os.environ:
+        if CLIENT_ID is None or AUTHORIZATION is None or TOKEN is None:
+            print("Running on Replit")
+
+    if "DYNO" in os.environ:
+        if CLIENT_ID is None or AUTHORIZATION is None or TOKEN is None:
+            print("Running on Heroku")
+
+    env_keys = {
+        "client_id": "Your client id",
+        "authorization": "Your authorization token",
+        "token": "Your discord bot token"
+    }
+    with open(".env", "w") as env_file:
+        for key, value in env_keys.items():
+            env_file.write(f"{key}={value}\n")
+
+    if os.path.exists(".env"):
+        print("Secrets missing! created successfully please change filler text on .env or host secrets")
+        os._exit(0)
+
+
 if __name__ == "__main__":
+    CLIENT_ID = os.environ.get("client_id")
+    AUTHORIZATION = os.environ.get("authorization")
+    TOKEN = os.environ.get("token")
+    create_env()
     load_dotenv()
     ch = ConfigHandler("data.json")
     commands.when_mentioned_or(ch.get_prefix())
@@ -706,9 +739,7 @@ if __name__ == "__main__":
     bot = commands.Bot(command_prefix=ch.get_prefix(), intents=intents)
     bot.remove_command("help")  # delete default help command
     processed_streamers = []
-    CLIENT_ID = os.environ.get("client_id")
-    AUTHORIZATION = os.environ.get("authorization")
-    TOKEN = os.environ.get("token")
+
     VERSION = ch.get_version()
     HEADERS = {
         "Client-ID": CLIENT_ID,
