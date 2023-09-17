@@ -2,8 +2,6 @@ import asyncio
 import datetime
 import io
 import json
-import time
-import pytz
 import requests
 import os
 from PIL import Image
@@ -13,7 +11,6 @@ import traceback
 from colorama import init, Fore, Style
 from discord.ext import commands
 from discord import Intents
-import tzlocal
 from dotenv import load_dotenv
 
 
