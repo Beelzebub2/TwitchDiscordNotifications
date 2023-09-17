@@ -12,6 +12,7 @@ from colorama import init, Fore, Style
 from discord.ext import commands
 from discord import Intents
 from dotenv import load_dotenv
+load_dotenv()
 
 
 def error_handler(func):
@@ -139,15 +140,15 @@ def main():
             os.system("cls")
         else:
             os.system("clear")
-    
+
     @error_handler
     def generate_timestamp_string(started_at):
 
-        started_datetime = datetime.datetime.fromisoformat(started_at.rstrip('Z'))
+        started_datetime = datetime.datetime.fromisoformat(
+            started_at.rstrip('Z'))
         unix_timestamp = int(started_datetime.timestamp())
         timestamp_string = f"<t:{unix_timestamp}:T>"
         return timestamp_string
-
 
     @error_handler
     async def check_stream(streamer_name):
@@ -208,7 +209,8 @@ def main():
                                 profile_picture_url = profile_picture_url.replace(
                                     "{width}", "300"
                                 ).replace("{height}", "300")
-                                start_time_str = generate_timestamp_string(started_at)
+                                start_time_str = generate_timestamp_string(
+                                    started_at)
                                 embed = discord.Embed(
                                     title=f"{streamer_name} is streaming!",
                                     description=f"Click [here](https://www.twitch.tv/{streamer_name}) to watch the stream.",
@@ -566,6 +568,18 @@ def main():
 
         await ctx.send(embed=embed)
 
+    @bot.command(name="invite", aliases=["i"])
+    async def invite(ctx):
+        # Create an embed to display the commands and their descriptions
+        embed = discord.Embed(
+            title="Invite Me!",
+            description=f"[Click here](https://discord.com/oauth2/authorize?client_id={bot.user.id}&permissions=2205281600&scope=bot%20identify%20guilds%20applications.commands&redirect_url=http://localhost/api/callback&response_type=code)",
+            color=65280,
+        )
+        embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
+
+        await ctx.send(embed=embed)
+
     @bot.event
     async def on_disconnect():
         clear_console()
@@ -709,7 +723,6 @@ if __name__ == "__main__":
     AUTHORIZATION = os.environ.get("authorization")
     TOKEN = os.environ.get("token")
     create_env()
-    load_dotenv()
     ch = ConfigHandler("data.json")
     commands.when_mentioned_or(ch.get_prefix())
     intents = Intents.all()
