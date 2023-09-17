@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import io
 import json
+import time
 import pytz
 import requests
 import os
@@ -141,6 +142,15 @@ def main():
             os.system("cls")
         else:
             os.system("clear")
+    
+    @error_handler
+    def generate_timestamp_string(started_at):
+
+        started_datetime = datetime.datetime.fromisoformat(started_at.rstrip('Z'))
+        unix_timestamp = int(started_datetime.timestamp())
+        timestamp_string = f"<t:{unix_timestamp}:T>"
+        return timestamp_string
+
 
     @error_handler
     async def check_stream(streamer_name):
@@ -201,36 +211,7 @@ def main():
                                 profile_picture_url = profile_picture_url.replace(
                                     "{width}", "300"
                                 ).replace("{height}", "300")
-
-                                # Parse the starting time
-                                start_time = datetime.datetime.strptime(
-                                    started_at, "%Y-%m-%dT%H:%M:%SZ"
-                                )
-
-                                timezone_offset_match = re.search(
-                                    r"([+-]\d{2}):(\d{2})", started_at
-                                )
-                                if timezone_offset_match:
-                                    timezone_offset_hours = int(
-                                        timezone_offset_match.group(1)
-                                    )
-                                    timezone_offset_minutes = int(
-                                        timezone_offset_match.group(2)
-                                    )
-                                    timezone_delta = datetime.timedelta(
-                                        hours=timezone_offset_hours,
-                                        minutes=timezone_offset_minutes,
-                                    )
-                                    start_time += timezone_delta
-
-                                local_timezone = tzlocal.get_localzone()
-                                start_time = start_time.replace(
-                                    tzinfo=pytz.utc)
-                                start_time = start_time.astimezone(
-                                    local_timezone)
-                                start_time_str = start_time.strftime(
-                                    "%H:%M:%S")
-
+                                start_time_str = generate_timestamp_string(started_at)
                                 embed = discord.Embed(
                                     title=f"{streamer_name} is streaming!",
                                     description=f"Click [here](https://www.twitch.tv/{streamer_name}) to watch the stream.",

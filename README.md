@@ -33,6 +33,7 @@ Discord bot: https://discord.com/developers/applications/
 
 v1.4 17/09/2023
 
++   Fixed the local timezone being wrong on replit and for users with different timezone from script host
 +   Optimized code and fixed some issues
 +   Changed bot data handling from .ini to json
 +   Changed the way the bot works to function with commands instead of plain messages
