@@ -173,6 +173,9 @@ def main():
             processed_streamers.append(streamer_name.lower())
             return True
 
+        if streamer_name in processed_streamers:
+            processed_streamers.remove(streamer_name)
+
         return False
 
     @error_handler
