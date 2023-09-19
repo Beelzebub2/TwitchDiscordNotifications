@@ -374,7 +374,9 @@ def main():
         user_ids = ch.get_all_user_ids()
         if user_id in user_ids:
             streamer_list = ch.get_streamers_for_user(user_id)
-            if streamer_name.lower() in streamer_list:
+            if any(
+                streamer_name.lower() == s.lower() for s in streamer_list
+            ):
                 ch.remove_streamer_from_user(user_id, streamer_name)
                 if streamer_name in processed_streamers:
                     processed_streamers.remove(streamer_name)
