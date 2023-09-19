@@ -155,9 +155,6 @@ def main():
         if not streamer_name:
             return False
 
-        if streamer_name.lower() in processed_streamers:
-            return False  # Skip processing if already in the processed_streamers list
-
         endpoint = "https://api.twitch.tv/helix/streams"
 
         # Parameters for the API request
