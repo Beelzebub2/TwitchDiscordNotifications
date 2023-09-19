@@ -5,6 +5,7 @@ import json
 import requests
 import os
 from PIL import Image
+import concurrent.futures
 import re
 import discord
 import traceback
@@ -12,6 +13,7 @@ from colorama import init, Fore, Style
 from discord.ext import commands
 from discord import Intents
 from dotenv import load_dotenv
+
 load_dotenv()
 
 
@@ -129,7 +131,6 @@ class ConfigHandler:
 
 @error_handler
 def main():
-
     @error_handler
     def get_timestamp():
         now = datetime.datetime.now()
@@ -143,9 +144,8 @@ def main():
 
     @error_handler
     def generate_timestamp_string(started_at):
-
         started_datetime = datetime.datetime.fromisoformat(
-            started_at.rstrip('Z'))
+            started_at.rstrip("Z"))
         unix_timestamp = int(started_datetime.timestamp())
         timestamp_string = f"<t:{unix_timestamp}:T>"
         return timestamp_string
@@ -194,7 +194,9 @@ def main():
                                 stream_data = data["data"][0]
                                 started_at = stream_data["started_at"]
                                 user_id = stream_data["user_id"]
-                                user_url = f"https://api.twitch.tv/helix/users?id={user_id}"
+                                user_url = (
+                                    f"https://api.twitch.tv/helix/users?id={user_id}"
+                                )
                                 if "game_name" in stream_data:
                                     game = stream_data["game_name"]
                                 title = stream_data["title"]
@@ -224,7 +226,8 @@ def main():
                                     text=f"{VERSION} | Made by Beelzebub2")
                                 mention = f"||{member.mention}||"
                                 embed.add_field(
-                                    name="Stream Start Time (local)", value=start_time_str
+                                    name="Stream Start Time (local)",
+                                    value=start_time_str,
                                 )
                                 try:
                                     await dm_channel.send(mention, embed=embed)
@@ -300,11 +303,8 @@ def main():
         user_ids = ch.get_all_user_ids()
         if user_id in user_ids:
             streamer_list = ch.get_streamers_for_user(user_id)
-            if streamer_name.lower() not in [
-                s.lower().strip() for s in streamer_list
-            ]:
-                ch.add_streamer_to_user(
-                    user_id, streamer_name.strip())
+            if streamer_name.lower() not in [s.lower().strip() for s in streamer_list]:
+                ch.add_streamer_to_user(user_id, streamer_name.strip())
                 streamer_list.append(streamer_name.strip())
                 print(
                     Fore.CYAN
@@ -341,11 +341,13 @@ def main():
                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                 await ctx.send(embed=embed)
         else:
-            ch.add_user(user_data={
-                "discord_username": ctx.author.name,
-                "discord_id": user_id,
-                "streamer_list": [streamer_name.strip()],
-            })
+            ch.add_user(
+                user_data={
+                    "discord_username": ctx.author.name,
+                    "discord_id": user_id,
+                    "streamer_list": [streamer_name.strip()],
+                }
+            )
             print(
                 Fore.CYAN
                 + get_timestamp()
@@ -363,7 +365,9 @@ def main():
             embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
             await ctx.send(embed=embed)
 
-    @bot.command(name="unwatch", aliases=["u"], help="Removes the streamer from your watch list")
+    @bot.command(
+        name="unwatch", aliases=["u"], help="Removes the streamer from your watch list"
+    )
     async def unwatch(ctx, streamer_name: str):
         if "https://www.twitch.tv/" in streamer_name:
             streamer_name = re.search(
@@ -374,9 +378,7 @@ def main():
         user_ids = ch.get_all_user_ids()
         if user_id in user_ids:
             streamer_list = ch.get_streamers_for_user(user_id)
-            if any(
-                streamer_name.lower() == s.lower() for s in streamer_list
-            ):
+            if any(streamer_name.lower() == s.lower() for s in streamer_list):
                 ch.remove_streamer_from_user(user_id, streamer_name)
                 if streamer_name in processed_streamers:
                     processed_streamers.remove(streamer_name)
@@ -413,7 +415,9 @@ def main():
                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                 await ctx.channel.send(embed=embed)
 
-    @bot.command(name="clear", aliases=["c"], help="Clears all the messages sent by the bot")
+    @bot.command(
+        name="clear", aliases=["c"], help="Clears all the messages sent by the bot"
+    )
     async def clear_bot_messages(ctx):
         messages_to_remove = 1000
         user = await bot.fetch_user(ctx.author.id)
@@ -432,7 +436,11 @@ def main():
         embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
         await ctx.send(embed=embed)
 
-    @bot.command(name="list", aliases=["l"], help="Returns a embed with a list of all the streamers you're currently watching")
+    @bot.command(
+        name="list",
+        aliases=["l"],
+        help="Returns a embed with a list of all the streamers you're currently watching",
+    )
     async def list_streamers(ctx):
         user_id = str(ctx.author.id)
         user_ids = ch.get_all_user_ids()
@@ -454,7 +462,9 @@ def main():
 
                 pfps = []
                 names = []
-                for streamer_name in streamer_list:
+
+                # Define a function to fetch profile pictures and names
+                def fetch_streamer_data(streamer_name):
                     streamer_name = streamer_name.replace(" ", "")
                     url = f"https://api.twitch.tv/helix/users?login={streamer_name}"
                     response = requests.get(url, headers=HEADERS)
@@ -463,27 +473,27 @@ def main():
                     if "data" in data and len(data["data"]) > 0:
                         streamer_data = data["data"][0]
                         profile_picture_url = streamer_data.get(
-                            "profile_image_url", ""
-                        )
+                            "profile_image_url", "")
                         profile_picture_url = profile_picture_url.replace(
                             "{width}", "150"
                         ).replace("{height}", "150")
                         pfps.append(profile_picture_url)
                         names.append(streamer_data["display_name"])
                     else:
-                        print(
-                            f"No data found for streamer: {streamer_name}")
+                        print(f"No data found for streamer: {streamer_name}")
+
+                # Use a thread pool to parallelize the image retrieval
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    executor.map(fetch_streamer_data, streamer_list)
 
                 # Combine profile pictures into one image
                 pfp_size = (100, 100)
                 image_width = pfp_size[0] * len(pfps)
-                combined_image = Image.new(
-                    "RGB", (image_width, pfp_size[1]))
+                combined_image = Image.new("RGB", (image_width, pfp_size[1]))
                 x_offset = 0
                 for pfp_url in pfps:
                     pfp_response = requests.get(pfp_url)
-                    pfp_image = Image.open(
-                        io.BytesIO(pfp_response.content))
+                    pfp_image = Image.open(io.BytesIO(pfp_response.content))
                     # Resize the profile picture to the desired size
                     pfp_image = pfp_image.resize(pfp_size)
                     # Calculate the centering position for the profile picture
@@ -574,7 +584,7 @@ def main():
         # Create an embed to display the commands and their descriptions
         embed = discord.Embed(
             title="Invite Me!",
-            description=f"[Click here](https://discord.com/oauth2/authorize?client_id={bot.user.id}&permissions=2205281600&scope=bot%20identify%20guilds%20applications.commands&redirect_url=http://localhost/api/callback&response_type=code)",
+            description=f"[Click here](https://discord.com/api/oauth2/authorize?client_id={bot.user.id}&permissions=8&scope=bot)",
             color=65280,
         )
         embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
@@ -674,16 +684,16 @@ def main():
         if bot.user.mentioned_in(message):
             if isinstance(message.channel, discord.DMChannel):
                 embed = discord.Embed(
-                    title=f'Hello, {message.author.display_name}!',
-                    description=f'My prefix is: `{bot.command_prefix}`',
-                    color=discord.Color.green()
+                    title=f"Hello, {message.author.display_name}!",
+                    description=f"My prefix is: `{bot.command_prefix}`",
+                    color=discord.Color.green(),
                 )
             elif isinstance(message.channel, discord.TextChannel):
                 # Mention in a server
                 embed = discord.Embed(
-                    title=f'Hello, {message.author.display_name}!',
-                    description=f'My prefix for this server is: `{bot.command_prefix}`',
-                    color=discord.Color.green()
+                    title=f"Hello, {message.author.display_name}!",
+                    description=f"My prefix for this server is: `{bot.command_prefix}`",
+                    color=discord.Color.green(),
                 )
             await message.channel.send(embed=embed)
 
@@ -708,14 +718,16 @@ def create_env():
     env_keys = {
         "client_id": "Your client id",
         "authorization": "Your authorization token",
-        "token": "Your discord bot token"
+        "token": "Your discord bot token",
     }
     with open(".env", "w") as env_file:
         for key, value in env_keys.items():
             env_file.write(f"{key}={value}\n")
 
     if os.path.exists(".env"):
-        print("Secrets missing! created successfully please change filler text on .env or host secrets")
+        print(
+            "Secrets missing! created successfully please change filler text on .env or host secrets"
+        )
         os._exit(0)
 
 
