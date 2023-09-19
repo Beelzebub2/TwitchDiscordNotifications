@@ -165,14 +165,13 @@ def main():
         data = response.json()
 
         if "data" in data and len(data["data"]) > 0:
-            await send_notification(streamer_name.strip())
-            # Add to processed_streamers
-            processed_streamers.append(streamer_name.lower())
+            if streamer_name.lower() not in processed_streamers:
+                await send_notification(streamer_name.strip())
+                processed_streamers.append(streamer_name.lower())
             return True
 
         if streamer_name in processed_streamers:
             processed_streamers.remove(streamer_name)
-
         return False
 
     @error_handler
