@@ -3,6 +3,7 @@ import datetime
 import io
 import json
 import requests
+import time
 import os
 from PIL import Image
 import concurrent.futures
@@ -366,6 +367,126 @@ def main():
             await ctx.send(embed=embed)
 
     @bot.command(
+        name="list",
+        aliases=["l"],
+        help="Returns a embed with a list of all the streamers you're currently watching",
+    )
+    async def list_streamers(ctx):
+        user_id = str(ctx.author.id)
+        user_ids = ch.get_all_user_ids()
+        if user_id in user_ids:
+            streamer_list = ch.get_streamers_for_user(user_id)
+            if streamer_list:
+                streamer_names = ", ".join(streamer_list)
+                print(
+                    "\033[K"
+                    + Fore.CYAN
+                    + get_timestamp()
+                    + Fore.RESET
+                    + " "
+                    + Fore.LIGHTYELLOW_EX
+                    + ctx.author.name
+                    + Fore.RESET
+                    + f" requested their streamers: {streamer_names}"
+                )
+
+                pfps = []
+                names = []
+
+                def fetch_streamer_data(streamer_name):
+                    streamer_name = streamer_name.replace(" ", "")
+                    url = f"https://api.twitch.tv/helix/users?login={streamer_name}"
+                    response = requests.get(url, headers=HEADERS)
+                    data = response.json()
+
+                    if "data" in data and len(data["data"]) > 0:
+                        streamer_data = data["data"][0]
+                        profile_picture_url = streamer_data.get(
+                            "profile_image_url", "")
+                        profile_picture_url = profile_picture_url.replace(
+                            "{width}", "150"
+                        ).replace("{height}", "150")
+                        pfps.append(profile_picture_url)
+                        names.append(streamer_data["display_name"])
+                    else:
+                        print(f"No data found for streamer: {streamer_name}")
+
+                # Use a thread pool to parallelize the image retrieval
+                with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
+                    executor.map(fetch_streamer_data, streamer_list)
+
+                pfp_size = (100, 100)
+                max_images_per_row = 3
+                num_images = len(pfps)
+                num_rows = (num_images + max_images_per_row -
+                            1) // max_images_per_row
+
+                image_width = pfp_size[0] * max_images_per_row
+                image_height = pfp_size[1] * num_rows
+                combined_image = Image.new("RGB", (image_width, image_height))
+                x_offset = 0
+                y_offset = 0
+                for pfp_url in pfps:
+                    pfp_response = requests.get(pfp_url)
+                    pfp_image = Image.open(io.BytesIO(pfp_response.content))
+                    pfp_image = pfp_image.resize(pfp_size)
+                    combined_image.paste(pfp_image, (x_offset, y_offset))
+                    x_offset += pfp_size[0]
+                    if x_offset >= image_width:
+                        x_offset = 0
+                        y_offset += pfp_size[1]
+
+                combined_image.save("combined_image.png")
+
+                embed = discord.Embed(
+                    title="Your Streamers",
+                    description=f"**You are currently watching the following streamers:\n{streamer_names}**",
+                    color=10242047,
+                )
+                embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
+                embed.set_image(url="attachment://combined_image.png")
+
+                with open("combined_image.png", "rb") as img_file:
+                    file = discord.File(img_file)
+                    await ctx.channel.send(file=file, embed=embed)
+                os.remove("combined_image.png")
+
+            else:
+                print(
+                    Fore.CYAN
+                    + get_timestamp()
+                    + Fore.RESET
+                    + " "
+                    + Fore.YELLOW
+                    + f"{Fore.CYAN + ctx.author.name + Fore.RESET} requested their streamers, but the watchlist is empty."
+                    + Fore.RESET
+                )
+                embed = discord.Embed(
+                    title="Stream Watchlist",
+                    description="Your watchlist is empty.",
+                    color=16759808,
+                )
+                embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
+                await ctx.channel.send(embed=embed)
+        else:
+            print(
+                Fore.CYAN
+                + get_timestamp()
+                + Fore.RESET
+                + " "
+                + Fore.RED
+                + f"{Fore.CYAN + ctx.author.name + Fore.RESET} requested their streamers, but they don't have a watchlist yet."
+                + Fore.RESET
+            )
+            embed = discord.Embed(
+                title="Stream Watchlist",
+                description="You don't have a watchlist yet.",
+                color=16711680,
+            )
+            embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
+            await ctx.channel.send(embed=embed)
+
+    @bot.command(
         name="unwatch", aliases=["u"], help="Removes the streamer from your watch list"
     )
     async def unwatch(ctx, streamer_name: str):
@@ -622,6 +743,8 @@ def main():
         await bot.change_presence(activity=activity)
 
         while True:
+            start_time = time.time()
+
             print(
                 "\033[K"
                 + Fore.CYAN
@@ -633,9 +756,19 @@ def main():
                 + Fore.RESET,
                 end="\r",
             )
+
             streamers = ch.get_all_streamers()
-            for streamer in streamers:
-                await check_stream(streamer)
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                await asyncio.gather(
+                    *[
+                        asyncio.create_task(check_stream(streamer))
+                        for streamer in streamers
+                    ]
+                )
+
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+
             if len(processed_streamers) != 0:
                 print(
                     Fore.CYAN
@@ -643,14 +776,25 @@ def main():
                     + Fore.RESET
                     + " "
                     + Fore.LIGHTGREEN_EX
-                    + "Currently streaming: "
+                    + f"Currently streaming (Time taken: {elapsed_time:.2f} seconds): "
                     + Fore.RESET
                     + Fore.LIGHTWHITE_EX
                     + str(processed_streamers)
                     + Fore.RESET,
                     end="\r",
                 )
-            await asyncio.sleep(5)
+            else:
+                print(
+                    Fore.CYAN
+                    + get_timestamp()
+                    + Fore.RESET
+                    + Fore.LIGHTWHITE_EX
+                    + f" Checked {len(streamers)} streamers. Time taken: {elapsed_time:.2f} seconds"
+                    + Fore.RESET,
+                    end="\r",
+                )
+
+            await asyncio.sleep(4)
 
     @bot.event
     async def on_command_error(ctx, error):

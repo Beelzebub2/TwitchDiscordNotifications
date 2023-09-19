@@ -33,6 +33,7 @@ Discord bot: https://discord.com/developers/applications/
 
 v1.5 19/09/2023
 
++   Made the streamer checker faster
 +   Made list image generation faster
 +   Fixed some bugs
 
