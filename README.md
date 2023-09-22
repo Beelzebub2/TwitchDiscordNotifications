@@ -18,7 +18,7 @@ Discord bot: https://discord.com/developers/applications/
 [Invite TwitchStreamChecker](https://discord.com/api/oauth2/authorize?client_id=1124891382595727460&permissions=8&scope=bot)
 
 ## Preview  
-![notification preview](https://i.imgur.com/my3Z8ks.png)
+![notification preview](https://i.imgur.com/hpgxark.png)
 
 ## **Usage**  
 ### **Commands**
