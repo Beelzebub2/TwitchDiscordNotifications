@@ -6,19 +6,20 @@
 
 Get notifications of your favorite streamers on your discord Dm's
 
-## **Important links**
-  
-Twitch Clientid (Application): https://dev.twitch.tv/console/apps   
-**(OAuth redirect link must be "https://twitchapps.com/tokengen/")**  
-Twitch OAuth key: https://twitchapps.com/tokengen/  
-![OAuth](https://i.imgur.com/fuHBvHK.png)  
-Discord bot: https://discord.com/developers/applications/
 
 ## Easy setup
 #### Simply invite this bot **(Can't promise 100% uptime it will be off if the host restarts or crashes)** 
 [Invite TwitchStreamChecker](https://discord.com/api/oauth2/authorize?client_id=1124891382595727460&permissions=8&scope=bot)  
 **OR**  
 [Join TwitchStreamChecker server so you don't have to invite him](https://discord.gg/gbdPCxNavc)  
+
+## **Important links**
+Twitch Clientid (Application): https://dev.twitch.tv/console/apps   
+**(OAuth redirect link must be "https://twitchapps.com/tokengen/")**  
+Twitch OAuth key: https://twitchapps.com/tokengen/  
+![OAuth](https://i.imgur.com/fuHBvHK.png)  
+Discord bot: https://discord.com/developers/applications/
+
 
 ## Preview  
 ![notification preview](https://i.imgur.com/hpgxark.png)
