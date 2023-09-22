@@ -38,6 +38,9 @@ Discord bot: https://discord.com/developers/applications/
 
 v1.6 22/09/2023
 
++   Made some config commands
++   Fixed some typos
++   Added multi-guild support
 +   Added missing command descriptions
 +   Fixed wrong time being shown on local timestamp
 

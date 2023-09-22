@@ -3,5 +3,6 @@
     "Config": {
         "version": "v1.6",
         "prefix": ","
-    }
+    },
+    "Guilds": {}
 }

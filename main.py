@@ -129,6 +129,41 @@ class ConfigHandler:
         self.data = self.load_config()
         return self.data.get("Config", {}).get("prefix")
 
+    def create_new_guild_template(self, guild_id, guild_name):
+        self.data = self.load_config()
+        self.data["Guilds"][str(guild_id)] = {
+            "name": guild_name,
+            "prefix": ",",
+            "role_to_add": None,
+        }
+        self.save_config()
+
+    def is_guild_in_config(self, guild_id):
+        self.data = self.load_config()
+        return str(guild_id) in self.data.get("Guilds", {})
+
+    def get_guild_prefix(self, guild_id):
+        self.data = self.load_config()
+        guild_info = self.data["Guilds"].get(str(guild_id), {})
+        return guild_info.get("prefix", "")
+
+    def change_role_to_add(self, guild_id, new_role_id):
+        self.data = self.load_config()
+        guild_info = self.data["Guilds"].get(str(guild_id), {})
+        guild_info["role_to_add"] = str(new_role_id)
+        self.save_config()
+
+    def get_role_to_add(self, guild_id):
+        self.data = self.load_config()
+        guild_info = self.data["Guilds"].get(str(guild_id), {})
+        return guild_info.get("role_to_add", "")
+
+    def change_guild_prefix(self, guild_id, new_prefix):
+        self.data = self.load_config()
+        guild_info = self.data["Guilds"].get(str(guild_id), {})
+        guild_info["prefix"] = new_prefix
+        self.save_config()
+
 
 @error_handler
 def main():
@@ -268,12 +303,19 @@ def main():
                     + Fore.RESET
                 )
 
-    @bot.command(name="watch", aliases=["w"], help="Add a streamer to your watch list")
-    async def watch(ctx, streamer_name: str):
-        if "https://www.twitch.tv/" in streamer_name:
+    @bot.command(
+        name="watch",
+        aliases=["w"],
+        usage="watch <streamername_or_link>",
+        help="Add a streamer to your watch list (provide either streamer name or link)",
+    )
+    async def watch(ctx, streamer_name_or_link: str):
+        if "https://www.twitch.tv/" in streamer_name_or_link:
             streamer_name = re.search(
-                r"https://www.twitch.tv/([^\s/]+)", streamer_name
+                r"https://www.twitch.tv/([^\s/]+)", streamer_name_or_link
             ).group(1)
+        else:
+            streamer_name = streamer_name_or_link
         url = f"https://api.twitch.tv/helix/users?login={streamer_name}"
         headers = {
             "Client-ID": f"{CLIENT_ID}",
@@ -367,13 +409,18 @@ def main():
             await ctx.send(embed=embed)
 
     @bot.command(
-        name="unwatch", aliases=["u"], help="Removes the streamer from your watch list"
+        name="unwatch",
+        aliases=["u"],
+        usage="unwatch <streamername_or_link>",
+        help="Removes the streamer from your watch list (provide either streamer name or link)",
     )
-    async def unwatch(ctx, streamer_name: str):
-        if "https://www.twitch.tv/" in streamer_name:
+    async def unwatch(ctx, streamer_name_or_link: str):
+        if "https://www.twitch.tv/" in streamer_name_or_link:
             streamer_name = re.search(
-                r"https://www.twitch.tv/([^\s/]+)", streamer_name
+                r"https://www.twitch.tv/([^\s/]+)", streamer_name_or_link
             ).group(1)
+        else:
+            streamer_name = streamer_name_or_link
 
         user_id = str(ctx.author.id)
         user_ids = ch.get_all_user_ids()
@@ -417,7 +464,10 @@ def main():
                 await ctx.channel.send(embed=embed)
 
     @bot.command(
-        name="clear", aliases=["c"], help="Clears all the messages sent by the bot"
+        name="clear",
+        aliases=["c"],
+        help="Clears all the messages sent by the bot",
+        usage="clear",
     )
     async def clear_bot_messages(ctx):
         messages_to_remove = 1000
@@ -441,9 +491,11 @@ def main():
         name="list",
         aliases=["l"],
         help="Returns a embed with a list of all the streamers you're currently watching",
+        usage="list",
     )
     async def list_streamers(ctx):
         user_id = str(ctx.author.id)
+        member = await bot.fetch_user(int(user_id))
         user_ids = ch.get_all_user_ids()
         if user_id in user_ids:
             streamer_list = ch.get_streamers_for_user(user_id)
@@ -499,7 +551,7 @@ def main():
                 combined_image.save("combined_image.png")
 
                 embed = discord.Embed(
-                    title="Your Streamers",
+                    title=f"Your Streamers {member.name}",
                     description=f"**You are currently watching the following streamers:\n{streamer_names}**",
                     color=10242047,
                 )
@@ -549,13 +601,13 @@ def main():
     @bot.command(
         name="help",
         aliases=["h", "commands", "command"],
-        help="Shows all the available commands  and they're descriptions",
+        usage="help",
+        help="Shows all the available commands and their descriptions",
     )
     async def list_commands(ctx):
-        # Create an embed to display the commands and their descriptions
         embed = discord.Embed(
             title="Bot Commands",
-            description="Here are the available commands and their descriptions:",
+            description="Here are the available commands, their descriptions, and usage:",
             color=65280,
         )
 
@@ -566,11 +618,11 @@ def main():
             description = command.help or "No description available."
             aliases = ", ".join(
                 command.aliases) if command.aliases else "No aliases"
+            usage = command.usage or f"No usage specified for {command.name}"
 
-            # Add a field for each command, showing its description and aliases
             embed.add_field(
-                name=f"**{command.name}**",
-                value=f"Description: {description}\nAliases: {aliases}",
+                name=f"**{command.name.capitalize()}**",
+                value=f"Description: {description}\nUsage: `{usage}`\nAliases: {aliases}",
                 inline=False,
             )
 
@@ -578,7 +630,12 @@ def main():
 
         await ctx.send(embed=embed)
 
-    @bot.command(name="invite", aliases=["i"], help="Generates bot invite link")
+    @bot.command(
+        name="invite",
+        aliases=["i"],
+        help="Generates bot invite link",
+        usage="invite",
+    )
     async def invite(ctx):
         # Create an embed to display the commands and their descriptions
         embed = discord.Embed(
@@ -589,6 +646,41 @@ def main():
         embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
 
         await ctx.send(embed=embed)
+
+    @bot.command(
+        name="configrole",
+        aliases=["cr"],
+        usage="configrole <@role>",
+        help="Change the role to add in the server configuration",
+    )
+    async def prefix_config_role(ctx, role: discord.Role):
+        if not ctx.author.guild_permissions.administrator:
+            await ctx.send(
+                "You do not have the necessary permissions to use this command."
+            )
+            return
+        guild_id = ctx.guild.id
+        role_id = role.id
+        ch.change_role_to_add(guild_id, role_id)
+        await ctx.send(
+            f"The role to add has been updated to {role.mention} in the server configuration."
+        )
+
+    @bot.command(
+        name="configprefix",
+        aliases=["cx"],
+        usage="configprefix <new_prefix>",
+        help="changes the default prefix of the guild",
+    )
+    async def change_guild_prefix(ctx, new_prefix: str):
+        if ctx.author.guild_permissions.administrator:
+            guild_id = ctx.guild.id
+            ch.change_guild_prefix(guild_id, new_prefix)
+            await ctx.send(f"Prefix for this guild has been updated to `{new_prefix}`.")
+        else:
+            await ctx.send(
+                "You do not have the necessary permissions to change the prefix."
+            )
 
     @bot.event
     async def on_disconnect():
@@ -688,7 +780,7 @@ def main():
                 + Fore.RESET
             )
             embed = discord.Embed(
-                title="Streamer not found",
+                title="Command not found",
                 description=f"Command **__{command}__** does not exist use .help for more info.",
                 color=discord.Color.red(),
             )
@@ -701,25 +793,56 @@ def main():
     @bot.event
     async def on_message(message):
         if message.author == bot.user:
-            return  # Ignore messages sent by the bot itself
+            return
+        guild_id = message.guild.id
+        guild_name = message.guild.name
+        if not ch.is_guild_in_config(guild_id):
+            ch.create_new_guild_template(guild_id, guild_name)
 
         if bot.user.mentioned_in(message):
             if isinstance(message.channel, discord.DMChannel):
                 embed = discord.Embed(
                     title=f"Hello, {message.author.display_name}!",
-                    description=f"My prefix is: `{bot.command_prefix}`",
+                    description=f"My prefix is: `{ch.get_prefix()}`",
                     color=discord.Color.green(),
                 )
             elif isinstance(message.channel, discord.TextChannel):
-                # Mention in a server
+                guild_prefix = bot.command_prefix
+                if message.guild:
+                    guild_prefix = ch.get_guild_prefix(message.guild.id)
+
                 embed = discord.Embed(
                     title=f"Hello, {message.author.display_name}!",
-                    description=f"My prefix for this server is: `{bot.command_prefix}`",
+                    description=f"My prefix for this server is: `{guild_prefix}`",
                     color=discord.Color.green(),
                 )
             await message.channel.send(embed=embed)
 
         await bot.process_commands(message)
+
+    @bot.event
+    async def on_member_join(member):
+        guild_id = member.guild.id
+
+        role_id = int(ch.get_role_to_add(guild_id))
+        general_channel = member.guild.text_channels[0]
+
+        if not role_id:
+            await general_channel.send(
+                f"Welcome {member.mention} to the server, but it seems the server administrator has not configured the role assignment. Please contact an admin for assistance."
+            )
+        else:
+            role = member.guild.get_role(role_id)
+            if role:
+                if role not in member.roles:
+                    await member.add_roles(role)
+                    print(
+                        f"Assigned role named {role.name} to {member.display_name} in the target guild."
+                    )
+            else:
+                await general_channel.send(
+                    f"Welcome {member.mention} to the server, but the configured role with ID {role_id} does not exist. Please contact an admin to update the role ID."
+                )
 
 
 @error_handler
@@ -753,16 +876,27 @@ def create_env():
         os._exit(0)
 
 
+async def get_custom_prefix(bot, message):
+    if message.guild:
+        guild_id = message.guild.id
+        custom_prefix = ch.get_guild_prefix(guild_id)
+        if custom_prefix:
+            return custom_prefix
+    return ch.get_prefix()
+
+
 if __name__ == "__main__":
     CLIENT_ID = os.environ.get("client_id")
     AUTHORIZATION = os.environ.get("authorization")
     TOKEN = os.environ.get("token")
     create_env()
     ch = ConfigHandler("data.json")
-    commands.when_mentioned_or(ch.get_prefix())
     intents = Intents.all()
     intents.dm_messages = True
-    bot = commands.Bot(command_prefix=ch.get_prefix(), intents=intents)
+    bot = commands.Bot(
+        command_prefix=commands.when_mentioned_or(ch.get_prefix), intents=intents
+    )
+    bot.command_prefix = get_custom_prefix
     bot.remove_command("help")  # delete default help command
     processed_streamers = []
 
