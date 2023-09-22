@@ -15,7 +15,7 @@ Twitch OAuth key: https://twitchapps.com/tokengen/
 Discord bot: https://discord.com/developers/applications/
 
 ### Or simply invite this bot **(Can't promise 100% uptime it will be off if the host restarts or crashes)** 
-[Invite](https://discord.com/api/oauth2/authorize?client_id=1124891382595727460&permissions=8&scope=bot)
+[Invite TwitchStreamChecker](https://discord.com/api/oauth2/authorize?client_id=1124891382595727460&permissions=8&scope=bot)
 
 ## Preview  
 ![notification preview](https://i.imgur.com/my3Z8ks.png)
