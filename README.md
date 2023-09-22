@@ -13,7 +13,7 @@ Get notifications of your favorite streamers on your discord Dm's
 **OR**  
 [Join TwitchStreamChecker server so you don't have to invite him](https://discord.gg/gbdPCxNavc)  
 
-## **Important links**
+## **Important links if you self host**
 Twitch Clientid (Application): https://dev.twitch.tv/console/apps   
 **(OAuth redirect link must be "https://twitchapps.com/tokengen/")**  
 Twitch OAuth key: https://twitchapps.com/tokengen/  
