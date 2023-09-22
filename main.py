@@ -147,7 +147,7 @@ def main():
     def generate_timestamp_string(started_at):
         started_datetime = datetime.datetime.fromisoformat(
             started_at.rstrip("Z"))
-        unix_timestamp = int(started_datetime.timestamp())
+        unix_timestamp = int(started_datetime.timestamp()) + 3600
         timestamp_string = f"<t:{unix_timestamp}:T>"
         return timestamp_string
 
@@ -546,7 +546,11 @@ def main():
             embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
             await ctx.channel.send(embed=embed)
 
-    @bot.command(name="help", aliases=["h", "commands", "command"])
+    @bot.command(
+        name="help",
+        aliases=["h", "commands", "command"],
+        help="Shows all the available commands  and they're descriptions",
+    )
     async def list_commands(ctx):
         # Create an embed to display the commands and their descriptions
         embed = discord.Embed(
@@ -574,7 +578,7 @@ def main():
 
         await ctx.send(embed=embed)
 
-    @bot.command(name="invite", aliases=["i"])
+    @bot.command(name="invite", aliases=["i"], help="Generates bot invite link")
     async def invite(ctx):
         # Create an embed to display the commands and their descriptions
         embed = discord.Embed(
