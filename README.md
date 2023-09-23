@@ -22,7 +22,9 @@ Discord bot: https://discord.com/developers/applications/
 
 
 ## Preview  
-![notification preview](https://i.imgur.com/hpgxark.png)
+![notification preview](https://i.imgur.com/hpgxark.png)  
+![notification preview](https://i.imgur.com/Dx6LxR6.png)
+
 
 ## **Usage**  
 ### **Commands**
