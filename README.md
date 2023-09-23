@@ -38,6 +38,10 @@ Discord bot: https://discord.com/developers/applications/
 ## Changes
 ```diff
 
+v1.6 23/09/2023
+
++   Fixed some bugs with ping for prefix
+
 v1.6 22/09/2023
 
 +   Made some config commands

@@ -180,8 +180,7 @@ def main():
 
     @error_handler
     def generate_timestamp_string(started_at):
-        started_datetime = datetime.datetime.fromisoformat(
-            started_at.rstrip("Z"))
+        started_datetime = datetime.datetime.fromisoformat(started_at.rstrip("Z"))
         unix_timestamp = int(started_datetime.timestamp()) + 3600
         timestamp_string = f"<t:{unix_timestamp}:T>"
         return timestamp_string
@@ -237,8 +236,7 @@ def main():
                                     game = stream_data["game_name"]
                                 title = stream_data["title"]
                                 viewers = stream_data["viewer_count"]
-                                user_response = requests.get(
-                                    user_url, headers=HEADERS)
+                                user_response = requests.get(user_url, headers=HEADERS)
                                 user_data = user_response.json()
                                 profile_picture_url = user_data["data"][0][
                                     "profile_image_url"
@@ -246,20 +244,17 @@ def main():
                                 profile_picture_url = profile_picture_url.replace(
                                     "{width}", "300"
                                 ).replace("{height}", "300")
-                                start_time_str = generate_timestamp_string(
-                                    started_at)
+                                start_time_str = generate_timestamp_string(started_at)
                                 embed = discord.Embed(
                                     title=f"{streamer_name} is streaming!",
                                     description=f"Click [here](https://www.twitch.tv/{streamer_name}) to watch the stream.",
                                     color=discord.Color.green(),
                                 )
                                 embed.add_field(name="Game", value=game)
-                                embed.add_field(
-                                    name="Stream Title", value=title)
+                                embed.add_field(name="Stream Title", value=title)
                                 embed.add_field(name="Viewers", value=viewers)
                                 embed.set_thumbnail(url=profile_picture_url)
-                                embed.set_footer(
-                                    text=f"{VERSION} | Made by Beelzebub2")
+                                embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                                 mention = f"||{member.mention}||"
                                 embed.add_field(
                                     name="Stream Start Time (local)",
@@ -524,8 +519,7 @@ def main():
 
                     if "data" in data and len(data["data"]) > 0:
                         streamer_data = data["data"][0]
-                        profile_picture_url = streamer_data.get(
-                            "profile_image_url", "")
+                        profile_picture_url = streamer_data.get("profile_image_url", "")
                         profile_picture_url = profile_picture_url.replace(
                             "{width}", "150"
                         ).replace("{height}", "150")
@@ -616,8 +610,7 @@ def main():
                 continue
 
             description = command.help or "No description available."
-            aliases = ", ".join(
-                command.aliases) if command.aliases else "No aliases"
+            aliases = ", ".join(command.aliases) if command.aliases else "No aliases"
             usage = command.usage or f"No usage specified for {command.name}"
 
             embed.add_field(
@@ -794,10 +787,12 @@ def main():
     async def on_message(message):
         if message.author == bot.user:
             return
-        guild_id = message.guild.id
-        guild_name = message.guild.name
-        if not ch.is_guild_in_config(guild_id):
-            ch.create_new_guild_template(guild_id, guild_name)
+
+        if message.guild:
+            guild_id = message.guild.id
+            guild_name = message.guild.name
+            if not ch.is_guild_in_config(guild_id):
+                ch.create_new_guild_template(guild_id, guild_name)
 
         if bot.user.mentioned_in(message):
             if isinstance(message.channel, discord.DMChannel):
@@ -806,6 +801,7 @@ def main():
                     description=f"My prefix is: `{ch.get_prefix()}`",
                     color=discord.Color.green(),
                 )
+
             elif isinstance(message.channel, discord.TextChannel):
                 guild_prefix = bot.command_prefix
                 if message.guild:
