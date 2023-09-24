@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import io
 import json
+import aiohttp
 import requests
 import time
 import os
@@ -186,28 +187,30 @@ def main():
         return timestamp_string
 
     @error_handler
-    async def check_stream(streamer_name):
+    async def check_stream(session, streamer_name):
         if not streamer_name:
             return False
 
-        endpoint = "https://api.twitch.tv/helix/streams"
-
-        # Parameters for the API request
         params = {
             "user_login": streamer_name,
         }
-        response = requests.get(endpoint, headers=HEADERS, params=params)
-        data = response.json()
 
-        if "data" in data and len(data["data"]) > 0:
-            if streamer_name.lower() not in processed_streamers:
-                await send_notification(streamer_name.strip())
-                processed_streamers.append(streamer_name.lower())
-            return True
+        async with session.get(
+            API_BASE_URL, headers=HEADERS, params=params
+        ) as response:
+            if response.status == 200:
+                data = await response.json()
 
-        if streamer_name in processed_streamers:
-            processed_streamers.remove(streamer_name)
-        return False
+                if "data" in data and len(data["data"]) > 0:
+                    if streamer_name.lower() not in processed_streamers:
+                        asyncio.create_task(send_notification(streamer_name.strip()))
+                        processed_streamers.append(streamer_name.lower())
+                    return True
+
+                if streamer_name in processed_streamers:
+                    processed_streamers.remove(streamer_name)
+
+            return False
 
     @error_handler
     async def send_notification(streamer_name):
@@ -225,6 +228,11 @@ def main():
                             url = f"https://api.twitch.tv/helix/streams?user_login={streamer_name}"
                             response = requests.get(url, headers=HEADERS)
                             data = response.json()
+                            embed = discord.Embed(
+                                title=f"{streamer_name} is streaming!",
+                                description=f"Click [here](https://www.twitch.tv/{streamer_name}) to watch the stream.",
+                                color=discord.Color.green(),
+                            )
                             if "data" in data and len(data["data"]) > 0:
                                 stream_data = data["data"][0]
                                 started_at = stream_data["started_at"]
@@ -232,10 +240,20 @@ def main():
                                 user_url = (
                                     f"https://api.twitch.tv/helix/users?id={user_id}"
                                 )
-                                if "game_name" in stream_data:
+                                if (
+                                    "game_name" in stream_data
+                                    and stream_data["game_name"]
+                                ):
                                     game = stream_data["game_name"]
+                                    embed.add_field(name="Game", value=game)
+
                                 title = stream_data["title"]
                                 viewers = stream_data["viewer_count"]
+                                if int(viewers) == 0:
+                                    embed.add_field(
+                                        name="Viewers",
+                                        value="No viewers. Be the first!",
+                                    )
                                 user_response = requests.get(user_url, headers=HEADERS)
                                 user_data = user_response.json()
                                 profile_picture_url = user_data["data"][0][
@@ -245,12 +263,6 @@ def main():
                                     "{width}", "300"
                                 ).replace("{height}", "300")
                                 start_time_str = generate_timestamp_string(started_at)
-                                embed = discord.Embed(
-                                    title=f"{streamer_name} is streaming!",
-                                    description=f"Click [here](https://www.twitch.tv/{streamer_name}) to watch the stream.",
-                                    color=discord.Color.green(),
-                                )
-                                embed.add_field(name="Game", value=game)
                                 embed.add_field(name="Stream Title", value=title)
                                 embed.add_field(name="Viewers", value=viewers)
                                 embed.set_thumbnail(url=profile_picture_url)
@@ -361,8 +373,6 @@ def main():
                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                 embed.set_thumbnail(url=pfp)
                 await ctx.send(embed=embed)
-                if streamer_name in processed_streamers:
-                    processed_streamers.remove(streamer_name)
             else:
                 print(
                     Fore.CYAN
@@ -423,7 +433,10 @@ def main():
             streamer_list = ch.get_streamers_for_user(user_id)
             if any(streamer_name.lower() == s.lower() for s in streamer_list):
                 ch.remove_streamer_from_user(user_id, streamer_name)
-                if streamer_name in processed_streamers:
+                if (
+                    streamer_name in processed_streamers
+                    and streamer_name not in ch.get_all_streamers()
+                ):
                     processed_streamers.remove(streamer_name)
 
                 print(
@@ -482,10 +495,28 @@ def main():
         embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
         await ctx.send(embed=embed)
 
+    async def fetch_streamer_data(session, streamer_name, pfps, names):
+        streamer_name = streamer_name.replace(" ", "")
+        url = f"https://api.twitch.tv/helix/users?login={streamer_name}"
+
+        async with session.get(url, headers=HEADERS) as response:
+            if response.status == 200:
+                data = await response.json()
+                if "data" in data and len(data["data"]) > 0:
+                    streamer_data = data["data"][0]
+                    profile_picture_url = streamer_data.get("profile_image_url", "")
+                    profile_picture_url = profile_picture_url.replace(
+                        "{width}", "150"
+                    ).replace("{height}", "150")
+                    pfps.append(profile_picture_url)
+                    names.append(streamer_data["display_name"])
+                else:
+                    print(f"No data found for streamer: {streamer_name}")
+
     @bot.command(
         name="list",
         aliases=["l"],
-        help="Returns a embed with a list of all the streamers you're currently watching",
+        help="Returns an embed with a list of all the streamers you're currently watching",
         usage="list",
     )
     async def list_streamers(ctx):
@@ -511,25 +542,13 @@ def main():
                 pfps = []
                 names = []
 
-                def fetch_streamer_data(streamer_name):
-                    streamer_name = streamer_name.replace(" ", "")
-                    url = f"https://api.twitch.tv/helix/users?login={streamer_name}"
-                    response = requests.get(url, headers=HEADERS)
-                    data = response.json()
-
-                    if "data" in data and len(data["data"]) > 0:
-                        streamer_data = data["data"][0]
-                        profile_picture_url = streamer_data.get("profile_image_url", "")
-                        profile_picture_url = profile_picture_url.replace(
-                            "{width}", "150"
-                        ).replace("{height}", "150")
-                        pfps.append(profile_picture_url)
-                        names.append(streamer_data["display_name"])
-                    else:
-                        print(f"No data found for streamer: {streamer_name}")
-
-                with concurrent.futures.ThreadPoolExecutor() as executor:
-                    executor.map(fetch_streamer_data, streamer_list)
+                async with aiohttp.ClientSession() as session:
+                    await asyncio.gather(
+                        *[
+                            fetch_streamer_data(session, streamer, pfps, names)
+                            for streamer in streamer_list
+                        ]
+                    )
 
                 pfp_size = (100, 100)
                 image_width = pfp_size[0] * len(pfps)
@@ -721,12 +740,9 @@ def main():
             )
 
             streamers = ch.get_all_streamers()
-            with concurrent.futures.ThreadPoolExecutor() as executor:
+            async with aiohttp.ClientSession() as session:
                 await asyncio.gather(
-                    *[
-                        asyncio.create_task(check_stream(streamer))
-                        for streamer in streamers
-                    ]
+                    *[check_stream(session, streamer) for streamer in streamers]
                 )
 
             end_time = time.time()
@@ -757,7 +773,7 @@ def main():
                     end="\r",
                 )
 
-            await asyncio.sleep(4)
+            await asyncio.sleep(5)
 
     @bot.event
     async def on_command_error(ctx, error):
@@ -895,7 +911,7 @@ if __name__ == "__main__":
     bot.command_prefix = get_custom_prefix
     bot.remove_command("help")  # delete default help command
     processed_streamers = []
-
+    API_BASE_URL = "https://api.twitch.tv/helix/streams"
     VERSION = ch.get_version()
     HEADERS = {
         "Client-ID": CLIENT_ID,

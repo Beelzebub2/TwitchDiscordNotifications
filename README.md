@@ -1,5 +1,5 @@
 # **TwitchDiscordNotifications**
-![Static Badge](https://img.shields.io/badge/Version-v1.6-8ebff1?style=for-the-badge&logo=v)
+![Static Badge](https://img.shields.io/badge/Version-v1.7-8ebff1?style=for-the-badge&logo=v)
 ![Static Badge](https://img.shields.io/badge/Language-python-3776ab?style=for-the-badge&logo=python)
 ![Static Badge](https://img.shields.io/badge/License-GNU%20GPL%20v3-blue.svg?style=for-the-badge)  
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/S6S8HV2DY)
@@ -42,6 +42,13 @@ Discord bot: https://discord.com/developers/applications/
 
 ## Changes
 ```diff
+
+v1.7 24/09/2023
+
++   General optimization
++   Huge check_stream function speed increase
++   Huge list command speed increase
++   Fixed some small bugs
 
 v1.6 23/09/2023
 
