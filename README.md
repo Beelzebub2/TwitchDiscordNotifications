@@ -45,6 +45,7 @@ Discord bot: https://discord.com/developers/applications/
 
 v1.7 24/09/2023
 
++   Cleaner console UI
 +   General optimization
 +   Huge check_stream function speed increase
 +   Huge list command speed increase

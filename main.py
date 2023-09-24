@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import io
 import json
+import shutil
 import aiohttp
 import requests
 import time
@@ -28,6 +29,7 @@ def error_handler(func):
             file = tb[-1].filename  # Extract the filename
             line = tb[-1].lineno
             error_message = f"An error occurred in {Fore.CYAN + Style.BRIGHT}{file}{Style.RESET_ALL}\n{Fore.CYAN + Style.BRIGHT}Line: {line}{Fore.RED} error: {error} {Style.RESET_ALL}"
+            print(" " * console_width, end="\r")
             print(
                 Fore.YELLOW
                 + Style.BRIGHT
@@ -274,6 +276,7 @@ def main():
                                 )
                                 try:
                                     await dm_channel.send(mention, embed=embed)
+                                    print(" " * console_width, end="\r")
                                     print(
                                         Fore.CYAN
                                         + get_timestamp()
@@ -283,6 +286,7 @@ def main():
                                         + f"Notification sent successfully for {Fore.CYAN + streamer_name + Fore.RESET}."
                                     )
                                 except discord.errors.Forbidden:
+                                    print(" " * console_width, end="\r")
                                     print(
                                         Fore.CYAN
                                         + get_timestamp()
@@ -291,6 +295,7 @@ def main():
                                         + f"Cannot send a message to user {member.name}. Missing permissions or DMs disabled."
                                     )
                             else:
+                                print(" " * console_width, end="\r")
                                 print(
                                     Fore.CYAN
                                     + get_timestamp()
@@ -299,7 +304,7 @@ def main():
                                     + f"{streamer_name} is not streaming."
                                 )
             except discord.errors.NotFound:
-                # Handle the case where the user is not found
+                print(" " * console_width, end="\r")
                 print(
                     Fore.CYAN
                     + get_timestamp()
@@ -331,6 +336,7 @@ def main():
         response = requests.get(url, headers=headers)
         data = response.json()
         if not data["data"]:
+            print(" " * console_width, end="\r")
             print(
                 Fore.CYAN
                 + get_timestamp()
@@ -356,6 +362,7 @@ def main():
             if streamer_name.lower() not in [s.lower().strip() for s in streamer_list]:
                 ch.add_streamer_to_user(user_id, streamer_name.strip())
                 streamer_list.append(streamer_name.strip())
+                print(" " * console_width, end="\r")
                 print(
                     Fore.CYAN
                     + get_timestamp()
@@ -374,6 +381,7 @@ def main():
                 embed.set_thumbnail(url=pfp)
                 await ctx.send(embed=embed)
             else:
+                print(" " * console_width, end="\r")
                 print(
                     Fore.CYAN
                     + get_timestamp()
@@ -396,6 +404,7 @@ def main():
                     "streamer_list": [streamer_name.strip()],
                 }
             )
+            print(" " * console_width, end="\r")
             print(
                 Fore.CYAN
                 + get_timestamp()
@@ -438,7 +447,7 @@ def main():
                     and streamer_name not in ch.get_all_streamers()
                 ):
                     processed_streamers.remove(streamer_name)
-
+                print(" " * console_width, end="\r")
                 print(
                     Fore.CYAN
                     + get_timestamp()
@@ -456,6 +465,7 @@ def main():
                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                 await ctx.channel.send(embed=embed)
             else:
+                print(" " * console_width, end="\r")
                 print(
                     Fore.CYAN
                     + get_timestamp()
@@ -511,6 +521,7 @@ def main():
                     pfps.append(profile_picture_url)
                     names.append(streamer_data["display_name"])
                 else:
+                    print(" " * console_width, end="\r")
                     print(f"No data found for streamer: {streamer_name}")
 
     @bot.command(
@@ -527,6 +538,7 @@ def main():
             streamer_list = ch.get_streamers_for_user(user_id)
             if streamer_list:
                 streamer_names = ", ".join(streamer_list)
+                print(" " * console_width, end="\r")
                 print(
                     "\033[K"
                     + Fore.CYAN
@@ -577,6 +589,7 @@ def main():
                 os.remove("combined_image.png")
 
             else:
+                print(" " * console_width, end="\r")
                 print(
                     Fore.CYAN
                     + get_timestamp()
@@ -594,6 +607,7 @@ def main():
                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                 await ctx.channel.send(embed=embed)
         else:
+            print(" " * console_width, end="\r")
             print(
                 Fore.CYAN
                 + get_timestamp()
@@ -700,6 +714,7 @@ def main():
 
     @bot.event
     async def on_resumed():
+        print(" " * console_width, end="\r")
         print(
             Fore.CYAN
             + get_timestamp()
@@ -712,6 +727,7 @@ def main():
     @bot.event
     async def on_ready():
         clear_console()
+        print(" " * console_width, end="\r")
         print(
             Fore.CYAN
             + get_timestamp()
@@ -726,7 +742,7 @@ def main():
 
         while True:
             start_time = time.time()
-
+            print(" " * console_width, end="\r")
             print(
                 "\033[K"
                 + Fore.CYAN
@@ -749,6 +765,7 @@ def main():
             elapsed_time = end_time - start_time
 
             if len(processed_streamers) != 0:
+                print(" " * console_width, end="\r")
                 print(
                     Fore.CYAN
                     + get_timestamp()
@@ -763,6 +780,7 @@ def main():
                     end="\r",
                 )
             else:
+                print(" " * console_width, end="\r")
                 print(
                     Fore.CYAN
                     + get_timestamp()
@@ -779,6 +797,7 @@ def main():
     async def on_command_error(ctx, error):
         if isinstance(error, commands.CommandNotFound):
             command = ctx.message.content
+            print(" " * console_width, end="\r")
             print(
                 Fore.CYAN
                 + get_timestamp()
@@ -848,6 +867,7 @@ def main():
             if role:
                 if role not in member.roles:
                     await member.add_roles(role)
+                    print(" " * console_width, end="\r")
                     print(
                         f"Assigned role named {role.name} to {member.display_name} in the target guild."
                     )
@@ -908,6 +928,10 @@ if __name__ == "__main__":
     bot = commands.Bot(
         command_prefix=commands.when_mentioned_or(ch.get_prefix), intents=intents
     )
+    try:
+        console_width = shutil.get_terminal_size().columns
+    except AttributeError:
+        console_width = 80
     bot.command_prefix = get_custom_prefix
     bot.remove_command("help")  # delete default help command
     processed_streamers = []
