@@ -8,7 +8,6 @@ import requests
 import time
 import os
 from PIL import Image
-import concurrent.futures
 import re
 import discord
 import traceback
