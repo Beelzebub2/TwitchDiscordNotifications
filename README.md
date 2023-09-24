@@ -10,7 +10,7 @@ Get notifications of your favorite streamers on your discord Dm's
 ## Easy setup
 #### Simply invite this bot
 [Invite TwitchStreamChecker](https://discord.com/api/oauth2/authorize?client_id=1124891382595727460&permissions=8&scope=bot)  
-**OR**  
+**OR (Recommended)**  
 [Join TwitchStreamChecker server so you don't have to invite him](https://discord.gg/gbdPCxNavc)  
 
 ## **Important links if you self host**
