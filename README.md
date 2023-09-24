@@ -34,8 +34,9 @@ Discord bot: https://discord.com/developers/applications/
 **Unwatch streamername or streamerlink** - Removes the streamer from that user's list  
 **Clear** - Deletes all the messages sent by the bot (1per second to avoid being rate limited)  
 **List** - Generates a embed with all the watchlist streamers
-**configprefix** - Changes the prefix on that guild
-**configrole** - Changes the role given to every new member of guild
+**Configprefix** - Changes the prefix on that guild
+**Configrole** - Changes the role given to every new member of guild
+**Invite** - generates bot invite link
 #### Replit
 **It should create the secrets automatically so just change the filler text in there**
 
