@@ -255,6 +255,8 @@ def main():
                                         name="Viewers",
                                         value="No viewers. Be the first!",
                                     )
+                                else:
+                                    embed.add_field(name="Viewers", value=viewers)
                                 user_response = requests.get(user_url, headers=HEADERS)
                                 user_data = user_response.json()
                                 profile_picture_url = user_data["data"][0][
@@ -265,7 +267,6 @@ def main():
                                 ).replace("{height}", "300")
                                 start_time_str = generate_timestamp_string(started_at)
                                 embed.add_field(name="Stream Title", value=title)
-                                embed.add_field(name="Viewers", value=viewers)
                                 embed.set_thumbnail(url=profile_picture_url)
                                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                                 mention = f"||{member.mention}||"
