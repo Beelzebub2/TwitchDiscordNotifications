@@ -46,6 +46,11 @@ Discord bot: https://discord.com/developers/applications/
 ## Changes
 ```diff
 
+v1.7 25/09/2023
+
++   Made some console UI changes
++   Fixed minor bug in check_stream
+
 v1.7 24/09/2023
 
 +   Cleaner console UI

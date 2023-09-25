@@ -172,7 +172,10 @@ def main():
     @error_handler
     def get_timestamp():
         now = datetime.datetime.now()
-        return now.strftime("%Y-%m-%d %H:%M:%S")
+        timestr = now.strftime("%Y-%m-%d %H:%M:%S")
+        timestr = f"{Fore.YELLOW}[{Fore.RESET}{timestr}{Fore.YELLOW}]{Fore.RESET}"
+        return timestr
+
 
     def clear_console():
         if os.name == "nt":
@@ -207,8 +210,7 @@ def main():
                         asyncio.create_task(send_notification(streamer_name.strip()))
                         processed_streamers.append(streamer_name.lower())
                     return True
-
-                if streamer_name in processed_streamers:
+                if streamer_name.lower() in processed_streamers:
                     processed_streamers.remove(streamer_name)
 
             return False
