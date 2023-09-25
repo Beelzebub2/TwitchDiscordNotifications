@@ -49,6 +49,8 @@ Discord bot: https://discord.com/developers/applications/
 
 v1.8 25/09/2023
 
++   Added username to console UI sucessfull notification message
++   Fixed small bug with send_notifications
 +   Added unregister command
 +   Made help command display commands in alphabetical order
 +   Made some console UI changes

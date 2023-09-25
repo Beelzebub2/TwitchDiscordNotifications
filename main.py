@@ -308,7 +308,7 @@ def main():
                                         + Fore.RESET
                                         + " "
                                         + Fore.LIGHTGREEN_EX
-                                        + f"Notification sent successfully for {Fore.CYAN + streamer_name + Fore.RESET}."
+                                        + f"Notification sent successfully for {Fore.CYAN + streamer_name + Fore.RESET}. {Fore.LIGHTGREEN_EX}to member {Fore.LIGHTCYAN_EX + member.name + Fore.RESET}"
                                     )
                                 except discord.errors.Forbidden:
                                     print(" " * console_width, end="\r")
@@ -351,8 +351,9 @@ def main():
             streamer_name = re.search(
                 r"https://www.twitch.tv/([^\s/]+)", streamer_name_or_link
             ).group(1)
+            streamer_name = streamer_name.lower()
         else:
-            streamer_name = streamer_name_or_link
+            streamer_name = streamer_name_or_link.lower()
         url = f"https://api.twitch.tv/helix/users?login={streamer_name}"
         headers = {
             "Client-ID": f"{CLIENT_ID}",
@@ -458,8 +459,9 @@ def main():
             streamer_name = re.search(
                 r"https://www.twitch.tv/([^\s/]+)", streamer_name_or_link
             ).group(1)
+            streamer_name = streamer_name.lower()
         else:
-            streamer_name = streamer_name_or_link
+            streamer_name = streamer_name_or_link.lower()
 
         user_id = str(ctx.author.id)
         user_ids = ch.get_all_user_ids()
@@ -471,7 +473,7 @@ def main():
                     streamer_name in processed_streamers
                     and streamer_name not in ch.get_all_streamers()
                 ):
-                    processed_streamers.remove(streamer_name)
+                    processed_streamers.remove(streamer_name.lower())
                 print(" " * console_width, end="\r")
                 print(
                     Fore.CYAN
