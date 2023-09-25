@@ -176,7 +176,6 @@ def main():
         timestr = f"{Fore.YELLOW}[{Fore.RESET}{Fore.CYAN + timestr + Fore.RESET}{Fore.YELLOW}]{Fore.RESET}"
         return timestr
 
-
     def clear_console():
         if os.name == "nt":
             os.system("cls")
@@ -211,7 +210,7 @@ def main():
                         processed_streamers.append(streamer_name.lower())
                     return True
                 if streamer_name.lower() in processed_streamers:
-                    processed_streamers.remove(streamer_name)
+                    processed_streamers.remove(streamer_name.lower())
 
             return False
 
