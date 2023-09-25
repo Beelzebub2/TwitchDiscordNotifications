@@ -8,7 +8,7 @@ Get notifications of your favorite streamers on your discord Dm's
 
 
 ## Easy setup
-**For easy setup you only need to join my server and send command ,watch streamer to create your watchlist  
+**For easy setup you only need to join my server and send command ,watch streamername or link to create your watchlist  
 Or invite it to your discord server and do the same**
 #### Simply invite this bot
 [Invite TwitchStreamChecker](https://discord.com/api/oauth2/authorize?client_id=1124891382595727460&permissions=8&scope=bot)  
