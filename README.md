@@ -61,7 +61,7 @@ v1.7 24/09/2023
 
 v1.6 23/09/2023
 
-+   Fixed some bugs with ping for prefix
++   Fixed some bugs with mention bot for prefix
 
 v1.6 22/09/2023
 
