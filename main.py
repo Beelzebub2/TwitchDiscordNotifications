@@ -74,11 +74,11 @@ class ConfigHandler:
                     return True
         return False
 
-    def remove_streamer_from_user(self, discord_id, streamer):
+    def remove_streamer_from_user(self, user_id, streamer):
         self.data = self.load_config()
         for user_data_list in self.data["User-list"].values():
             for user_data in user_data_list:
-                if user_data["discord_id"] == discord_id:
+                if user_data["discord_id"] == user_id:
                     if streamer in user_data["streamer_list"]:
                         user_data["streamer_list"].remove(streamer)
                         self.save_config()
@@ -165,6 +165,30 @@ class ConfigHandler:
         guild_info = self.data["Guilds"].get(str(guild_id), {})
         guild_info["prefix"] = new_prefix
         self.save_config()
+
+    def delete_user(self, user_id):
+        self.data = self.load_config()
+        user_key_to_delete = None
+
+        for user_key, user_data_list in self.data["User-list"].items():
+            for user_data in user_data_list:
+                if user_data["discord_id"] == user_id:
+                    user_key_to_delete = user_key
+                    break
+
+        if user_key_to_delete is not None:
+            del self.data["User-list"][user_key_to_delete]
+            user_keys = list(self.data["User-list"].keys())
+            for i, user_key in enumerate(user_keys):
+                new_user_key = f"User{i+1}"
+                self.data["User-list"][new_user_key] = self.data["User-list"].pop(
+                    user_key
+                )
+
+            self.save_config()
+            return True
+        else:
+            return False
 
 
 @error_handler
@@ -639,7 +663,10 @@ def main():
             color=65280,
         )
 
-        for command in bot.commands:
+        # Sort the bot.commands list alphabetically by command name
+        sorted_commands = sorted(bot.commands, key=lambda x: x.name)
+
+        for command in sorted_commands:
             if command.hidden:
                 continue
 
@@ -708,6 +735,40 @@ def main():
             await ctx.send(
                 "You do not have the necessary permissions to change the prefix."
             )
+
+    @bot.command(
+        name="unregister",
+        aliases=["unreg"],
+        help="Wipes out the watchlist.",
+        usage="unregister",
+    )
+    async def unregister_user(ctx):
+        user_id = str(ctx.author.id)
+
+        if ch.delete_user(user_id):
+            print(" " * console_width, end="\r")
+            print(
+                Fore.CYAN
+                + get_timestamp()
+                + Fore.RESET
+                + " "
+                + Fore.YELLOW
+                + f"{Fore.RED + ctx.author.name + Fore.RESET} Unregistered from bot."
+                + Fore.RESET
+            )
+            await ctx.send("You have been unregistered from the bot.")
+        else:
+            print(" " * console_width, end="\r")
+            print(
+                Fore.CYAN
+                + get_timestamp()
+                + Fore.RESET
+                + " "
+                + Fore.YELLOW
+                + f"{Fore.RED + ctx.author.name + Fore.RESET} Tried to unregister from bot but wasn't registered to begin with."
+                + Fore.RESET
+            )
+            await ctx.send("You are not registered with the bot.")
 
     @bot.event
     async def on_disconnect():

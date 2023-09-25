@@ -1,5 +1,5 @@
 # **TwitchDiscordNotifications**
-![Static Badge](https://img.shields.io/badge/Version-v1.7-8ebff1?style=for-the-badge&logo=v)
+![Static Badge](https://img.shields.io/badge/Version-v1.8-8ebff1?style=for-the-badge&logo=v)
 ![Static Badge](https://img.shields.io/badge/Language-python-3776ab?style=for-the-badge&logo=python)
 ![Static Badge](https://img.shields.io/badge/License-GNU%20GPL%20v3-blue.svg?style=for-the-badge)  
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/S6S8HV2DY)
@@ -39,15 +39,18 @@ Discord bot: https://discord.com/developers/applications/
 **List** - Generates a embed with all the watchlist streamers
 **Configprefix** - Changes the prefix on that guild
 **Configrole** - Changes the role given to every new member of guild
-**Invite** - generates bot invite link
+**Invite** - Generates bot invite link  
+**Ungerister** - Permanently deletes user's watchlist and data
 #### Replit
 **It should create the secrets automatically so just change the filler text in there**
 
 ## Changes
 ```diff
 
-v1.7 25/09/2023
+v1.8 25/09/2023
 
++   Added unregister command
++   Made help command display commands in alphabetical order
 +   Made some console UI changes
 +   Fixed minor bug in check_stream
 
