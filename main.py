@@ -173,7 +173,7 @@ def main():
     def get_timestamp():
         now = datetime.datetime.now()
         timestr = now.strftime("%Y-%m-%d %H:%M:%S")
-        timestr = f"{Fore.YELLOW}[{Fore.RESET}{timestr}{Fore.YELLOW}]{Fore.RESET}"
+        timestr = f"{Fore.YELLOW}[{Fore.RESET}{Fore.CYAN + timestr + Fore.RESET}{Fore.YELLOW}]{Fore.RESET}"
         return timestr
 
 
