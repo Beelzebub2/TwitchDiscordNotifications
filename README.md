@@ -51,6 +51,7 @@ Discord bot: https://discord.com/developers/applications/
 
 v1.9 29/09/2023
 
++   Removed unecessary request on send_notification
 +   Added custom keyboard interrupt handler
 +   Added a function to allow bot restart without notification spam for already streaming streamers
 +   Added a stats command

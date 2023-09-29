@@ -284,7 +284,7 @@ def main():
 
                 if "data" in data and len(data["data"]) > 0:
                     if streamer_name.lower() not in processed_streamers:
-                        asyncio.create_task(send_notification(streamer_name.strip()))
+                        asyncio.create_task(send_notification(streamer_name.strip(), data))
                         processed_streamers.append(streamer_name.lower())
                     return True
                 if streamer_name.lower() in processed_streamers:
@@ -293,10 +293,9 @@ def main():
             return False
 
     @error_handler
-    async def send_notification(streamer_name):
-        Data = ch.get_user_ids_with_streamers()
-
-        for user_id, streamers in Data.items():
+    async def send_notification(streamer_name, data):
+        streamer_lists = ch.get_user_ids_with_streamers()
+        for user_id, streamers in streamer_lists.items():
             try:
                 member = await bot.fetch_user(int(user_id))
                 if member:
@@ -305,9 +304,7 @@ def main():
                         dm_channel = await member.create_dm()
                     for streamer in streamers:
                         if streamer_name == streamer.strip():
-                            url = f"https://api.twitch.tv/helix/streams?user_login={streamer_name}"
-                            response = requests.get(url, headers=HEADERS)
-                            data = response.json()
+                            data = data
                             embed = discord.Embed(
                                 title=f"{streamer_name} is streaming!",
                                 description=f"Click [here](https://www.twitch.tv/{streamer_name}) to watch the stream.",
