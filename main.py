@@ -2,8 +2,11 @@ import asyncio
 import datetime
 import io
 import json
+import signal
 import shutil
+import sys
 import aiohttp
+import tempfile
 import requests
 import time
 import os
@@ -15,6 +18,7 @@ from colorama import init, Fore, Style
 from discord.ext import commands
 from discord import Intents
 from dotenv import load_dotenv
+from test import log_print
 
 load_dotenv()
 
@@ -39,6 +43,28 @@ def error_handler(func):
             )
 
     return wrapper
+
+
+@error_handler
+def log_print(message, log_file_name="log.txt"):
+    def remove_color_codes(text):
+        color_pattern = re.compile(r"\x1b\[[0-9;]*m")
+        return color_pattern.sub("", text)
+
+    original_stdout = sys.stdout
+    try:
+        print(message)
+
+        with open(log_file_name, "a") as log_file:
+            sys.stdout = log_file
+            message_without_colors = remove_color_codes(message)
+            print(message_without_colors)
+
+    except Exception as e:
+        sys.stdout = original_stdout
+        print(f"Error logging to file: {e}")
+    finally:
+        sys.stdout = original_stdout
 
 
 class ConfigHandler:
@@ -190,6 +216,37 @@ class ConfigHandler:
         else:
             return False
 
+    def save_to_temp_json(self, data):
+        temp_dir = tempfile.gettempdir()
+        file_path = os.path.join(temp_dir, "temp_restart_data.json")
+
+        with open(file_path, "w") as file:
+            json.dump(data, file)
+
+    def check_restart_status(self):
+        temp_dir = tempfile.gettempdir()
+        file_path = os.path.join(temp_dir, "temp_restart_data.json")
+
+        try:
+            with open(file_path, "r") as file:
+                data = json.load(file)
+                restarted = data.get("Restarted", False)
+
+                if restarted:
+                    self.processed_streamers = data.get("Streamers", [])
+                    data["Restarted"] = False
+                    with open(file_path, "w") as file:
+                        json.dump(data, file)
+                    return True
+                else:
+                    return False
+        except FileNotFoundError:
+            return False
+
+    def get_bot_owner_id(self):
+        bot_owner_id = self.data.get("Config", {}).get("bot_owner_id", "")
+        return bot_owner_id
+
 
 @error_handler
 def main():
@@ -201,10 +258,7 @@ def main():
         return timestr
 
     def clear_console():
-        if os.name == "nt":
-            os.system("cls")
-        else:
-            os.system("clear")
+        os.system("cls" if os.name == "nt" else "clear")
 
     @error_handler
     def generate_timestamp_string(started_at):
@@ -302,7 +356,7 @@ def main():
                                 try:
                                     await dm_channel.send(mention, embed=embed)
                                     print(" " * console_width, end="\r")
-                                    print(
+                                    log_print(
                                         Fore.CYAN
                                         + get_timestamp()
                                         + Fore.RESET
@@ -312,7 +366,7 @@ def main():
                                     )
                                 except discord.errors.Forbidden:
                                     print(" " * console_width, end="\r")
-                                    print(
+                                    log_print(
                                         Fore.CYAN
                                         + get_timestamp()
                                         + Fore.RESET
@@ -321,16 +375,17 @@ def main():
                                     )
                             else:
                                 print(" " * console_width, end="\r")
-                                print(
+                                log_print(
                                     Fore.CYAN
                                     + get_timestamp()
                                     + Fore.RESET
                                     + " "
                                     + f"{streamer_name} is not streaming."
                                 )
+                                processed_streamers.remove(streamer_name)
             except discord.errors.NotFound:
                 print(" " * console_width, end="\r")
-                print(
+                log_print(
                     Fore.CYAN
                     + get_timestamp()
                     + Fore.RESET
@@ -363,7 +418,7 @@ def main():
         data = response.json()
         if not data["data"]:
             print(" " * console_width, end="\r")
-            print(
+            log_print(
                 Fore.CYAN
                 + get_timestamp()
                 + Fore.RESET
@@ -389,7 +444,7 @@ def main():
                 ch.add_streamer_to_user(user_id, streamer_name.strip())
                 streamer_list.append(streamer_name.strip())
                 print(" " * console_width, end="\r")
-                print(
+                log_print(
                     Fore.CYAN
                     + get_timestamp()
                     + Fore.RESET
@@ -408,7 +463,7 @@ def main():
                 await ctx.send(embed=embed)
             else:
                 print(" " * console_width, end="\r")
-                print(
+                log_print(
                     Fore.CYAN
                     + get_timestamp()
                     + Fore.RESET
@@ -431,7 +486,7 @@ def main():
                 }
             )
             print(" " * console_width, end="\r")
-            print(
+            log_print(
                 Fore.CYAN
                 + get_timestamp()
                 + Fore.RESET
@@ -475,7 +530,7 @@ def main():
                 ):
                     processed_streamers.remove(streamer_name.lower())
                 print(" " * console_width, end="\r")
-                print(
+                log_print(
                     Fore.CYAN
                     + get_timestamp()
                     + Fore.RESET
@@ -493,7 +548,7 @@ def main():
                 await ctx.channel.send(embed=embed)
             else:
                 print(" " * console_width, end="\r")
-                print(
+                log_print(
                     Fore.CYAN
                     + get_timestamp()
                     + Fore.RESET
@@ -549,7 +604,7 @@ def main():
                     names.append(streamer_data["display_name"])
                 else:
                     print(" " * console_width, end="\r")
-                    print(f"No data found for streamer: {streamer_name}")
+                    log_print(f"No data found for streamer: {streamer_name}")
 
     @bot.command(
         name="list",
@@ -566,7 +621,7 @@ def main():
             if streamer_list:
                 streamer_names = ", ".join(streamer_list)
                 print(" " * console_width, end="\r")
-                print(
+                log_print(
                     "\033[K"
                     + Fore.CYAN
                     + get_timestamp()
@@ -593,6 +648,7 @@ def main():
                 image_width = pfp_size[0] * len(pfps)
                 combined_image = Image.new("RGB", (image_width, pfp_size[1]))
                 x_offset = 0
+                # TODO y offset is == 0 now, change later
                 for pfp_url in pfps:
                     pfp_response = requests.get(pfp_url)
                     pfp_image = Image.open(io.BytesIO(pfp_response.content))
@@ -617,7 +673,7 @@ def main():
 
             else:
                 print(" " * console_width, end="\r")
-                print(
+                log_print(
                     Fore.CYAN
                     + get_timestamp()
                     + Fore.RESET
@@ -635,7 +691,7 @@ def main():
                 await ctx.channel.send(embed=embed)
         else:
             print(" " * console_width, end="\r")
-            print(
+            log_print(
                 Fore.CYAN
                 + get_timestamp()
                 + Fore.RESET
@@ -665,7 +721,6 @@ def main():
             color=65280,
         )
 
-        # Sort the bot.commands list alphabetically by command name
         sorted_commands = sorted(bot.commands, key=lambda x: x.name)
 
         for command in sorted_commands:
@@ -749,7 +804,7 @@ def main():
 
         if ch.delete_user(user_id):
             print(" " * console_width, end="\r")
-            print(
+            log_print(
                 Fore.CYAN
                 + get_timestamp()
                 + Fore.RESET
@@ -758,10 +813,16 @@ def main():
                 + f"{Fore.RED + ctx.author.name + Fore.RESET} Unregistered from bot."
                 + Fore.RESET
             )
-            await ctx.send("You have been unregistered from the bot.")
+            embed = discord.Embed(
+                title="Unregistration Successful",
+                description="You have been unregistered from the bot.",
+                color=0x00FF00,
+            )
+            embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
+            await ctx.send(embed=embed)
         else:
             print(" " * console_width, end="\r")
-            print(
+            log_print(
                 Fore.CYAN
                 + get_timestamp()
                 + Fore.RESET
@@ -770,7 +831,55 @@ def main():
                 + f"{Fore.RED + ctx.author.name + Fore.RESET} Tried to unregister from bot but wasn't registered to begin with."
                 + Fore.RESET
             )
-            await ctx.send("You are not registered with the bot.")
+            embed = discord.Embed(
+                title="Unregistration Error",
+                description="You are not registered with the bot.",
+                color=0xFF0000,
+            )
+            embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
+            await ctx.send(embed=embed)
+
+    @bot.command(
+        name="restart",
+        aliases=["rr"],
+        help="Restarts Bot.",
+        usage="restart",
+        hidden=True,
+    )
+    async def restart(ctx):
+        if str(ctx.author.id) != ch.get_bot_owner_id():
+            embed = discord.Embed(
+                title="Permission Error",
+                description="You don't have permissions to use this command.",
+                color=0xFF0000,
+            )
+            embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
+            await ctx.send(embed=embed)
+            return
+        data = {"Restarted": True, "Streamers": processed_streamers}
+        ch.save_to_temp_json(data)
+        embed = discord.Embed(
+            title="Restarting",
+            description="Bot is restarting...",
+            color=0x00FF00,
+        )
+        embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
+        await ctx.send(embed=embed)
+
+        python = sys.executable
+        print(python)
+        os.execl(python, python, *sys.argv)
+
+    @bot.command(name="stats", aliases=["st"], help="Shows Bots stats.", usage="stats")
+    async def uptime(ctx):
+        current_time = datetime.datetime.now()
+        uptime = current_time - bot_start_time
+        uptime = str(uptime).split(".")[0]
+        embed = discord.Embed(title="Bot Stats", color=discord.Color.green())
+        embed.add_field(name="Uptime", value=f"My current uptime is {uptime}")
+        embed.add_field(name="Users", value=len(ch.get_all_user_ids()))
+        embed.add_field(name="Streamers", value=len(ch.get_all_streamers()))
+        await ctx.send(embed=embed)
 
     @bot.event
     async def on_disconnect():
@@ -779,7 +888,7 @@ def main():
     @bot.event
     async def on_resumed():
         print(" " * console_width, end="\r")
-        print(
+        log_print(
             Fore.CYAN
             + get_timestamp()
             + Fore.RESET
@@ -790,9 +899,22 @@ def main():
 
     @bot.event
     async def on_ready():
+        global bot_start_time
+        bot_start_time = datetime.datetime.now()
+        if not ch.check_restart_status():
+            bot_owner_id = ch.get_bot_owner_id()
+            if bot_owner_id:
+                owner = bot.get_user(int(bot_owner_id))
+                embed = discord.Embed(
+                    title="Initialization Successful",
+                    description="Bot started successfully.",
+                    color=0x00FF00,
+                )
+            embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
+            await owner.send(embed=embed)
         clear_console()
         print(" " * console_width, end="\r")
-        print(
+        log_print(
             Fore.CYAN
             + get_timestamp()
             + Fore.RESET
@@ -862,7 +984,7 @@ def main():
         if isinstance(error, commands.CommandNotFound):
             command = ctx.message.content
             print(" " * console_width, end="\r")
-            print(
+            log_print(
                 Fore.CYAN
                 + get_timestamp()
                 + Fore.RESET
@@ -932,14 +1054,13 @@ def main():
                 if role not in member.roles:
                     await member.add_roles(role)
                     print(" " * console_width, end="\r")
-                    print(
+                    log_print(
                         f"Assigned role named {role.name} to {member.display_name} in the target guild."
                     )
             else:
                 await general_channel.send(
                     f"Welcome {member.mention} to the server, but the configured role with ID {role_id} does not exist. Please contact an admin to update the role ID."
                 )
-
 
 @error_handler
 def create_env():
@@ -981,7 +1102,24 @@ async def get_custom_prefix(bot, message):
     return ch.get_prefix()
 
 
+def custom_interrupt_handler(signum, frame):
+    print(" " * console_width, end="\r")
+    if len(processed_streamers) > 0:
+        print(
+            f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} Saving currently streaming streamers and exiting..."
+        )
+        data = {"Restarted": True, "Streamers": processed_streamers}
+        ch.save_to_temp_json(data)
+        os._exit(0)
+
+    print(
+        f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} No streamers currently streaming. exiting..."
+    )
+    os._exit(0)
+
+
 if __name__ == "__main__":
+    signal.signal(signal.SIGINT, custom_interrupt_handler)
     CLIENT_ID = os.environ.get("client_id")
     AUTHORIZATION = os.environ.get("authorization")
     TOKEN = os.environ.get("token")
@@ -998,7 +1136,10 @@ if __name__ == "__main__":
         console_width = 80
     bot.command_prefix = get_custom_prefix
     bot.remove_command("help")  # delete default help command
-    processed_streamers = []
+    if ch.check_restart_status():
+        processed_streamers = ch.processed_streamers
+    else:
+        processed_streamers = []
     API_BASE_URL = "https://api.twitch.tv/helix/streams"
     VERSION = ch.get_version()
     HEADERS = {

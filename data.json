@@ -1,8 +1,9 @@
 {
     "User-list": {},
     "Config": {
-        "version": "v1.8",
-        "prefix": ","
+        "version": "v1.9",
+        "prefix": ",",
+        "bot_owner_id": ""
     },
     "Guilds": {}
 }

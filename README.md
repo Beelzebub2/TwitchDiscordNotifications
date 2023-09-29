@@ -1,5 +1,5 @@
 # **TwitchDiscordNotifications**
-![Static Badge](https://img.shields.io/badge/Version-v1.8-8ebff1?style=for-the-badge&logo=v)
+![Static Badge](https://img.shields.io/badge/Version-v1.9-8ebff1?style=for-the-badge&logo=v)
 ![Static Badge](https://img.shields.io/badge/Language-python-3776ab?style=for-the-badge&logo=python)
 ![Static Badge](https://img.shields.io/badge/License-GNU%20GPL%20v3-blue.svg?style=for-the-badge)  
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/S6S8HV2DY)
@@ -32,20 +32,31 @@ Discord bot: https://discord.com/developers/applications/
 ## **Usage**  
 ### **Commands**
 #### **Must be sent to bot Dm's**  
-**Help** - Shows list of commands  
-**Watch streamername or streamerlink** - Will get the user id and create a new list if it doesn't exist otherwise it will add the streamer to that users list  
-**Unwatch streamername or streamerlink** - Removes the streamer from that user's list  
-**Clear** - Deletes all the messages sent by the bot (1per second to avoid being rate limited)  
-**List** - Generates a embed with all the watchlist streamers
-**Configprefix** - Changes the prefix on that guild
-**Configrole** - Changes the role given to every new member of guild
-**Invite** - Generates bot invite link  
-**Ungerister** - Permanently deletes user's watchlist and data
+**Help** - Shows list of commands.  
+**Watch streamername or streamerlink** - Will get the user id and create a new list if it doesn't exist otherwise it will add the streamer to that users list.  
+**Unwatch streamername or streamerlink** - Removes the streamer from that user's list.  
+**Clear** - Deletes all the messages sent by the bot (1per second to avoid being rate limited).  
+**List** - Generates a embed with all the watchlist streamers.
+**Configprefix** - Changes the prefix on that guild.
+**Configrole** - Changes the role given to every new member of guild.
+**Invite** - Generates bot invite link.  
+**Ungerister** - Permanently deletes user's watchlist and data.  
+**Stats** - Shows bots stats.  
+**Restart** - Restarts the bot (available only to bot host).  
 #### Replit
 **It should create the secrets automatically so just change the filler text in there**
 
 ## Changes
 ```diff
+
+v1.9 29/09/2023
+
++   Added custom keyboard interrupt handler
++   Added a function to allow bot restart without notification spam for already streaming streamers
++   Added a stats command
++   Added a restart bot command available to bot hosts
++   Added some missing embeds
++   Added a log system (early stages)
 
 v1.8 25/09/2023
 
