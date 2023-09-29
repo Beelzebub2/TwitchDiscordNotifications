@@ -36,9 +36,9 @@ Discord bot: https://discord.com/developers/applications/
 **Watch streamername or streamerlink** - Will get the user id and create a new list if it doesn't exist otherwise it will add the streamer to that users list.  
 **Unwatch streamername or streamerlink** - Removes the streamer from that user's list.  
 **Clear** - Deletes all the messages sent by the bot (1per second to avoid being rate limited).  
-**List** - Generates a embed with all the watchlist streamers.
-**Configprefix** - Changes the prefix on that guild.
-**Configrole** - Changes the role given to every new member of guild.
+**List** - Generates a embed with all the watchlist streamers.  
+**Configprefix** - Changes the prefix on that guild.  
+**Configrole** - Changes the role given to every new member of guild.  
 **Invite** - Generates bot invite link.  
 **Ungerister** - Permanently deletes user's watchlist and data.  
 **Stats** - Shows bots stats.  
