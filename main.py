@@ -29,7 +29,7 @@ def error_handler(func):
             return func(*args, **kwargs)
         except Exception as error:
             tb = traceback.extract_tb(error.__traceback__)
-            file = tb[-1].filename  # Extract the filename
+            file = tb[-1].filename
             line = tb[-1].lineno
             error_message = f"An error occurred in {Fore.CYAN + Style.BRIGHT}{file}{Style.RESET_ALL}\n{Fore.CYAN + Style.BRIGHT}Line: {line}{Fore.RED} error: {error} {Style.RESET_ALL}"
             print(" " * console_width, end="\r")
