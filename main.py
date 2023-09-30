@@ -18,7 +18,6 @@ from colorama import init, Fore, Style
 from discord.ext import commands
 from discord import Intents
 from dotenv import load_dotenv
-from test import log_print
 
 load_dotenv()
 
