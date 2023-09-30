@@ -5,11 +5,12 @@ import json
 import signal
 import shutil
 import sys
-import aiohttp
 import tempfile
-import requests
 import time
 import os
+
+import aiohttp
+import requests
 from PIL import Image
 import re
 import discord
