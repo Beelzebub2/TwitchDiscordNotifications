@@ -49,6 +49,12 @@ Discord bot: https://discord.com/developers/applications/
 ## Changes
 ```diff
 
+v1.9 30/09/2023
+
++   Made log_print limit logged lines to 1k
++   Fixed a bug with log_print
++   Added Streamer names to top of pfp on list command
+
 v1.9 29/09/2023
 
 +   Removed unecessary request on send_notification

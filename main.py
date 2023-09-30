@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import io
 import json
+import math
 import signal
 import shutil
 import sys
@@ -11,7 +12,7 @@ import os
 
 import aiohttp
 import requests
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 import re
 import discord
 import traceback
@@ -46,10 +47,24 @@ def error_handler(func):
 
 
 @error_handler
-def log_print(message, log_file_name="log.txt"):
+def log_print(message, log_file_name="log.txt", max_lines=1000):
     def remove_color_codes(text):
-        color_pattern = re.compile(r"\x1b\[[0-9;]*m")
+        color_pattern = re.compile(r"(\x1b\[[0-9;]*m)|(\033\[K)")
         return color_pattern.sub("", text)
+
+    def trim_log_file():
+        try:
+            with open(log_file_name, "r") as original_file:
+                lines = original_file.readlines()
+
+            if len(lines) >= max_lines:
+                lines_to_remove = len(lines) - max_lines + 1
+                new_lines = lines[lines_to_remove:]
+                with open(log_file_name, "w") as updated_file:
+                    updated_file.writelines(new_lines)
+
+        except Exception as e:
+            print(f"Error trimming log file: {e}")
 
     original_stdout = sys.stdout
     try:
@@ -59,6 +74,7 @@ def log_print(message, log_file_name="log.txt"):
             sys.stdout = log_file
             message_without_colors = remove_color_codes(message)
             print(message_without_colors)
+        trim_log_file()
 
     except Exception as e:
         sys.stdout = original_stdout
@@ -284,7 +300,9 @@ def main():
 
                 if "data" in data and len(data["data"]) > 0:
                     if streamer_name.lower() not in processed_streamers:
-                        asyncio.create_task(send_notification(streamer_name.strip(), data))
+                        asyncio.create_task(
+                            send_notification(streamer_name.strip(), data)
+                        )
                         processed_streamers.append(streamer_name.lower())
                     return True
                 if streamer_name.lower() in processed_streamers:
@@ -601,7 +619,9 @@ def main():
                     names.append(streamer_data["display_name"])
                 else:
                     print(" " * console_width, end="\r")
-                    log_print(f"No data found for streamer: {streamer_name}")
+                    log_print(
+                        f"{get_timestamp()} No data found for streamer: {streamer_name}"
+                    )
 
     @bot.command(
         name="list",
@@ -613,8 +633,10 @@ def main():
         user_id = str(ctx.author.id)
         member = await bot.fetch_user(int(user_id))
         user_ids = ch.get_all_user_ids()
+
         if user_id in user_ids:
             streamer_list = ch.get_streamers_for_user(user_id)
+
             if streamer_list:
                 streamer_names = ", ".join(streamer_list)
                 print(" " * console_width, end="\r")
@@ -627,12 +649,10 @@ def main():
                     + Fore.LIGHTYELLOW_EX
                     + ctx.author.name
                     + Fore.RESET
-                    + f" requested their streamers: {streamer_names}"
+                    + f" requested their streamers: {len(streamer_list)}"
                 )
-
                 pfps = []
                 names = []
-
                 async with aiohttp.ClientSession() as session:
                     await asyncio.gather(
                         *[
@@ -641,23 +661,68 @@ def main():
                         ]
                     )
 
-                pfp_size = (100, 100)
-                image_width = pfp_size[0] * len(pfps)
-                combined_image = Image.new("RGB", (image_width, pfp_size[1]))
+                num_pfps = len(pfps)
+                max_images_per_row = 5
+                image_width = 100
+                image_height = 100
+                num_rows = math.ceil(num_pfps / max_images_per_row)
+
+                name_box_width = image_width
+                name_box_height = 20
+                name_box_color = (0, 0, 0)
+                name_text_color = (255, 255, 255)
+                font_size = 9
+                font = ImageFont.truetype("arialbd.ttf", font_size)
+
+                if num_pfps <= max_images_per_row:
+                    combined_image_width = num_pfps * image_width
+                else:
+                    combined_image_width = max_images_per_row * image_width
+
+                combined_image_height = num_rows * (image_height + name_box_height)
+
+                combined_image = Image.new(
+                    "RGB", (combined_image_width, combined_image_height)
+                )
+
                 x_offset = 0
-                # TODO y offset is == 0 now, change later
-                for pfp_url in pfps:
+                y_offset = name_box_height
+
+                for i, (pfp_url, name) in enumerate(zip(pfps, names)):
                     pfp_response = requests.get(pfp_url)
                     pfp_image = Image.open(io.BytesIO(pfp_response.content))
-                    pfp_image = pfp_image.resize(pfp_size)
-                    y_offset = (combined_image.height - pfp_size[1]) // 2
+                    pfp_image.thumbnail((image_width, image_height))
+
+                    name_x = x_offset
+                    name_y = y_offset - name_box_height
+
                     combined_image.paste(pfp_image, (x_offset, y_offset))
-                    x_offset += pfp_size[0]
+
+                    name_box = Image.new(
+                        "RGB", (name_box_width, name_box_height), name_box_color
+                    )
+
+                    draw = ImageDraw.Draw(name_box)
+                    text_bbox = draw.textbbox((0, 0), name, font=font)
+                    text_width = text_bbox[2] - text_bbox[0]
+                    text_height = text_bbox[3] - text_bbox[1]
+                    text_x = (name_box_width - text_width) // 2
+                    text_y = (name_box_height - text_height) // 2
+                    draw.text((text_x, text_y), name, fill=name_text_color, font=font)
+
+                    combined_image.paste(name_box, (name_x, name_y))
+
+                    x_offset += image_width
+
+                    if x_offset >= combined_image_width:
+                        x_offset = 0
+                        y_offset += image_height + name_box_height
+
                 combined_image.save("combined_image.png")
 
                 embed = discord.Embed(
                     title=f"Your Streamers {member.name}",
-                    description=f"**You are currently watching the following streamers:\n{streamer_names}**",
+                    description=f"**You are currently watching the following streamers:**",
                     color=10242047,
                 )
                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
@@ -667,6 +732,8 @@ def main():
                     file = discord.File(img_file)
                     await ctx.channel.send(file=file, embed=embed)
                 os.remove("combined_image.png")
+
+                return streamer_names, combined_image
 
             else:
                 print(" " * console_width, end="\r")
@@ -1052,12 +1119,13 @@ def main():
                     await member.add_roles(role)
                     print(" " * console_width, end="\r")
                     log_print(
-                        f"Assigned role named {role.name} to {member.display_name} in the target guild."
+                        f"{get_timestamp()} Assigned role named {role.name} to {member.display_name} in the target guild."
                     )
             else:
                 await general_channel.send(
                     f"Welcome {member.mention} to the server, but the configured role with ID {role_id} does not exist. Please contact an admin to update the role ID."
                 )
+
 
 @error_handler
 def create_env():
