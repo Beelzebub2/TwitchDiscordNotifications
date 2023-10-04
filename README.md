@@ -51,6 +51,12 @@ Discord bot: https://discord.com/developers/applications/
 
 v1.9 30/09/2023
 
++   Moved Config Handler to it's own file
++   Made a better guild detector
++   Fixed some small issues
+
+v1.9 30/09/2023
+
 +   Made log_print limit logged lines to 1k
 +   Fixed a bug with log_print
 +   Added Streamer names to top of pfp on list command
