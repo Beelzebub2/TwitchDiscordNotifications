@@ -49,7 +49,7 @@ Discord bot: https://discord.com/developers/applications/
 ## Changes
 ```diff
 
-v1.9 30/09/2023
+v1.9 4/10/2023
 
 +   Moved Config Handler to it's own file
 +   Made a better guild detector
