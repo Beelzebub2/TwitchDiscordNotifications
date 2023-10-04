@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import pickle
 import io
 import math
 import signal
@@ -7,7 +8,6 @@ import shutil
 import sys
 import time
 import os
-
 import aiohttp
 import requests
 from PIL import Image, ImageDraw, ImageFont
@@ -18,7 +18,7 @@ from colorama import init, Fore, Style
 from discord.ext import commands
 from discord import Intents
 from dotenv import load_dotenv
-from config_handler import ConfigHandler
+from functions.configHandler import ConfigHandler
 
 load_dotenv()
 
@@ -226,174 +226,6 @@ def main():
                     + f"User with ID {user_id} not found."
                     + Fore.RESET
                 )
-
-    @bot.command(
-        name="watch",
-        aliases=["w"],
-        usage="watch <streamername_or_link>",
-        help="Add a streamer to your watch list (provide either streamer name or link)",
-    )
-    async def watch(ctx, streamer_name_or_link: str):
-        if "https://www.twitch.tv/" in streamer_name_or_link:
-            streamer_name = re.search(
-                r"https://www.twitch.tv/([^\s/]+)", streamer_name_or_link
-            ).group(1)
-            streamer_name = streamer_name.lower()
-        else:
-            streamer_name = streamer_name_or_link.lower()
-        url = f"https://api.twitch.tv/helix/users?login={streamer_name}"
-        headers = {
-            "Client-ID": f"{CLIENT_ID}",
-            "Authorization": f"Bearer {AUTHORIZATION}",
-        }
-        response = requests.get(url, headers=headers)
-        data = response.json()
-        if not data["data"]:
-            print(" " * console_width, end="\r")
-            log_print(
-                Fore.CYAN
-                + get_timestamp()
-                + Fore.RESET
-                + " "
-                + Fore.RED
-                + f"{Fore.CYAN + streamer_name + Fore.RESET} Twitch profile not found."
-                + Fore.RESET
-            )
-            embed = discord.Embed(
-                title="Streamer not found",
-                description=f"**__{streamer_name}__** was not found.",
-                color=discord.Color.red(),
-            )
-            embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
-            await ctx.send(embed=embed)
-            return
-        pfp = data["data"][0]["profile_image_url"]
-        user_id = str(ctx.author.id)
-        user_ids = ch.get_all_user_ids()
-        if user_id in user_ids:
-            streamer_list = ch.get_streamers_for_user(user_id)
-            if streamer_name.lower() not in [s.lower().strip() for s in streamer_list]:
-                ch.add_streamer_to_user(user_id, streamer_name.strip())
-                streamer_list.append(streamer_name.strip())
-                print(" " * console_width, end="\r")
-                log_print(
-                    Fore.CYAN
-                    + get_timestamp()
-                    + Fore.RESET
-                    + " "
-                    + Fore.LIGHTGREEN_EX
-                    + f"Added {Fore.CYAN + streamer_name + Fore.RESET} to user {Fore.CYAN + ctx.author.name + Fore.RESET}'s watchlist."
-                    + Fore.RESET
-                )
-                embed = discord.Embed(
-                    title="Stream Watchlist",
-                    description=f"Added **__{streamer_name}__** to your watchlist.",
-                    color=65280,
-                )
-                embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
-                embed.set_thumbnail(url=pfp)
-                await ctx.send(embed=embed)
-            else:
-                print(" " * console_width, end="\r")
-                log_print(
-                    Fore.CYAN
-                    + get_timestamp()
-                    + Fore.RESET
-                    + " "
-                    + f"{Fore.CYAN + streamer_name + Fore.RESET} is already in user {Fore.CYAN + ctx.author.name + Fore.RESET}'s watchlist."
-                )
-                embed = discord.Embed(
-                    title="Stream Watchlist",
-                    description=f"{streamer_name} is already in your watchlist.",
-                    color=16759808,
-                )
-                embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
-                await ctx.send(embed=embed)
-        else:
-            ch.add_user(
-                user_data={
-                    "discord_username": ctx.author.name,
-                    "discord_id": user_id,
-                    "streamer_list": [streamer_name.strip()],
-                }
-            )
-            print(" " * console_width, end="\r")
-            log_print(
-                Fore.CYAN
-                + get_timestamp()
-                + Fore.RESET
-                + " "
-                + Fore.LIGHTGREEN_EX
-                + f"Created a new watchlist for user {Fore.CYAN + ctx.author.name + Fore.RESET} and added {Fore.CYAN + streamer_name + Fore.RESET}."
-                + Fore.RESET
-            )
-            embed = discord.Embed(
-                title="Stream Watchlist",
-                description=f"Created a new watchlist for you and added {streamer_name}.",
-                color=65280,
-            )
-            embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
-            await ctx.send(embed=embed)
-
-    @bot.command(
-        name="unwatch",
-        aliases=["u"],
-        usage="unwatch <streamername_or_link>",
-        help="Removes the streamer from your watch list (provide either streamer name or link)",
-    )
-    async def unwatch(ctx, streamer_name_or_link: str):
-        if "https://www.twitch.tv/" in streamer_name_or_link:
-            streamer_name = re.search(
-                r"https://www.twitch.tv/([^\s/]+)", streamer_name_or_link
-            ).group(1)
-            streamer_name = streamer_name.lower()
-        else:
-            streamer_name = streamer_name_or_link.lower()
-
-        user_id = str(ctx.author.id)
-        user_ids = ch.get_all_user_ids()
-        if user_id in user_ids:
-            streamer_list = ch.get_streamers_for_user(user_id)
-            if any(streamer_name.lower() == s.lower() for s in streamer_list):
-                ch.remove_streamer_from_user(user_id, streamer_name)
-                if (
-                    streamer_name in processed_streamers
-                    and streamer_name not in ch.get_all_streamers()
-                ):
-                    processed_streamers.remove(streamer_name.lower())
-                print(" " * console_width, end="\r")
-                log_print(
-                    Fore.CYAN
-                    + get_timestamp()
-                    + Fore.RESET
-                    + " "
-                    + Fore.LIGHTGREEN_EX
-                    + f"Removed {Fore.CYAN + streamer_name + Fore.RESET} from user {Fore.CYAN + ctx.author.name + Fore.RESET}'s watchlist."
-                    + Fore.RESET
-                )
-                embed = discord.Embed(
-                    title="Stream Watchlist",
-                    description=f"Removed {streamer_name} from your watchlist.",
-                    color=65280,
-                )
-                embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
-                await ctx.channel.send(embed=embed)
-            else:
-                print(" " * console_width, end="\r")
-                log_print(
-                    Fore.CYAN
-                    + get_timestamp()
-                    + Fore.RESET
-                    + " "
-                    + f"{Fore.CYAN + streamer_name + Fore.RESET} is not in user {Fore.CYAN + ctx.author.name + Fore.RESET}'s watchlist."
-                )
-                embed = discord.Embed(
-                    title="Stream Watchlist",
-                    description=f"{streamer_name} is not in your watchlist.",
-                    color=16759808,
-                )
-                embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
-                await ctx.channel.send(embed=embed)
 
     @bot.command(
         name="clear",
@@ -638,149 +470,9 @@ def main():
 
         await ctx.send(embed=embed)
 
-    @bot.command(
-        name="configrole",
-        aliases=["cr"],
-        usage="configrole <@role>",
-        help="Change the role to add in the server configuration",
-    )
-    async def prefix_config_role(ctx, role: discord.Role):
-        if not ctx.author.guild_permissions.administrator:
-            await ctx.send(
-                "You do not have the necessary permissions to use this command."
-            )
-            return
-        guild_id = ctx.guild.id
-        role_id = role.id
-        ch.change_role_to_add(guild_id, role_id)
-        await ctx.send(
-            f"The role to add has been updated to {role.mention} in the server configuration."
-        )
-
-    @bot.command(
-        name="configprefix",
-        aliases=["cx"],
-        usage="configprefix <new_prefix>",
-        help="changes the default prefix of the guild",
-    )
-    async def change_guild_prefix(ctx, new_prefix: str):
-        if ctx.author.guild_permissions.administrator:
-            guild_id = ctx.guild.id
-            ch.change_guild_prefix(guild_id, new_prefix)
-            await ctx.send(f"Prefix for this guild has been updated to `{new_prefix}`.")
-        else:
-            await ctx.send(
-                "You do not have the necessary permissions to change the prefix."
-            )
-
-    @bot.command(
-        name="unregister",
-        aliases=["unreg"],
-        help="Wipes out the watchlist.",
-        usage="unregister",
-    )
-    async def unregister_user(ctx):
-        user_id = str(ctx.author.id)
-
-        if ch.delete_user(user_id):
-            print(" " * console_width, end="\r")
-            log_print(
-                Fore.CYAN
-                + get_timestamp()
-                + Fore.RESET
-                + " "
-                + Fore.YELLOW
-                + f"{Fore.RED + ctx.author.name + Fore.RESET} Unregistered from bot."
-                + Fore.RESET
-            )
-            embed = discord.Embed(
-                title="Unregistration Successful",
-                description="You have been unregistered from the bot.",
-                color=0x00FF00,
-            )
-            embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
-            await ctx.send(embed=embed)
-        else:
-            print(" " * console_width, end="\r")
-            log_print(
-                Fore.CYAN
-                + get_timestamp()
-                + Fore.RESET
-                + " "
-                + Fore.YELLOW
-                + f"{Fore.RED + ctx.author.name + Fore.RESET} Tried to unregister from bot but wasn't registered to begin with."
-                + Fore.RESET
-            )
-            embed = discord.Embed(
-                title="Unregistration Error",
-                description="You are not registered with the bot.",
-                color=0xFF0000,
-            )
-            embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
-            await ctx.send(embed=embed)
-
-    @bot.command(
-        name="restart",
-        aliases=["rr"],
-        help="Restarts Bot.",
-        usage="restart",
-        hidden=True,
-    )
-    async def restart(ctx):
-        if str(ctx.author.id) != ch.get_bot_owner_id():
-            embed = discord.Embed(
-                title="Permission Error",
-                description="You don't have permissions to use this command.",
-                color=0xFF0000,
-            )
-            embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
-            await ctx.send(embed=embed)
-            return
-        data = {"Restarted": True, "Streamers": processed_streamers}
-        ch.save_to_temp_json(data)
-        embed = discord.Embed(
-            title="Restarting",
-            description="Bot is restarting...",
-            color=0x00FF00,
-        )
-        embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
-        await ctx.send(embed=embed)
-
-        python = sys.executable
-        print(python)
-        os.execl(python, python, *sys.argv)
-
-    @bot.command(name="stats", aliases=["st"], help="Shows Bots stats.", usage="stats")
-    async def uptime(ctx):
-        current_time = datetime.datetime.now()
-        uptime = current_time - bot_start_time
-        uptime = str(uptime).split(".")[0]
-        embed = discord.Embed(title="Bot Stats", color=discord.Color.green())
-        embed.add_field(name="Uptime", value=f"My current uptime is {uptime}")
-        embed.add_field(name="Users", value=len(ch.get_all_user_ids()))
-        embed.add_field(name="Streamers", value=len(ch.get_all_streamers()))
-        await ctx.send(embed=embed)
-
-    @bot.event
-    async def on_disconnect():
-        clear_console()
-
-    @bot.event
-    async def on_resumed():
-        print(" " * console_width, end="\r")
-        log_print(
-            Fore.CYAN
-            + get_timestamp()
-            + Fore.RESET
-            + Fore.LIGHTGREEN_EX
-            + f" Running as {Fore.LIGHTCYAN_EX + bot.user.name + Fore.RESET}"
-        )
-        clear_console()
-
     @bot.event
     async def on_ready():
-        global bot_start_time
-        bot_start_time = datetime.datetime.now()
+        ch.save_time(str(datetime.datetime.now()))
         if not ch.check_restart_status():
             bot_owner_id = ch.get_bot_owner_id()
             if bot_owner_id:
@@ -859,91 +551,6 @@ def main():
 
             await asyncio.sleep(5)
 
-    @bot.event
-    async def on_command_error(ctx, error):
-        if isinstance(error, commands.CommandNotFound):
-            command = ctx.message.content
-            print(" " * console_width, end="\r")
-            log_print(
-                Fore.CYAN
-                + get_timestamp()
-                + Fore.RESET
-                + " "
-                + Fore.RED
-                + f"Command {Fore.CYAN + command + Fore.RESET} doesn't exist."
-                + Fore.RESET
-            )
-            embed = discord.Embed(
-                title="Command not found",
-                description=f"Command **__{command}__** does not exist use .help for more info.",
-                color=discord.Color.red(),
-            )
-            embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
-            await ctx.send(embed=embed)
-        else:
-            # Handle other errors
-            await ctx.send(f"An error occurred: {error}")
-
-    @bot.event
-    async def on_message(message):
-        if message.author == bot.user:
-            return
-
-        if bot.user.mentioned_in(message):
-            if isinstance(message.channel, discord.DMChannel):
-                embed = discord.Embed(
-                    title=f"Hello, {message.author.display_name}!",
-                    description=f"My prefix is: `{ch.get_prefix()}`",
-                    color=discord.Color.green(),
-                )
-
-            elif isinstance(message.channel, discord.TextChannel):
-                guild_prefix = bot.command_prefix
-                if message.guild:
-                    guild_prefix = ch.get_guild_prefix(message.guild.id)
-
-                embed = discord.Embed(
-                    title=f"Hello, {message.author.display_name}!",
-                    description=f"My prefix for this server is: `{guild_prefix}`",
-                    color=discord.Color.green(),
-                )
-            await message.channel.send(embed=embed)
-
-        await bot.process_commands(message)
-
-    @bot.event
-    async def on_guild_join(guild):
-        guild_id = guild.id
-        guild_name = guild.name
-        if not ch.is_guild_in_config(guild_id):
-            ch.create_new_guild_template(guild_id, guild_name)
-
-    @bot.event
-    async def on_member_join(member):
-        guild_id = member.guild.id
-
-        role_id = int(ch.get_role_to_add(guild_id))
-        general_channel = member.guild.text_channels[0]
-
-        if not role_id:
-            await general_channel.send(
-                f"Welcome {member.mention} to the server, but it seems the server administrator has not configured the role assignment. Please contact an admin for assistance."
-            )
-        else:
-            role = member.guild.get_role(role_id)
-            if role:
-                if role not in member.roles:
-                    await member.add_roles(role)
-                    print(" " * console_width, end="\r")
-                    log_print(
-                        f"{get_timestamp()} Assigned role named {role.name} to {member.display_name} in the target guild."
-                    )
-            else:
-                await general_channel.send(
-                    f"Welcome {member.mention} to the server, but the configured role with ID {role_id} does not exist. Please contact an admin to update the role ID."
-                )
-
-
 @error_handler
 def create_env():
     if os.path.exists(".env"):
@@ -999,6 +606,15 @@ def custom_interrupt_handler(signum, frame):
     )
     os._exit(0)
 
+async def load_extensions():
+    for filename in os.listdir('./commands'):
+        if filename.endswith('.py'):
+            await bot.load_extension(f'commands.{filename[:-3]}')
+
+async def loadAndStart():
+    async with bot:
+        await load_extensions()
+        await bot.start(TOKEN)
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, custom_interrupt_handler)
@@ -1028,6 +644,22 @@ if __name__ == "__main__":
         "Client-ID": CLIENT_ID,
         "Authorization": f"Bearer {AUTHORIZATION}",
     }
+    
+    date_format = "%Y-%m-%d %H:%M:%S.%f"
+    shared_variables = {
+        "ch": ch,
+        "console_width": console_width,
+        "processed_streamers": processed_streamers,
+        "version": VERSION,
+        "authorization": AUTHORIZATION,
+        "client_id": CLIENT_ID,
+        "date_format": date_format,
+        "intents": intents
+    }
+
+    with open("variables.pkl", "wb") as file:
+        pickle.dump(shared_variables, file)
+
     init()
     main()
-    bot.run(TOKEN)
+    asyncio.run(loadAndStart())
