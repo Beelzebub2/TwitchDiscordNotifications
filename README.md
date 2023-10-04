@@ -51,6 +51,7 @@ Discord bot: https://discord.com/developers/applications/
 
 v2.0 05/10/2023 Thanks to CDJuaum
 
+!   Working on Slash Commands
 !   Moving all the commands to different files
 !   Working on a better log system
 !   Working on a more efficient and reliable way to save user watchlists 
