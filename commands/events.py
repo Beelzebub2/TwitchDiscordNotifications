@@ -22,15 +22,14 @@ class Events(commands.Cog):
     '''On Guild Join'''
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
-        guild_id = guild.id
-        guild_name = guild.name
-        if not ch.is_guild_in_config(guild_id):
-            ch.create_new_guild_template(guild_id, guild_name)
+        if not ch.is_guild_in_config(guild.id):
+            ch.create_new_guild_template(guild.id, guild.name)
 
     '''On Guild Remove'''
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
-        ch.remove_guild(guild.id)
+        if ch.is_guild_in_config():
+            ch.remove_guild(guild.id)
 
     '''On Member Join'''
     @commands.Cog.listener()
@@ -82,6 +81,17 @@ class Events(commands.Cog):
             )
             embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
             await ctx.send(embed=embed)
+        else:
+            print(" " * console_width, end="\r")
+            log_print(
+                Fore.CYAN
+                + get_timestamp()
+                + Fore.RESET
+                + " "
+                + Fore.RED
+                + f"Error: {error}"
+                + Fore.RESET
+            )
 
     '''On Message'''
     @commands.Cog.listener()
