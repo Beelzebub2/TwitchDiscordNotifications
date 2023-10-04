@@ -3,7 +3,8 @@
     "Config": {
         "version": "v1.9",
         "prefix": ",",
-        "bot_owner_id": ""
+        "bot_owner_id": "",
+        "time": ""
     },
     "Guilds": {}
 }
