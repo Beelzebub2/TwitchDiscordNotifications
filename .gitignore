@@ -2,3 +2,6 @@
 Twitch/
 .vscode/
 test.py
+variables.pkl
+commands/__pycache__
+functions/__pycache__

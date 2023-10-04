@@ -53,6 +53,8 @@ v2.0 05/10/2023 Thanks to CDJuaum
 
 !   Working on a better log system
 !   Working on a more efficient and reliable way to save user watchlists 
++   Added timestamps to all embeds
++   Fixed small issue with watch command
 +   Bot logs errors instead of sending in DMs
 +   Added event listener to on guild remove
 +   Completely reorganized the code into subsections in different files

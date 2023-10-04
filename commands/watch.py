@@ -1,3 +1,4 @@
+import datetime
 from discord.ext import commands
 import requests
 from colorama import Fore
@@ -56,6 +57,7 @@ class Watch(commands.Cog):
                 title="Streamer not found",
                 description=f"**__{streamer_name}__** was not found.",
                 color=discord.Color.red(),
+                timestamp=datetime.datetime.now()
             )
             embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
             await ctx.send(embed=embed)
@@ -82,6 +84,7 @@ class Watch(commands.Cog):
                     title="Stream Watchlist",
                     description=f"Added **__{streamer_name}__** to your watchlist.",
                     color=65280,
+                    timestamp=datetime.datetime.now()
                 )
                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                 embed.set_thumbnail(url=pfp)
@@ -99,6 +102,7 @@ class Watch(commands.Cog):
                     title="Stream Watchlist",
                     description=f"{streamer_name} is already in your watchlist.",
                     color=16759808,
+                    timestamp=datetime.datetime.now()
                 )
                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                 await ctx.send(embed=embed)
@@ -124,8 +128,10 @@ class Watch(commands.Cog):
                 title="Stream Watchlist",
                 description=f"Created a new watchlist for you and added {streamer_name}.",
                 color=65280,
+                timestamp=datetime.datetime.now()
             )
             embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
+            embed.set_thumbnail(url=pfp)
             await ctx.send(embed=embed)
 
 async def setup(bot):

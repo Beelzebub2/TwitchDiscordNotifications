@@ -1,3 +1,4 @@
+import datetime
 from discord.ext import commands
 from colorama import Fore
 import discord
@@ -38,6 +39,7 @@ class UnRegister(commands.Cog):
                 title="Unregistration Successful",
                 description="You have been unregistered from the bot.",
                 color=0x00FF00,
+                timestamp=datetime.datetime.now()
             )
             embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
             await ctx.send(embed=embed)
@@ -56,6 +58,7 @@ class UnRegister(commands.Cog):
                 title="Unregistration Error",
                 description="You are not registered with the bot.",
                 color=0xFF0000,
+                timestamp=datetime.datetime.now()
             )
             embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
             await ctx.send(embed=embed)

@@ -1,3 +1,4 @@
+import datetime
 from discord.ext import commands
 from functions.others import get_timestamp, log_print
 import pickle
@@ -78,6 +79,7 @@ class Events(commands.Cog):
                 title="Command not found",
                 description=f"Command **__{command}__** does not exist use .help for more info.",
                 color=discord.Color.red(),
+                timestamp=datetime.datetime.now()
             )
             embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
             await ctx.send(embed=embed)
@@ -106,6 +108,7 @@ class Events(commands.Cog):
                     title=f"Hello, {message.author.display_name}!",
                     description=f"My prefix is: `{ch.get_prefix()}`",
                     color=discord.Color.green(),
+                    timestamp=datetime.datetime.now()
                 )
 
             elif isinstance(message.channel, discord.TextChannel):
@@ -117,6 +120,7 @@ class Events(commands.Cog):
                     title=f"Hello, {message.author.display_name}!",
                     description=f"My prefix for this server is: `{guild_prefix}`",
                     color=discord.Color.green(),
+                    timestamp=datetime.datetime.now()
                 )
             await message.channel.send(embed=embed)
 

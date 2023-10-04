@@ -144,6 +144,7 @@ def main():
                                 title=f"{streamer_name} is streaming!",
                                 description=f"Click [here](https://www.twitch.tv/{streamer_name}) to watch the stream.",
                                 color=discord.Color.green(),
+                                timestamp=datetime.datetime.now()
                             )
                             if "data" in data and len(data["data"]) > 0:
                                 stream_data = data["data"][0]
@@ -247,6 +248,7 @@ def main():
             title="Conversation Cleared",
             description="All messages have been cleared.",
             color=65280,
+            timestamp=datetime.datetime.now()
         )
         embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
         await ctx.send(embed=embed)
@@ -373,6 +375,7 @@ def main():
                     title=f"Your Streamers {member.name}",
                     description=f"**You are currently watching the following streamers:**",
                     color=10242047,
+                    timestamp=datetime.datetime.now()
                 )
                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                 embed.set_image(url="attachment://combined_image.png")
@@ -399,6 +402,7 @@ def main():
                     title="Stream Watchlist",
                     description="Your watchlist is empty.",
                     color=16759808,
+                    timestamp=datetime.datetime.now()
                 )
                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                 await ctx.channel.send(embed=embed)
@@ -417,6 +421,7 @@ def main():
                 title="Stream Watchlist",
                 description="You don't have a watchlist yet.",
                 color=16711680,
+                timestamp=datetime.datetime.now()
             )
             embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
             await ctx.channel.send(embed=embed)
@@ -432,7 +437,9 @@ def main():
             title="Bot Commands",
             description="Here are the available commands, their descriptions, and usage:",
             color=65280,
+            timestamp=datetime.datetime.now()
         )
+        
 
         sorted_commands = sorted(bot.commands, key=lambda x: x.name)
 
@@ -465,6 +472,7 @@ def main():
             title="Invite Me!",
             description=f"[Click here](https://discord.com/api/oauth2/authorize?client_id={bot.user.id}&permissions=8&scope=bot)",
             color=65280,
+            timestamp=datetime.datetime.now()
         )
         embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
 
@@ -481,6 +489,7 @@ def main():
                     title="Initialization Successful",
                     description="Bot started successfully.",
                     color=0x00FF00,
+                    timestamp=datetime.datetime.now()
                 )
             embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
             await owner.send(embed=embed)

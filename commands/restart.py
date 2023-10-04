@@ -1,3 +1,4 @@
+import datetime
 from discord.ext import commands
 import sys
 import os
@@ -27,6 +28,7 @@ class Restart(commands.Cog):
                 title="Permission Error",
                 description="You don't have permissions to use this command.",
                 color=0xFF0000,
+                timestamp=datetime.datetime.now()
             )
             embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
             await ctx.send(embed=embed)
@@ -37,6 +39,7 @@ class Restart(commands.Cog):
             title="Restarting",
             description="Bot is restarting...",
             color=0x00FF00,
+            timestamp=datetime.datetime.now()
         )
         embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
         await ctx.send(embed=embed)

@@ -1,3 +1,4 @@
+import datetime
 from discord.ext import commands
 from colorama import Fore
 import discord
@@ -57,6 +58,7 @@ class UnWatch(commands.Cog):
                     title="Stream Watchlist",
                     description=f"Removed {streamer_name} from your watchlist.",
                     color=65280,
+                    timestamp=datetime.datetime.now()
                 )
                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                 await ctx.channel.send(embed=embed)
@@ -73,6 +75,7 @@ class UnWatch(commands.Cog):
                     title="Stream Watchlist",
                     description=f"{streamer_name} is not in your watchlist.",
                     color=16759808,
+                    timestamp=datetime.datetime.now()
                 )
                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                 await ctx.channel.send(embed=embed)
