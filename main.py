@@ -81,6 +81,8 @@ def log_print(message, log_file_name="log.txt", max_lines=1000):
     finally:
         sys.stdout = original_stdout
 
+def clear_console():
+    os.system("cls" if os.name == "nt" else "clear")
 
 @error_handler
 def main():
@@ -90,9 +92,6 @@ def main():
         timestr = now.strftime("%Y-%m-%d %H:%M:%S")
         timestr = f"{Fore.YELLOW}[{Fore.RESET}{Fore.CYAN + timestr + Fore.RESET}{Fore.YELLOW}]{Fore.RESET}"
         return timestr
-
-    def clear_console():
-        os.system("cls" if os.name == "nt" else "clear")
 
     @error_handler
     def generate_timestamp_string(started_at):
@@ -626,8 +625,19 @@ async def load_extensions():
 
 async def loadAndStart():
     async with bot:
-        await load_extensions()
-        await bot.start(TOKEN)
+        try:
+            await load_extensions()
+            await bot.start(TOKEN)
+        except discord.errors.PrivilegedIntentsRequired:
+            clear_console()
+            print(
+                Fore.LIGHTRED_EX
+                + "[INTENTS ERROR] "
+                + Fore.LIGHTYELLOW_EX
+                + "Please grant all the intents to your bot on https://discord.com/developers/applications/YourBotId/bot"
+                + Fore.RESET
+            )
+            os._exit(0)
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, custom_interrupt_handler)
