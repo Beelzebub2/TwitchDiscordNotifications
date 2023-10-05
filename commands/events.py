@@ -94,7 +94,7 @@ class Events(commands.Cog):
                 + f"Error: {error}"
                 + Fore.RESET
             )
-
+    
     '''On Message'''
     @commands.Cog.listener()
     async def on_message(self, message):
