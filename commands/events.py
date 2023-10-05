@@ -1,7 +1,9 @@
 import datetime
 from discord.ext import commands
-from functions.others import get_timestamp, log_print
 import pickle
+import discord
+from colorama import Fore
+import functions
 
 with open("variables.pkl", "rb") as file:
     variables = pickle.load(file)
@@ -9,6 +11,7 @@ with open("variables.pkl", "rb") as file:
 ch = variables["ch"]
 console_width = variables["console_width"]
 intents = variables["intents"]
+processed_streamers = variables["processed_streamers"]
 
 bot = commands.Bot(
         command_prefix=commands.when_mentioned_or(ch.get_prefix), intents=intents
@@ -50,8 +53,8 @@ class Events(commands.Cog):
                 if role not in member.roles:
                     await member.add_roles(role)
                     print(" " * console_width, end="\r")
-                    log_print(
-                        f"{get_timestamp()} Assigned role named {role.name} to {member.display_name} in the target guild."
+                    functions.others.log_print(
+                        f"{functions.others.get_timestamp()} Assigned role named {role.name} to {member.display_name} in the target guild."
                     )
             else:
                 await general_channel.send(
@@ -61,14 +64,12 @@ class Events(commands.Cog):
     '''On Command Error'''
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        from colorama import Fore
-        import discord
         if isinstance(error, commands.CommandNotFound):
             command = ctx.message.content
             print(" " * console_width, end="\r")
-            log_print(
+            functions.others.log_print(
                 Fore.CYAN
-                + get_timestamp()
+                + functions.others.get_timestamp()
                 + Fore.RESET
                 + " "
                 + Fore.RED
@@ -85,16 +86,16 @@ class Events(commands.Cog):
             await ctx.send(embed=embed)
         else:
             print(" " * console_width, end="\r")
-            log_print(
+            functions.others.log_print(
                 Fore.CYAN
-                + get_timestamp()
+                + functions.others.get_timestamp()
                 + Fore.RESET
                 + " "
                 + Fore.RED
                 + f"Error: {error}"
                 + Fore.RESET
             )
-
+    
     '''On Message'''
     @commands.Cog.listener()
     async def on_message(self, message):
