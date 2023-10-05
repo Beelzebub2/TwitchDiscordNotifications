@@ -55,6 +55,7 @@ v2.0 05/10/2023 Thanks to CDJuaum
 !   Moving all the commands to different files
 !   Working on a better log system
 !   Working on a more efficient and reliable way to save user watchlists 
++   Added change console title
 +   Made commands loading faster
 +   Added catch to Intents error
 +   Made bot get owner.id by itself

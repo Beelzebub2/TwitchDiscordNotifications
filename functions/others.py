@@ -1,7 +1,13 @@
 import re
+import os
 import datetime
 from colorama import Fore
 import sys
+import pickle
+
+
+with open("variables.pkl", "rb") as file:
+    variables = pickle.load(file)
 
 def log_print(message, log_file_name="log.txt", max_lines=1000):
     def remove_color_codes(text):
@@ -44,3 +50,16 @@ def get_timestamp():
     timestr = now.strftime("%Y-%m-%d %H:%M:%S")
     timestr = f"{Fore.YELLOW}[{Fore.RESET}{Fore.CYAN + timestr + Fore.RESET}{Fore.YELLOW}]{Fore.RESET}"
     return timestr
+
+def set_console_title(title):
+    if os.name == 'nt':
+        try:
+            os.system(f'title {title} {variables["version"]}')
+        except Exception:
+            pass
+    else:
+        try:
+            os.system(f'printf "\033]0;{title} {variables["version"]}\007"')
+        except Exception:
+            pass
+

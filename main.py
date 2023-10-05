@@ -20,6 +20,7 @@ from discord import Intents
 from dotenv import load_dotenv
 import concurrent.futures
 from functions.configHandler import ConfigHandler
+import functions.others
 
 load_dotenv()
 
@@ -498,6 +499,7 @@ def main():
             embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
             await owner.send(embed=embed)
         clear_console()
+        functions.others.set_console_title("TwitchDiscordNotifications")
         print(" " * console_width, end="\r")
         log_print(
             Fore.CYAN
