@@ -1,7 +1,7 @@
-requests==2.31.0
-urllib3==2.0.3
-colorama==0.4.6
-discord.py==2.3.1
+requests
+urllib3
+colorama
+discord.py
 Pillow==10.0.0
 python-dotenv
 aiohttp
