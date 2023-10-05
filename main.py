@@ -18,6 +18,7 @@ from colorama import init, Fore, Style
 from discord.ext import commands
 from discord import Intents
 from dotenv import load_dotenv
+import concurrent.futures
 from functions.configHandler import ConfigHandler
 
 load_dotenv()
@@ -618,10 +619,29 @@ def custom_interrupt_handler(signum, frame):
     )
     os._exit(0)
 
+async def load_extension(filename):
+    try:
+        await bot.load_extension(f'commands.{filename[:-3]}')
+        return f"Loaded {filename}"
+    except Exception as e:
+        return f"Failed to load {filename}: {e}"
+
 async def load_extensions():
-    for filename in os.listdir('./commands'):
-        if filename.endswith('.py'):
-            await bot.load_extension(f'commands.{filename[:-3]}')
+    extension_files = [filename for filename in os.listdir('./commands') if filename.endswith('.py')]
+    workers = len(extension_files) + 1
+    start_time = time.time()
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+        results = await asyncio.gather(*[load_extension(filename) for filename in extension_files])
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    for result in results:
+        print(result)
+    print(f"Elapsed time: {elapsed_time:.4f} seconds")
+
+
+
 
 async def loadAndStart():
     async with bot:
