@@ -14,8 +14,6 @@ try:
 except:
     pass
 
-
-
 def log_print(message, log_file_name="log.txt", max_lines=1000):
     def remove_color_codes(text):
         color_pattern = re.compile(r"(\x1b\[[0-9;]*m)|(\033\[K)")
