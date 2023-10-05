@@ -40,3 +40,21 @@
 [2023-10-05 17:43:03] Error: Command raised an exception: TypeError: object NoneType can't be used in 'await' expression
 [2023-10-05 17:43:58] Running as Twitch Notifications
 [2023-10-05 17:44:03] cdjuaum requested their streamers, but they don't have a watchlist yet.
+[2023-10-05 18:00:00] Running as Twitch Notifications
+[2023-10-05 18:23:11] Running as Twitch Notifications
+[2023-10-05 18:24:48] Running as Twitch Notifications
+[2023-10-05 18:32:07] Running as Twitch Notifications
+[2023-10-05 18:45:48] Running as Twitch Notifications
+[2023-10-05 18:47:54] Running as Twitch Notifications
+[2023-10-05 18:48:28] Running as Twitch Notifications
+[2023-10-05 19:07:52] Running as Twitch Notifications
+[2023-10-05 19:07:55] cdjuaum requested their streamers, but they don't have a watchlist yet.
+[2023-10-05 19:14:21] Running as Twitch Notifications
+[2023-10-05 19:14:27] cdjuaum requested their streamers, but they don't have a watchlist yet.
+[2023-10-05 19:14:28] cdjuaum requested their streamers, but they don't have a watchlist yet.
+[2023-10-05 19:14:30] cdjuaum requested their streamers, but they don't have a watchlist yet.
+[2023-10-05 19:14:31] cdjuaum requested their streamers, but they don't have a watchlist yet.
+[2023-10-05 19:14:32] cdjuaum requested their streamers, but they don't have a watchlist yet.
+[2023-10-05 19:14:33] Error: Command raised an exception: AttributeError: 'async_generator' object has no attribute 'flatten'
+[2023-10-05 19:18:19] Running as Twitch Notifications
+[2023-10-05 19:22:49] Running as Twitch Notifications
