@@ -25,84 +25,7 @@ import functions.others
 load_dotenv()
 
 
-def error_handler(func):
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except Exception as error:
-            tb = traceback.extract_tb(error.__traceback__)
-            file = tb[-1].filename
-            line = tb[-1].lineno
-            error_message = f"An error occurred in {Fore.CYAN + Style.BRIGHT}{file}{Style.RESET_ALL}\n{Fore.CYAN + Style.BRIGHT}Line: {line}{Fore.RED} error: {error} {Style.RESET_ALL}"
-            print(" " * console_width, end="\r")
-            print(
-                Fore.YELLOW
-                + Style.BRIGHT
-                + "\n"
-                + error_message
-                + "\n"
-                + Style.RESET_ALL
-            )
-
-    return wrapper
-
-
-@error_handler
-def log_print(message, log_file_name="log.txt", max_lines=1000):
-    def remove_color_codes(text):
-        color_pattern = re.compile(r"(\x1b\[[0-9;]*m)|(\033\[K)")
-        return color_pattern.sub("", text)
-
-    def trim_log_file():
-        try:
-            with open(log_file_name, "r") as original_file:
-                lines = original_file.readlines()
-
-            if len(lines) >= max_lines:
-                lines_to_remove = len(lines) - max_lines + 1
-                new_lines = lines[lines_to_remove:]
-                with open(log_file_name, "w") as updated_file:
-                    updated_file.writelines(new_lines)
-
-        except Exception as e:
-            print(f"Error trimming log file: {e}")
-
-    original_stdout = sys.stdout
-    try:
-        print(message)
-
-        with open(log_file_name, "a") as log_file:
-            sys.stdout = log_file
-            message_without_colors = remove_color_codes(message)
-            print(message_without_colors)
-        trim_log_file()
-
-    except Exception as e:
-        sys.stdout = original_stdout
-        print(f"Error logging to file: {e}")
-    finally:
-        sys.stdout = original_stdout
-
-def clear_console():
-    os.system("cls" if os.name == "nt" else "clear")
-
-@error_handler
 def main():
-    @error_handler
-    def get_timestamp():
-        now = datetime.datetime.now()
-        timestr = now.strftime("%Y-%m-%d %H:%M:%S")
-        timestr = f"{Fore.YELLOW}[{Fore.RESET}{Fore.CYAN + timestr + Fore.RESET}{Fore.YELLOW}]{Fore.RESET}"
-        return timestr
-
-    @error_handler
-    def generate_timestamp_string(started_at):
-        started_datetime = datetime.datetime.fromisoformat(started_at.rstrip("Z"))
-        unix_timestamp = int(started_datetime.timestamp()) + 3600
-        timestamp_string = f"<t:{unix_timestamp}:T>"
-        return timestamp_string
-
-    @error_handler
     async def check_stream(session, streamer_name):
         if not streamer_name:
             return False
@@ -129,7 +52,7 @@ def main():
 
             return False
 
-    @error_handler
+    
     async def send_notification(streamer_name, data):
         streamer_lists = ch.get_user_ids_with_streamers()
         for user_id, streamers in streamer_lists.items():
@@ -178,7 +101,7 @@ def main():
                                 profile_picture_url = profile_picture_url.replace(
                                     "{width}", "300"
                                 ).replace("{height}", "300")
-                                start_time_str = generate_timestamp_string(started_at)
+                                start_time_str = functions.others.generate_timestamp_string(started_at)
                                 embed.add_field(name="Stream Title", value=title)
                                 embed.set_thumbnail(url=profile_picture_url)
                                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
@@ -190,9 +113,9 @@ def main():
                                 try:
                                     await dm_channel.send(mention, embed=embed)
                                     print(" " * console_width, end="\r")
-                                    log_print(
+                                    functions.others.log_print(
                                         Fore.CYAN
-                                        + get_timestamp()
+                                        + functions.others.get_timestamp()
                                         + Fore.RESET
                                         + " "
                                         + Fore.LIGHTGREEN_EX
@@ -200,18 +123,18 @@ def main():
                                     )
                                 except discord.errors.Forbidden:
                                     print(" " * console_width, end="\r")
-                                    log_print(
+                                    functions.others.log_print(
                                         Fore.CYAN
-                                        + get_timestamp()
+                                        + functions.others.get_timestamp()
                                         + Fore.RESET
                                         + " "
                                         + f"Cannot send a message to user {member.name}. Missing permissions or DMs disabled."
                                     )
                             else:
                                 print(" " * console_width, end="\r")
-                                log_print(
+                                functions.others.log_print(
                                     Fore.CYAN
-                                    + get_timestamp()
+                                    + functions.others.get_timestamp()
                                     + Fore.RESET
                                     + " "
                                     + f"{streamer_name} is not streaming."
@@ -219,9 +142,9 @@ def main():
                                 processed_streamers.remove(streamer_name)
             except discord.errors.NotFound:
                 print(" " * console_width, end="\r")
-                log_print(
+                functions.others.log_print(
                     Fore.CYAN
-                    + get_timestamp()
+                    + functions.others.get_timestamp()
                     + Fore.RESET
                     + " "
                     + Fore.RED
@@ -271,8 +194,8 @@ def main():
                     names.append(streamer_data["display_name"])
                 else:
                     print(" " * console_width, end="\r")
-                    log_print(
-                        f"{get_timestamp()} No data found for streamer: {streamer_name}"
+                    functions.others.log_print(
+                        f"{functions.others.get_timestamp()} No data found for streamer: {streamer_name}"
                     )
 
     @bot.command(
@@ -292,10 +215,10 @@ def main():
             if streamer_list:
                 streamer_names = ", ".join(streamer_list)
                 print(" " * console_width, end="\r")
-                log_print(
+                functions.others.log_print(
                     "\033[K"
                     + Fore.CYAN
-                    + get_timestamp()
+                    + functions.others.get_timestamp()
                     + Fore.RESET
                     + " "
                     + Fore.LIGHTYELLOW_EX
@@ -390,9 +313,9 @@ def main():
 
             else:
                 print(" " * console_width, end="\r")
-                log_print(
+                functions.others.log_print(
                     Fore.CYAN
-                    + get_timestamp()
+                    + functions.others.get_timestamp()
                     + Fore.RESET
                     + " "
                     + Fore.YELLOW
@@ -409,9 +332,9 @@ def main():
                 await ctx.channel.send(embed=embed)
         else:
             print(" " * console_width, end="\r")
-            log_print(
+            functions.others.log_print(
                 Fore.CYAN
-                + get_timestamp()
+                + functions.others.get_timestamp()
                 + Fore.RESET
                 + " "
                 + Fore.RED
@@ -462,22 +385,6 @@ def main():
 
         await ctx.send(embed=embed)
 
-    @bot.command(
-        name="invite",
-        aliases=["i"],
-        help="Generates bot invite link",
-        usage="invite",
-    )
-    async def invite(ctx):
-        embed = discord.Embed(
-            title="Invite Me!",
-            description=f"[Click here](https://discord.com/api/oauth2/authorize?client_id={bot.user.id}&permissions=8&scope=bot)",
-            color=65280,
-            timestamp=datetime.datetime.now()
-        )
-        embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
-
-        await ctx.send(embed=embed)
 
     @bot.event
     async def on_ready():
@@ -498,12 +405,12 @@ def main():
             )
             embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
             await owner.send(embed=embed)
-        clear_console()
+        functions.others.clear_console()
         functions.others.set_console_title("TwitchDiscordNotifications")
         print(" " * console_width, end="\r")
-        log_print(
+        functions.others.log_print(
             Fore.CYAN
-            + get_timestamp()
+            + functions.others.get_timestamp()
             + Fore.RESET
             + Fore.LIGHTGREEN_EX
             + f" Running as {Fore.LIGHTCYAN_EX + bot.user.name + Fore.RESET}"
@@ -519,7 +426,7 @@ def main():
             print(
                 "\033[K"
                 + Fore.CYAN
-                + get_timestamp()
+                + functions.others.get_timestamp()
                 + Fore.RESET
                 + " "
                 + Fore.LIGHTYELLOW_EX
@@ -541,7 +448,7 @@ def main():
                 print(" " * console_width, end="\r")
                 print(
                     Fore.CYAN
-                    + get_timestamp()
+                    + functions.others.get_timestamp()
                     + Fore.RESET
                     + " "
                     + Fore.LIGHTGREEN_EX
@@ -556,7 +463,7 @@ def main():
                 print(" " * console_width, end="\r")
                 print(
                     Fore.CYAN
-                    + get_timestamp()
+                    + functions.others.get_timestamp()
                     + Fore.RESET
                     + Fore.LIGHTWHITE_EX
                     + f" Checked {len(streamers)} streamers. Time taken: {elapsed_time:.2f} seconds"
@@ -566,7 +473,7 @@ def main():
 
             await asyncio.sleep(5)
 
-@error_handler
+
 def create_env():
     if os.path.exists(".env"):
         return
@@ -651,7 +558,7 @@ async def loadAndStart():
             await load_extensions()
             await bot.start(TOKEN)
         except discord.errors.PrivilegedIntentsRequired:
-            clear_console()
+            functions.others.clear_console()
             print(
                 Fore.LIGHTRED_EX
                 + "[INTENTS ERROR] "

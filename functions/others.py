@@ -51,6 +51,12 @@ def get_timestamp():
     timestr = f"{Fore.YELLOW}[{Fore.RESET}{Fore.CYAN + timestr + Fore.RESET}{Fore.YELLOW}]{Fore.RESET}"
     return timestr
 
+def generate_timestamp_string(started_at):
+    started_datetime = datetime.datetime.fromisoformat(started_at.rstrip("Z"))
+    unix_timestamp = int(started_datetime.timestamp()) + 3600
+    timestamp_string = f"<t:{unix_timestamp}:T>"
+    return timestamp_string
+
 def set_console_title(title):
     if os.name == 'nt':
         try:
@@ -62,4 +68,7 @@ def set_console_title(title):
             os.system(f'printf "\033]0;{title} {variables["version"]}\007"')
         except Exception:
             pass
+
+def clear_console():
+    os.system("cls" if os.name == "nt" else "clear")
 
