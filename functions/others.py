@@ -5,9 +5,16 @@ from colorama import Fore
 import sys
 import pickle
 
+try:
+    with open("variables.pkl", "rb") as file:
+        variables = pickle.load(file)
+    console_width = variables["console_width"]
+    processed_streamers = variables["processed_streamers"]
+    ch = variables["ch"]
+except:
+    pass
 
-with open("variables.pkl", "rb") as file:
-    variables = pickle.load(file)
+
 
 def log_print(message, log_file_name="log.txt", max_lines=1000):
     def remove_color_codes(text):
@@ -71,4 +78,19 @@ def set_console_title(title):
 
 def clear_console():
     os.system("cls" if os.name == "nt" else "clear")
+
+def custom_interrupt_handler(signum, frame):
+    print(" " * console_width, end="\r")
+    if len(processed_streamers) > 0:
+        print(
+            f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} Saving currently streaming streamers and exiting..."
+        )
+        data = {"Restarted": True, "Streamers": processed_streamers}
+        ch.save_to_temp_json(data)
+        os._exit(0)
+
+    print(
+        f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} No streamers currently streaming. exiting..."
+    )
+    os._exit(0)
 

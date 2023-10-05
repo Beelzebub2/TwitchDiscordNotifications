@@ -444,30 +444,6 @@ def create_env():
         os._exit(0)
 
 
-async def get_custom_prefix(bot, message):
-    if message.guild:
-        guild_id = message.guild.id
-        custom_prefix = ch.get_guild_prefix(guild_id)
-        if custom_prefix:
-            return custom_prefix
-    return ch.get_prefix()
-
-
-def custom_interrupt_handler(signum, frame):
-    print(" " * console_width, end="\r")
-    if len(processed_streamers) > 0:
-        print(
-            f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} Saving currently streaming streamers and exiting..."
-        )
-        data = {"Restarted": True, "Streamers": processed_streamers}
-        ch.save_to_temp_json(data)
-        os._exit(0)
-
-    print(
-        f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} No streamers currently streaming. exiting..."
-    )
-    os._exit(0)
-
 async def load_extension(filename):
     try:
         await bot.load_extension(f'commands.{filename[:-3]}')
@@ -489,8 +465,13 @@ async def load_extensions():
         print(result)
     print(f"Elapsed time: {elapsed_time:.4f} seconds")
 
-
-
+async def get_custom_prefix(bot, message):
+    if message.guild:
+        guild_id = message.guild.id
+        custom_prefix = ch.get_guild_prefix(guild_id)
+        if custom_prefix:
+            return custom_prefix
+    return ch.get_prefix()
 
 async def loadAndStart():
     async with bot:
@@ -509,7 +490,7 @@ async def loadAndStart():
             os._exit(0)
 
 if __name__ == "__main__":
-    signal.signal(signal.SIGINT, custom_interrupt_handler)
+    signal.signal(signal.SIGINT, functions.others.custom_interrupt_handler)
     CLIENT_ID = os.environ.get("client_id")
     AUTHORIZATION = os.environ.get("authorization")
     TOKEN = os.environ.get("token")
