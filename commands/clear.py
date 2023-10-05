@@ -3,7 +3,6 @@ from discord.ext import commands
 import discord
 import datetime
 import pickle
-import functions.others
 
 with open("variables.pkl", "rb") as file:
     variables = pickle.load(file)
@@ -26,10 +25,11 @@ class Clear(commands.Cog):
         messages_to_remove = 1000
         user = await self.bot.fetch_user(ctx.author.id)
 
-        async for message in ctx.history(limit=messages_to_remove):
-            if message.author.id == self.bot.user.id:
-                await message.delete()
-                await asyncio.sleep(1)
+        # Collect all messages to be deleted
+        messages = [message async for message in ctx.history(limit=messages_to_remove) if message.author.id == self.bot.user.id]
+
+        # Use asyncio.gather to delete messages concurrently
+        await asyncio.gather(*(self.delete_message(message) for message in messages))
 
         # Create and send an embed message
         embed = discord.Embed(
@@ -40,7 +40,10 @@ class Clear(commands.Cog):
         )
         embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
         await ctx.send(embed=embed)
-    
+
+    async def delete_message(self, message):
+        await message.delete()
+        await asyncio.sleep(1)
 
 async def setup(bot):
     await bot.add_cog(Clear(bot))
