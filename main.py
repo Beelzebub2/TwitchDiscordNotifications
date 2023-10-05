@@ -483,14 +483,18 @@ def main():
         ch.save_time(str(datetime.datetime.now()))
         if not ch.check_restart_status():
             bot_owner_id = ch.get_bot_owner_id()
-            if bot_owner_id:
+            if not bot_owner_id:
+                bot_info = await bot.application_info()
+                owner = bot.get_user(int(bot_info.owner.id))
+                ch.save_bot_owner_id(str(owner.id))
+            else:
                 owner = bot.get_user(int(bot_owner_id))
-                embed = discord.Embed(
-                    title="Initialization Successful",
-                    description="Bot started successfully.",
-                    color=0x00FF00,
-                    timestamp=datetime.datetime.now()
-                )
+            embed = discord.Embed(
+                title="Initialization Successful",
+                description="Bot started successfully.",
+                color=0x00FF00,
+                timestamp=datetime.datetime.now()
+            )
             embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
             await owner.send(embed=embed)
         clear_console()

@@ -197,3 +197,10 @@ class ConfigHandler:
     def get_bot_owner_id(self):
         bot_owner_id = self.data.get("Config", {}).get("bot_owner_id", "")
         return bot_owner_id
+    
+    def save_bot_owner_id(self, owner_id):
+        self.data = self.load_config()
+        config_data = self.data.get("Config", {})
+        config_data["bot_owner_id"] = owner_id
+        self.data["Config"] = config_data
+        self.save_config()
