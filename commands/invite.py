@@ -6,8 +6,6 @@ import pickle
 with open("variables.pkl", "rb") as file:
     variables = pickle.load(file)
 
-ch = variables["ch"]
-date_format = variables["date_format"]
 VERSION = variables["version"]
 
 class Invite(commands.Cog):
