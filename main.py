@@ -1,19 +1,13 @@
 import asyncio
 import datetime
 import pickle
-import io
-import math
 import signal
 import shutil
-import sys
 import time
 import os
 import aiohttp
 import requests
-from PIL import Image, ImageDraw, ImageFont
-import re
 import discord
-import traceback
 from colorama import init, Fore, Style
 from discord.ext import commands
 from discord import Intents
