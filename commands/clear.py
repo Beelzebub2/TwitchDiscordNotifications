@@ -40,27 +40,6 @@ class Clear(commands.Cog):
         )
         embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
         await ctx.send(embed=embed)
-
-    async def fetch_streamer_data(session, streamer_name, pfps, names):
-        streamer_name = streamer_name.replace(" ", "")
-        url = f"https://api.twitch.tv/helix/users?login={streamer_name}"
-
-        async with session.get(url, headers=HEADERS) as response:
-            if response.status == 200:
-                data = await response.json()
-                if "data" in data and len(data["data"]) > 0:
-                    streamer_data = data["data"][0]
-                    profile_picture_url = streamer_data.get("profile_image_url", "")
-                    profile_picture_url = profile_picture_url.replace(
-                        "{width}", "150"
-                    ).replace("{height}", "150")
-                    pfps.append(profile_picture_url)
-                    names.append(streamer_data["display_name"])
-                else:
-                    print(" " * console_width, end="\r")
-                    functions.others.log_print(
-                        f"{functions.others.get_timestamp()} No data found for streamer: {streamer_name}"
-                    )
     
 
 async def setup(bot):
