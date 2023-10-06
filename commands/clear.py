@@ -12,8 +12,8 @@ HEADERS = variables["headers"]
 console_width = variables["console_width"]
 
 class Clear(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
+    def __init__(self, bot: commands.Bot) -> None:
+        self.bot = bot 
 
     @commands.command(
         name="clear",
@@ -21,7 +21,7 @@ class Clear(commands.Cog):
         help="Clears all the messages sent by the bot",
         usage="clear",
     )
-    async def clear_bot_messages(self, ctx):
+    async def clear_bot_messages(self, ctx) -> None:
         messages_to_remove = 1000
         user = await self.bot.fetch_user(ctx.author.id)
 
@@ -45,5 +45,5 @@ class Clear(commands.Cog):
         await message.delete()
         await asyncio.sleep(1)
 
-async def setup(bot):
+async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Clear(bot))
