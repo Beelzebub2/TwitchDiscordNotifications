@@ -8,7 +8,7 @@ import os
 import aiohttp
 import requests
 import discord
-from colorama import init, Fore, Style
+from colorama import init, Fore
 from discord.ext import commands
 from discord import Intents
 from dotenv import load_dotenv
