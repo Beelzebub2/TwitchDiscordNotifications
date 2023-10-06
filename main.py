@@ -162,6 +162,14 @@ def main():
                 owner = bot.get_user(int(owner_id))
             else:
                 owner = bot.get_user(int(bot_owner_id))
+            bot_guilds = bot.guilds
+            owner_in_guild = any(
+                owner in guild.members for guild in bot_guilds)
+
+            if not owner_in_guild:
+                functions.others.log_print(
+                    f"{functions.others.get_timestamp()}{Fore.RED} [ERROR] Warning: Owner is not in any guild where the bot is present.")
+
             embed = discord.Embed(
                 title="Initialization Successful",
                 description="Bot started successfully.",
@@ -172,6 +180,7 @@ def main():
             embed.add_field(name="Loaded commands", value=len(Loaded_commands))
             embed.add_field(name="Failed commands",
                             value="\n".join(Failed_commands))
+
             await owner.send(embed=embed)
         functions.others.clear_console()
         functions.others.set_console_title("TwitchDiscordNotifications")
