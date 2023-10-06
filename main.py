@@ -51,7 +51,7 @@ def main():
         streamer_lists = ch.get_user_ids_with_streamers()
         for user_id, streamers in streamer_lists.items():
             try:
-                member = await bot.fetch_user(int(user_id))
+                member = bot.get_user(int(user_id))
                 if member:
                     dm_channel = member.dm_channel
                     if dm_channel is None:
