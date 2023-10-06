@@ -74,6 +74,7 @@ class Events(commands.Cog):
                 + Fore.RESET
                 + " "
                 + Fore.RED
+                + "[ERROR] "
                 + f"Command {Fore.CYAN + command + Fore.RESET} doesn't exist."
                 + Fore.RESET
             )
