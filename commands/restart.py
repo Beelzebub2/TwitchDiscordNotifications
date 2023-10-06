@@ -17,23 +17,14 @@ class Restart(commands.Cog):
         self.bot = bot
 
     @commands.command(
-    name="restart",
-    aliases=["rr"],
-    help="Restarts Bot.",
-    usage="restart",
-    hidden=True,
-)
+        name="restart",
+        aliases=["rr"],
+        help="Restarts Bot.",
+        usage="restart",
+        hidden=True,
+    )
+    @commands.is_owner()
     async def restart(self, ctx):
-        if str(ctx.author.id) != ch.get_bot_owner_id():
-            embed = discord.Embed(
-                title="Permission Error",
-                description="You don't have permissions to use this command.",
-                color=0xFF0000,
-                timestamp=datetime.datetime.now()
-            )
-            embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
-            await ctx.send(embed=embed)
-            return
         data = {"Restarted": True, "Streamers": processed_streamers}
         ch.save_to_temp_json(data)
         embed = discord.Embed(
