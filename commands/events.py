@@ -60,7 +60,7 @@ class Events(commands.Cog):
                 await general_channel.send(
                     f"Welcome {member.mention} to the server, but the configured role with ID {role_id} does not exist. Please contact an admin to update the role ID."
                 )
-
+    # TODO Better error handler
     '''On Command Error'''
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
