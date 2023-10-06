@@ -4,11 +4,12 @@ import sys
 import os
 import discord
 import pickle
+from functions.Sql_handler import SQLiteHandler
 
 with open("variables.pkl", "rb") as file:
     variables = pickle.load(file)
 
-ch = variables["ch"]
+ch = SQLiteHandler("data.db")
 processed_streamers = variables["processed_streamers"]
 
 class Restart(commands.Cog):

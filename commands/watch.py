@@ -3,6 +3,7 @@ from discord.ext import commands
 import requests
 from colorama import Fore
 import discord
+from functions.Sql_handler import SQLiteHandler
 from functions.others import get_timestamp, log_print
 import re
 import pickle
@@ -10,7 +11,7 @@ import pickle
 with open("variables.pkl", "rb") as file:
     variables = pickle.load(file)
 
-ch = variables["ch"]
+ch = SQLiteHandler("data.db")
 console_width = variables["console_width"]
 processed_streamers = variables["processed_streamers"]
 VERSION = variables["version"]

@@ -14,6 +14,7 @@ from discord import Intents
 from dotenv import load_dotenv
 import concurrent.futures
 from functions.configHandler import ConfigHandler
+from functions.Sql_handler import SQLiteHandler
 import functions.others
 
 load_dotenv()
@@ -316,7 +317,7 @@ if __name__ == "__main__":
     AUTHORIZATION = os.environ.get("authorization")
     TOKEN = os.environ.get("token")
     create_env()
-    ch = ConfigHandler("data.json")
+    ch = SQLiteHandler("data.db")
     intents = Intents.all()
     intents.dm_messages = True
     bot = commands.Bot(
@@ -341,7 +342,6 @@ if __name__ == "__main__":
     
     date_format = "%Y-%m-%d %H:%M:%S.%f"
     shared_variables = {
-        "ch": ch,
         "console_width": console_width,
         "processed_streamers": processed_streamers,
         "version": VERSION,

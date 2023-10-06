@@ -2,13 +2,14 @@ import datetime
 from discord.ext import commands
 from colorama import Fore
 import discord
+from functions.Sql_handler import SQLiteHandler
 from functions.others import log_print, get_timestamp
 import pickle
 
 with open("variables.pkl", "rb") as file:
     variables = pickle.load(file)
 
-ch = variables["ch"]
+ch = SQLiteHandler("data.db")
 console_width = variables["console_width"]
 
 class UnRegister(commands.Cog):

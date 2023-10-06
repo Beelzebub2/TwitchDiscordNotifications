@@ -29,6 +29,7 @@ class SQLiteHandler:
         ''')
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS config (
+                id INTEGER PRIMARY KEY,
                 version TEXT,
                 prefix TEXT,
                 bot_owner_id TEXT,
@@ -191,13 +192,16 @@ class SQLiteHandler:
     '''works'''
     def set_version(self, new_version):
         cursor = self.conn.cursor()
-        cursor.execute('UPDATE Config SET version = ?', (new_version,))
+        cursor.execute("""
+            INSERT INTO Config (id, version) VALUES (?, ?)
+            ON CONFLICT(id) DO UPDATE SET version = excluded.version
+            """, (1, new_version))
         self.conn.commit()
 
     '''works'''
     def get_version(self):
         cursor = self.conn.cursor()
-        cursor.execute('SELECT version FROM Config')
+        cursor.execute('SELECT version FROM config')
         version = cursor.fetchone()
         if version is not None:
             return version[0]
@@ -207,13 +211,16 @@ class SQLiteHandler:
     '''works'''
     def set_prefix(self, prefix):
         cursor = self.conn.cursor()
-        cursor.execute('UPDATE Config SET prefix = ?', (prefix,))
+        cursor.execute("""
+            INSERT INTO Config (id, prefix) VALUES (?, ?)
+            ON CONFLICT(id) DO UPDATE SET prefix = excluded.prefix
+            """, (1, prefix))
         self.conn.commit()
 
     '''works'''
     def get_prefix(self):
         cursor = self.conn.cursor()
-        cursor.execute('SELECT prefix FROM Config')
+        cursor.execute('SELECT prefix FROM config')
         prefix = cursor.fetchone()
         if prefix is not None:
             return prefix[0]
@@ -223,7 +230,7 @@ class SQLiteHandler:
     '''works'''
     def get_time(self):
         cursor = self.conn.cursor()
-        cursor.execute('SELECT time FROM Config')
+        cursor.execute('SELECT time FROM config')
         prefix = cursor.fetchone()
         if prefix is not None:
             return prefix[0]
@@ -233,13 +240,16 @@ class SQLiteHandler:
     '''works'''
     def save_time(self, time):
         cursor = self.conn.cursor()
-        cursor.execute('UPDATE Config SET time = ?', (time,))
+        cursor.execute("""
+            INSERT INTO Config (id, time) VALUES (?, ?)
+            ON CONFLICT(id) DO UPDATE SET time = excluded.time
+            """, (1, time))
         self.conn.commit()
         
     '''works'''
     def get_bot_owner_id(self):
         cursor = self.conn.cursor()
-        cursor.execute('SELECT bot_owner_id FROM Config')
+        cursor.execute('SELECT bot_owner_id FROM config')
         owner_id = cursor.fetchone()
         if owner_id is not None:
             return owner_id[0]
@@ -249,7 +259,10 @@ class SQLiteHandler:
     '''works'''
     def save_bot_owner_id(self, owner_id):
         cursor = self.conn.cursor()
-        cursor.execute('UPDATE Config SET bot_owner_id = ?', (owner_id,))
+        cursor.execute("""
+            INSERT INTO Config (id, bot_owner_id) VALUES (?, ?)
+            ON CONFLICT(id) DO UPDATE SET bot_owner_id = excluded.bot_owner_id
+            """, (1, owner_id))
         self.conn.commit()
     
     '''works'''

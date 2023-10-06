@@ -11,12 +11,13 @@ import requests
 import io
 import os
 import datetime
+from functions.Sql_handler import SQLiteHandler
 
 
 with open("variables.pkl", "rb") as file:
     variables = pickle.load(file)
 
-ch = variables["ch"]
+ch = SQLiteHandler("data.db")
 console_width = variables["console_width"]
 VERSION = variables["version"]
 intents = variables["intents"]

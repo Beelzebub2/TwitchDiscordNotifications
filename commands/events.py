@@ -4,11 +4,12 @@ import pickle
 import discord
 from colorama import Fore
 import functions
+from functions.Sql_handler import SQLiteHandler
 
 with open("variables.pkl", "rb") as file:
     variables = pickle.load(file)
 
-ch = variables["ch"]
+ch = SQLiteHandler("data.db")
 console_width = variables["console_width"]
 intents = variables["intents"]
 processed_streamers = variables["processed_streamers"]
