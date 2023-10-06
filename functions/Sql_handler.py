@@ -41,17 +41,14 @@ class SQLiteHandler:
 
     def get_info_by_discord_id(self, discord_id):
         cursor = self.conn.cursor()
-        # Retrieve all information for the specified Discord ID
         cursor.execute(
             'SELECT * FROM users WHERE discord_id = ?', (discord_id,))
         rows = cursor.fetchall()
-        # Return the retrieved rows
         return rows
 
     def get_username_by_discord_id(self, discord_id):
         cursor = self.conn.cursor()
 
-        # Retrieve the username for the specified Discord ID
         cursor.execute(
             'SELECT username FROM users WHERE discord_id = ?', (discord_id,))
         row = cursor.fetchone()
@@ -91,26 +88,20 @@ class SQLiteHandler:
     def add_streamer_to_user(self, discord_id, streamer):
         try:
             cursor = self.conn.cursor()
-
-            # Retrieve the current value of the "streamer" column for the specified Discord ID
             cursor.execute(
                 'SELECT streamer FROM users WHERE discord_id = ?', (discord_id,))
             current_value = cursor.fetchone()
 
-            # Check if the Discord ID exists in the table
             if current_value is None:
-                # Discord ID does not exist, insert a new row with the specified Discord ID and streamer
                 cursor.execute(
                     'INSERT INTO users (discord_id, streamer) VALUES (?, ?)', (discord_id, streamer))
             else:
-                # Discord ID exists, concatenate the new streamer with the current value using a comma as a separator
                 current_value = current_value[0]
                 if current_value is not None:
                     streamers = current_value.split(',')
                 else:
                     streamers = []
                 if streamer not in streamers:
-                    # Streamer is not in the current value, concatenate the new streamer with the current value using a comma as a separator
                     if current_value is not None:
                         new_value = current_value + ',' + streamer
                     else:
@@ -135,8 +126,6 @@ class SQLiteHandler:
             if streamer in streamers:
                 streamers.remove(streamer)
                 new_value = ','.join(streamers)
-
-                # Update the specific user's streamer list
                 cursor.execute(
                     'UPDATE users SET streamer = ? WHERE discord_id = ?', (new_value, discord_id))
                 self.conn.commit()
@@ -254,19 +243,14 @@ class SQLiteHandler:
         try:
             cursor = self.conn.cursor()
 
-            # Check if a guild with the same ID already exists
             cursor.execute(
                 "SELECT guild_id FROM guilds WHERE guild_id = ?", (guild_id,))
             existing_guild = cursor.fetchone()
 
             if existing_guild is None:
-                # Guild with the same ID does not exist, insert a new row
                 cursor.execute("INSERT INTO guilds (guild_id, name, prefix, role_to_add) VALUES (?, ?, ?, ?)",
                                (guild_id, guild_name, ",", None))
                 self.conn.commit()
-                print("New guild created successfully.")
-            else:
-                print("Guild with the same ID already exists.")
 
             cursor.close()
         except Exception as e:
@@ -274,10 +258,10 @@ class SQLiteHandler:
 
     def is_guild_in_config(self, guild_id):
         cursor = self.conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM guilds WHERE guild_id = ?", (guild_id,))
+        cursor.execute(
+            "SELECT COUNT(*) FROM guilds WHERE guild_id = ?", (guild_id,))
         count = cursor.fetchone()[0]
         return count > 0
-
 
     def get_guild_prefix(self, guild_id):
         cursor = self.conn.cursor()

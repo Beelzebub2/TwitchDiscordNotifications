@@ -4,9 +4,9 @@ import datetime
 from colorama import Fore
 import sys
 import pickle
-
 import requests
-
+from functions.Sql_handler import SQLiteHandler
+ch = SQLiteHandler("data.db")
 try:
     with open("variables.pkl", "rb") as file:
         variables = pickle.load(file)
@@ -15,6 +15,7 @@ try:
     ch = variables["ch"]
 except:
     pass
+
 
 def log_print(message, log_file_name="log.txt", max_lines=1000):
     def remove_color_codes(text):
@@ -52,17 +53,20 @@ def log_print(message, log_file_name="log.txt", max_lines=1000):
     finally:
         sys.stdout = original_stdout
 
+
 def get_timestamp():
     now = datetime.datetime.now()
     timestr = now.strftime("%Y-%m-%d %H:%M:%S")
     timestr = f"{Fore.YELLOW}[{Fore.RESET}{Fore.CYAN + timestr + Fore.RESET}{Fore.YELLOW}]{Fore.RESET}"
     return timestr
 
+
 def generate_timestamp_string(started_at):
     started_datetime = datetime.datetime.fromisoformat(started_at.rstrip("Z"))
     unix_timestamp = int(started_datetime.timestamp()) + 3600
     timestamp_string = f"<t:{unix_timestamp}:T>"
     return timestamp_string
+
 
 def set_console_title(title):
     if os.name == 'nt':
@@ -76,8 +80,10 @@ def set_console_title(title):
         except Exception:
             pass
 
+
 def clear_console():
     os.system("cls" if os.name == "nt" else "clear")
+
 
 def custom_interrupt_handler(signum, frame):
     print(" " * console_width, end="\r")
@@ -93,6 +99,7 @@ def custom_interrupt_handler(signum, frame):
         f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} No streamers currently streaming. exiting..."
     )
     os._exit(0)
+
 
 def get_version(repo_url):
     readme_url = f"{repo_url}/blob/main/README.md"
