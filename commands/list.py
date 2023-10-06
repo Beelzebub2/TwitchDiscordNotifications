@@ -60,7 +60,6 @@ class ListStreamers(commands.Cog):
     )
     async def list_streamers(self, ctx):
         user_id = str(ctx.author.id)
-        member = bot.get_user(int(user_id))
         user_ids = ch.get_all_user_ids()
 
         if user_id in user_ids:
@@ -150,7 +149,7 @@ class ListStreamers(commands.Cog):
                 combined_image.save("combined_image.png")
 
                 embed = discord.Embed(
-                    title=f"Your Streamers {member.name}",
+                    title=f"Your Streamers {ctx.author.name}",
                     description=f"**You are currently watching the following streamers:**",
                     color=10242047,
                     timestamp=datetime.datetime.now()
