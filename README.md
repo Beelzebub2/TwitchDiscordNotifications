@@ -51,6 +51,8 @@ Discord bot: https://discord.com/developers/applications/
 
 v2.1 06/10/2023
 
++   Restructured main.py code
++   Fixed List command bug
 +   Added reload commands command
 +   Fixed Bot not logging in when owner not in a guild with bot
 +   Fixed small issues with clear command
