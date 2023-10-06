@@ -197,7 +197,6 @@ class TwitchDiscordBot:
                 )
 
     async def on_ready(self):
-        print("sTUCK ERHAPS?")
         self.ch.save_time(str(datetime.datetime.now()))
         if not self.ch.check_restart_status():
             bot_owner_id = self.ch.get_bot_owner_id()
@@ -218,7 +217,8 @@ class TwitchDiscordBot:
                 timestamp=datetime.datetime.now()
             )
             embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
-            embed.add_field(name="Loaded commands", value=len(self.Loaded_commands))
+            embed.add_field(name="Loaded commands",
+                            value=len(self.Loaded_commands))
             embed.add_field(name="Failed commands",
                             value="\n".join(self.Failed_commands))
             if not owner_in_guild:
@@ -375,6 +375,7 @@ class TwitchDiscordBot:
                     + Fore.RESET
                 )
                 os._exit(0)
+
 
 if __name__ == "__main__":
     bot_instance = TwitchDiscordBot()
