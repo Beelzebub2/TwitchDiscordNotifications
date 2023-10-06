@@ -1,5 +1,5 @@
 # **TwitchDiscordNotifications**
-![Static Badge](https://img.shields.io/badge/Version-v2.0-8ebff1?style=for-the-badge&logo=v)
+![Static Badge](https://img.shields.io/badge/Version-v2.1-8ebff1?style=for-the-badge&logo=v)
 ![Static Badge](https://img.shields.io/badge/Language-python-3776ab?style=for-the-badge&logo=python)
 ![Static Badge](https://img.shields.io/badge/License-GNU%20GPL%20v3-blue.svg?style=for-the-badge)  
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/S6S8HV2DY)
@@ -48,6 +48,13 @@ Discord bot: https://discord.com/developers/applications/
 
 ## Changes
 ```diff
+
+v2.1 06/10/2023
+
+!   Working on reload commands command
++   Fixed small issues with clear command
++   Fixed error with mention for prefix
++   Moved from json to Sqlite for data
 
 v2.0 05/10/2023 Thanks to CDJuaum
 

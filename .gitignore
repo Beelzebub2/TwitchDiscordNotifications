@@ -7,3 +7,4 @@ commands/__pycache__
 functions/__pycache__
 log.txt
 failed.py
+tests.py

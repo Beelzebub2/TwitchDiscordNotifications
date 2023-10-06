@@ -38,6 +38,8 @@ class UnWatch(commands.Cog):
         user_ids = ch.get_all_user_ids()
         if user_id in user_ids:
             streamer_list = ch.get_streamers_for_user(user_id)
+            print(streamer_list)
+            print(len(streamer_list))
             if any(streamer_name.lower() == s.lower() for s in streamer_list):
                 ch.remove_streamer_from_user(user_id, streamer_name)
                 if (

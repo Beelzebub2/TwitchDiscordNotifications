@@ -47,7 +47,6 @@ def main():
 
             return False
 
-    
     async def send_notification(streamer_name, data):
         streamer_lists = ch.get_user_ids_with_streamers()
         for user_id, streamers in streamer_lists.items():
@@ -87,8 +86,10 @@ def main():
                                         value="No viewers. Be the first!",
                                     )
                                 else:
-                                    embed.add_field(name="Viewers", value=viewers)
-                                user_response = requests.get(user_url, headers=HEADERS)
+                                    embed.add_field(
+                                        name="Viewers", value=viewers)
+                                user_response = requests.get(
+                                    user_url, headers=HEADERS)
                                 user_data = user_response.json()
                                 profile_picture_url = user_data["data"][0][
                                     "profile_image_url"
@@ -96,10 +97,13 @@ def main():
                                 profile_picture_url = profile_picture_url.replace(
                                     "{width}", "300"
                                 ).replace("{height}", "300")
-                                start_time_str = functions.others.generate_timestamp_string(started_at)
-                                embed.add_field(name="Stream Title", value=title)
+                                start_time_str = functions.others.generate_timestamp_string(
+                                    started_at)
+                                embed.add_field(
+                                    name="Stream Title", value=title)
                                 embed.set_thumbnail(url=profile_picture_url)
-                                embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
+                                embed.set_footer(
+                                    text=f"{VERSION} | Made by Beelzebub2")
                                 mention = f"||{member.mention}||"
                                 embed.add_field(
                                     name="Stream Start Time (local)",
@@ -147,7 +151,6 @@ def main():
                     + Fore.RESET
                 )
 
-
     @bot.event
     async def on_ready():
         ch.save_time(str(datetime.datetime.now()))
@@ -166,6 +169,9 @@ def main():
                 timestamp=datetime.datetime.now()
             )
             embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
+            embed.add_field(name="Loaded commands", value=len(Loaded_commands))
+            embed.add_field(name="Failed commands",
+                            value="\n".join(Failed_commands))
             await owner.send(embed=embed)
         functions.others.clear_console()
         functions.others.set_console_title("TwitchDiscordNotifications")
@@ -273,8 +279,10 @@ async def load_extension(filename):
     except Exception as e:
         return f"Failed to load {filename}: {e}"
 
+
 async def load_extensions():
-    extension_files = [filename for filename in os.listdir('./commands') if filename.endswith('.py')]
+    extension_files = [filename for filename in os.listdir(
+        './commands') if filename.endswith('.py')]
     workers = len(extension_files) + 1
     start_time = time.time()
 
@@ -285,7 +293,15 @@ async def load_extensions():
     elapsed_time = end_time - start_time
     for result in results:
         print(result)
+        parts = result.split(" ")
+        if len(parts) >= 2 and parts[0] == "Loaded":
+            Loaded_commands.append(result)
+        else:
+            result = result.split(":")
+            Failed_commands.append(result[0])
+
     print(f"Elapsed time: {elapsed_time:.4f} seconds")
+
 
 async def get_custom_prefix(bot, message):
     if message.guild:
@@ -294,6 +310,7 @@ async def get_custom_prefix(bot, message):
         if custom_prefix:
             return custom_prefix
     return ch.get_prefix()
+
 
 async def loadAndStart():
     async with bot:
@@ -316,12 +333,18 @@ if __name__ == "__main__":
     CLIENT_ID = os.environ.get("client_id")
     AUTHORIZATION = os.environ.get("authorization")
     TOKEN = os.environ.get("token")
+    repo_url = "https://github.com/Beelzebub2/TwitchDiscordNotifications"
+    VERSION = "v" + functions.others.get_version(repo_url)
     create_env()
     ch = SQLiteHandler("data.db")
+    ch.set_prefix(",")
+    ch.set_version(VERSION)
     intents = Intents.all()
     intents.dm_messages = True
+    Loaded_commands = []
+    Failed_commands = []
     bot = commands.Bot(
-        command_prefix=commands.when_mentioned_or(ch.get_prefix), intents=intents
+        command_prefix=commands.when_mentioned_or(ch.get_prefix()), intents=intents
     )
     try:
         console_width = shutil.get_terminal_size().columns
@@ -339,7 +362,7 @@ if __name__ == "__main__":
         "Client-ID": CLIENT_ID,
         "Authorization": f"Bearer {AUTHORIZATION}",
     }
-    
+
     date_format = "%Y-%m-%d %H:%M:%S.%f"
     shared_variables = {
         "console_width": console_width,
@@ -348,6 +371,8 @@ if __name__ == "__main__":
         "authorization": AUTHORIZATION,
         "client_id": CLIENT_ID,
         "date_format": date_format,
+        "loaded_commands": Loaded_commands,
+        "failed_commands": Failed_commands,
         "intents": intents,
         "headers": HEADERS
     }

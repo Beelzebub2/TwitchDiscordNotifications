@@ -11,6 +11,7 @@ with open("variables.pkl", "rb") as file:
 ch = SQLiteHandler("data.db")
 date_format = variables["date_format"]
 
+
 class Stats(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -21,11 +22,13 @@ class Stats(commands.Cog):
         start_time = datetime.datetime.strptime(ch.get_time(), date_format)
         uptime = current_time - start_time
         uptime = str(uptime).split(".")[0]
-        embed = discord.Embed(title="Bot Stats", color=discord.Color.green(), timestamp=datetime.datetime.now())
+        embed = discord.Embed(title="Bot Stats", color=discord.Color.green(
+        ), timestamp=datetime.datetime.now())
         embed.add_field(name="Uptime", value=f"My current uptime is {uptime}")
         embed.add_field(name="Users", value=len(ch.get_all_user_ids()))
         embed.add_field(name="Streamers", value=len(ch.get_all_streamers()))
         await ctx.send(embed=embed)
+
 
 async def setup(bot):
     await bot.add_cog(Stats(bot))

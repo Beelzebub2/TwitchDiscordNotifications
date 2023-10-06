@@ -11,9 +11,10 @@ VERSION = variables["version"]
 HEADERS = variables["headers"]
 console_width = variables["console_width"]
 
+
 class Clear(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
-        self.bot = bot 
+        self.bot = bot
 
     @commands.command(
         name="clear",
@@ -25,13 +26,14 @@ class Clear(commands.Cog):
         messages_to_remove = 1000
         user = await self.bot.fetch_user(ctx.author.id)
 
-        # Collect all messages to be deleted
-        messages = [message async for message in ctx.history(limit=messages_to_remove) if message.author.id == self.bot.user.id]
+        messages = []
+        async for message in ctx.history(limit=messages_to_remove):
+            if message.author.id == self.bot.user.id:
+                messages.append(message)
+        for message in messages:
+            await message.delete()
+            await asyncio.sleep(1)
 
-        # Use asyncio.gather to delete messages concurrently
-        await asyncio.gather(*(self.delete_message(message) for message in messages))
-
-        # Create and send an embed message
         embed = discord.Embed(
             title="Conversation Cleared",
             description="All messages have been cleared.",
@@ -41,9 +43,6 @@ class Clear(commands.Cog):
         embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
         await ctx.send(embed=embed)
 
-    async def delete_message(self, message):
-        await message.delete()
-        await asyncio.sleep(1)
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Clear(bot))

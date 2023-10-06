@@ -14,11 +14,6 @@ console_width = variables["console_width"]
 intents = variables["intents"]
 processed_streamers = variables["processed_streamers"]
 
-bot = commands.Bot(
-        command_prefix=commands.when_mentioned_or(ch.get_prefix), intents=intents
-    )
-
-'''All bot events that didn't need to be on main file'''
 
 class Events(commands.Cog):
     def __init__(self, bot):
@@ -27,13 +22,17 @@ class Events(commands.Cog):
     '''On Guild Join'''
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
-        if not ch.is_guild_in_config(guild.id):
+        # TODO add embed and log_print
+        in_guild = ch.is_guild_in_config(guild.id)
+        if not in_guild:
             ch.create_new_guild_template(guild.id, guild.name)
 
     '''On Guild Remove'''
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
-        if ch.is_guild_in_config():
+        # TODO add embed and log_print
+        in_guild = ch.is_guild_in_config(guild.id)
+        if in_guild:
             ch.remove_guild(guild.id)
 
     '''On Member Join'''
@@ -96,15 +95,15 @@ class Events(commands.Cog):
                 + f"Error: {error}"
                 + Fore.RESET
             )
-    
+
     '''On Message'''
     @commands.Cog.listener()
     async def on_message(self, message):
         import discord
-        if message.author == bot.user:
+        if message.author == self.bot.user:
             return
 
-        if bot.user.mentioned_in(message):
+        if self.bot.user.mentioned_in(message):
             if isinstance(message.channel, discord.DMChannel):
                 embed = discord.Embed(
                     title=f"Hello, {message.author.display_name}!",
@@ -114,7 +113,7 @@ class Events(commands.Cog):
                 )
 
             elif isinstance(message.channel, discord.TextChannel):
-                guild_prefix = bot.command_prefix
+                guild_prefix = self.bot.command_prefix
                 if message.guild:
                     guild_prefix = ch.get_guild_prefix(message.guild.id)
 
@@ -126,7 +125,6 @@ class Events(commands.Cog):
                 )
             await message.channel.send(embed=embed)
 
-        await bot.process_commands(message)
 
 async def setup(bot):
     await bot.add_cog(Events(bot))

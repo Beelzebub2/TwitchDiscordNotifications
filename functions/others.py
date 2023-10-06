@@ -5,6 +5,8 @@ from colorama import Fore
 import sys
 import pickle
 
+import requests
+
 try:
     with open("variables.pkl", "rb") as file:
         variables = pickle.load(file)
@@ -92,3 +94,18 @@ def custom_interrupt_handler(signum, frame):
     )
     os._exit(0)
 
+def get_version(repo_url):
+    readme_url = f"{repo_url}/blob/main/README.md"
+    response = requests.get(readme_url)
+    if response.status_code == 200:
+        readme_content = response.text
+        pattern = r"Version-v([\d.]+)"
+        match = re.search(pattern, readme_content)
+
+        if match:
+            version = match.group(1)
+            return version
+        else:
+            return "Version not found"
+    else:
+        return f"Version not found"
