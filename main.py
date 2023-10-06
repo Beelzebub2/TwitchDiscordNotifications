@@ -158,8 +158,9 @@ def main():
             bot_owner_id = ch.get_bot_owner_id()
             if not bot_owner_id:
                 bot_info = await bot.application_info()
-                owner = bot.get_user(int(bot_info.owner.id))
-                ch.save_bot_owner_id(str(owner.id))
+                owner_id = str(bot_info.owner.id)
+                ch.save_bot_owner_id(owner_id)
+                owner = bot.get_user(int(owner_id))
             else:
                 owner = bot.get_user(int(bot_owner_id))
             embed = discord.Embed(

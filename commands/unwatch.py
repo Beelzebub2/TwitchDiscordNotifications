@@ -15,15 +15,18 @@ console_width = variables["console_width"]
 processed_streamers = variables["processed_streamers"]
 VERSION = variables["version"]
 
+# TODO Accept multiple streamers
+
+
 class UnWatch(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(
-    name="unwatch",
-    aliases=["u"],
-    usage="unwatch <streamername_or_link>",
-    help="Removes the streamer from your watch list (provide either streamer name or link)",
+        name="unwatch",
+        aliases=["u"],
+        usage="unwatch <streamername_or_link>",
+        help="Removes the streamer from your watch list (provide either streamer name or link)",
     )
     async def unwatch(self, ctx, streamer_name_or_link: str):
         if "https://www.twitch.tv/" in streamer_name_or_link:
@@ -82,6 +85,7 @@ class UnWatch(commands.Cog):
                 )
                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                 await ctx.channel.send(embed=embed)
+
 
 async def setup(bot):
     await bot.add_cog(UnWatch(bot))

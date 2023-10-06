@@ -18,10 +18,13 @@ VERSION = variables["version"]
 AUTHORIZATION = variables["authorization"]
 CLIENT_ID = variables["client_id"]
 
+# TODO Accept multiple streamers
+
+
 class Watch(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    
+
     @commands.command(
         name="watch",
         aliases=["w"],
@@ -134,6 +137,7 @@ class Watch(commands.Cog):
             embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
             embed.set_thumbnail(url=pfp)
             await ctx.send(embed=embed)
+
 
 async def setup(bot):
     await bot.add_cog(Watch(bot))
