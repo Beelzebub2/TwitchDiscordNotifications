@@ -13,7 +13,6 @@ from discord.ext import commands
 from discord import Intents
 from dotenv import load_dotenv
 import concurrent.futures
-from functions.configHandler import ConfigHandler
 from functions.Sql_handler import SQLiteHandler
 import functions.others
 

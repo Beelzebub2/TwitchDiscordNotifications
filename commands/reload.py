@@ -1,49 +1,63 @@
-import asyncio
 import os
-import time
-import discord
 from discord.ext import commands
-import concurrent.futures
+import discord
+import datetime
+from functions.Sql_handler import SQLiteHandler
 
 # TODO make this shit work somehow
 
+ch = SQLiteHandler("data.db")
 
 class Reload(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot = bot      
 
-    async def load_extension(self, filename):
-        try:
-            await self.load_extension(f'commands.{filename[:-3]}')
-            return f"Loaded {filename}"
-        except Exception as e:
-            return f"Failed to load {filename}: {e}"
+    @commands.command(name="reload", aliases=["r"], description="reloads cogs")
+    @commands.is_owner()
+    async def reload(self, ctx):
+        Loaded_commands = []
+        Failed_commands = []
 
-    async def load_extensions(self):
-        extension_files = [filename for filename in os.listdir(
-            './commands') if filename.endswith('.py')]
-        workers = len(extension_files) + 1
-        start_time = time.time()
+        extension_files = [filename[:-3] for filename in os.listdir('./commands') if filename.endswith('.py')]
+        for filename in extension_files:
+            try:
+                await self.bot.reload_extension(f'commands.{filename}')
+                Loaded_commands.append(filename)
+            except:
+                Failed_commands.append(filename)
+        threshold = (len(Loaded_commands) - len(Failed_commands))
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-            results = await asyncio.gather(*[self.load_extension(filename) for filename in extension_files])
+        bot_info = await self.bot.application_info()
+        owner_id = str(bot_info.owner.id)
+        ch.save_bot_owner_id(owner_id)
+        owner = self.bot.get_user(int(owner_id))
+        if threshold <= 0:
+            title = "Error Reloading the commands"
+            description = "Failed reloading most/all of the commands"
+            url = "https://i.imgur.com/lmVQboe.png"
+            color = discord.Color.red()
+        else:
+            title = "Commands Reloaded"
+            description = "Reloaded most/all of the commands"
+            url = "https://i.imgur.com/TavP95o.png"
+            color = 0x00FF00
+        embed = discord.Embed(
+            title=title,
+            description=description,
+            color=color,
+            timestamp=datetime.datetime.now()
+        )
+        if len(Failed_commands) == 0 or len(Failed_commands) == None:
+            value = "0"
+        else:
+            value = "\n".join(Failed_commands)
+        embed.set_thumbnail(url=url)
+        embed.add_field(name="Loaded", value=len(Loaded_commands))
+        embed.add_field(name="Failed",
+                        value=value)
+        await owner.send(embed=embed)
+        
 
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        for result in results:
-            print(result)
-        print(f"Elapsed time: {elapsed_time:.4f} seconds")
 
-    @commands.command(
-        name="reload",
-        help="Reloads all bot commands",
-        usage="reload"
-    )
-    async def reload_all(self, ctx):
-        results = await self.load_extensions()
-        for result in results:
-            await ctx.send(result)
-
-
-def setup(bot):
-    bot.add_cog(Reload(bot))
+async def setup(bot):
+    await bot.add_cog(Reload(bot))
