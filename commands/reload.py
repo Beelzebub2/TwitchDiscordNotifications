@@ -4,8 +4,6 @@ import discord
 import datetime
 from functions.Sql_handler import SQLiteHandler
 
-# TODO make this shit work somehow
-
 ch = SQLiteHandler("data.db")
 
 class Reload(commands.Cog):
