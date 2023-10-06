@@ -73,6 +73,8 @@ class SQLiteHandler:
         else:
             # Discord ID does not exist, insert a new row with the Discord ID and username
             cursor.execute('INSERT INTO users (discord_id, username) VALUES (?, ?)', (discord_id, username))
+            
+        self.conn.commit()
 
     '''works'''
     def add_user(self, discord_id):
