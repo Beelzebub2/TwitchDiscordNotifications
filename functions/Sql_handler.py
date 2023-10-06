@@ -1,189 +1,163 @@
-import sqlite3
 import json
 import os
+import sqlite3
 import tempfile
 
-class SQLiteConfigHandler:
+class SQLiteHandler:
     def __init__(self, db_file):
         self.db_file = db_file
+        self.conn = sqlite3.connect(db_file)
         self.create_tables()
-        self.data = self.load_config()
 
     def create_tables(self):
-        conn = sqlite3.connect(self.db_file)
-        cursor = conn.cursor()
+        cursor = self.conn.cursor()
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS config (
+            CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY,
-                data TEXT
+                discord_id TEXT UNIQUE,
+                streamer TEXT
             )
         ''')
-        conn.commit()
-        conn.close()
+        self.conn.commit()
 
-    def load_config(self):
-        conn = sqlite3.connect(self.db_file)
-        cursor = conn.cursor()
-        cursor.execute('SELECT data FROM config ORDER BY id DESC LIMIT 1')
-        row = cursor.fetchone()
-        conn.close()
+    def add_user(self, discord_id):
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute("INSERT INTO users (discord_id) VALUES (?)", (discord_id,))
+            self.conn.commit()
+            return True
+        except sqlite3.IntegrityError:
+            return False  # User with the same discord_id already exists
 
-        if row is not None:
-            return json.loads(row[0])
-        else:
-            return {}
+    def add_streamer_to_user(self, discord_id, streamer):
+        cursor = self.conn.cursor()
+        cursor.execute("INSERT INTO users (discord_id, streamer) VALUES (?, ?)", (discord_id, streamer))
+        self.conn.commit()
 
-    def save_config(self, data):
-        conn = sqlite3.connect(self.db_file)
-        cursor = conn.cursor()
-        cursor.execute('INSERT INTO config (data) VALUES (?)', (json.dumps(data),))
-        conn.commit()
-        conn.close()
+    def remove_streamer_from_user(self, discord_id, streamer):
+        cursor = self.conn.cursor()
+        cursor.execute("DELETE FROM users WHERE discord_id = ? AND streamer = ?", (discord_id, streamer))
+        self.conn.commit()
 
-    def add_user(self, user_data):
-        self.data = self.load_config()
-        user_key = f"User{len(self.data.get('User-list', {})) + 1}"
-        self.data.setdefault("User-list", {})[user_key] = [user_data]
-        self.save_config(self.data)
-        return user_key
-
-    def add_streamer_to_user(self, user_id, streamer):
-        self.data = self.load_config()
-        for user_data_list in self.data.get("User-list", {}).values():
-            for user_data in user_data_list:
-                if user_data["discord_id"] == user_id:
-                    user_data["streamer_list"].append(streamer)
-                    self.save_config(self.data)
-                    return True
-        return False
-
-    def remove_streamer_from_user(self, user_id, streamer):
-        self.data = self.load_config()
-        for user_data_list in self.data.get("User-list", {}).values():
-            for user_data in user_data_list:
-                if user_data["discord_id"] == user_id:
-                    if streamer in user_data["streamer_list"]:
-                        user_data["streamer_list"].remove(streamer)
-                        self.save_config(self.data)
-                        return True
-        return False
+    def get_streamers_for_user(self, discord_id):
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT streamer FROM users WHERE discord_id = ?", (discord_id,))
+        streamers = [row[0] for row in cursor.fetchall()]
+        return streamers
 
     def get_all_streamers(self):
-        self.data = self.load_config()
-        streamers = set()
-        for user_data in self.data.get("User-list", {}).values():
-            streamers.update(user_data[0]["streamer_list"])
-        return list(streamers)
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT DISTINCT streamer FROM users")
+        streamers = [row[0] for row in cursor.fetchall()]
+        return streamers
 
     def get_user_ids_with_streamers(self):
-        self.data = self.load_config()
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT discord_id, streamer FROM users")
+        rows = cursor.fetchall()
         user_ids_with_streamers = {}
-        for user, user_data_list in self.data.get("User-list", {}).items():
-            for user_data in user_data_list:
-                user_id = user_data["discord_id"]
-                streamer_list = user_data["streamer_list"]
-                if user_id not in user_ids_with_streamers:
-                    user_ids_with_streamers[user_id] = streamer_list
-                else:
-                    user_ids_with_streamers[user_id].extend(streamer_list)
+        for row in rows:
+            discord_id, streamer = row
+            if discord_id not in user_ids_with_streamers:
+                user_ids_with_streamers[discord_id] = [streamer]
+            else:
+                user_ids_with_streamers[discord_id].append(streamer)
         return user_ids_with_streamers
 
     def get_all_user_ids(self):
-        self.data = self.load_config()
-        user_ids = []
-        for user_data_list in self.data.get("User-list", {}).values():
-            for user_data in user_data_list:
-                user_id = user_data["discord_id"]
-                if user_id not in user_ids:
-                    user_ids.append(user_id)
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT DISTINCT discord_id FROM users")
+        user_ids = [row[0] for row in cursor.fetchall()]
         return user_ids
 
     def get_streamers_for_user(self, user_id):
-        self.data = self.load_config()
-        for user_data_list in self.data.get("User-list", {}).values():
-            for user_data in user_data_list:
-                if user_data["discord_id"] == user_id:
-                    return user_data["streamer_list"]
-        return []
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT streamer FROM users WHERE discord_id = ?", (user_id,))
+        streamers = [row[0] for row in cursor.fetchall()]
+        return streamers
 
     def get_version(self):
-        self.data = self.load_config()
-        return self.data.get("Config", {}).get("version")
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT value FROM config WHERE key = 'version'")
+        row = cursor.fetchone()
+        if row:
+            return row[0]
 
     def get_prefix(self):
-        self.data = self.load_config()
-        return self.data.get("Config", {}).get("prefix")
-    
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT value FROM config WHERE key = 'prefix'")
+        row = cursor.fetchone()
+        if row:
+            return row[0]
+
     def get_time(self):
-        self.data = self.load_config()
-        return self.data.get("Config", {}).get("time")
-    
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT value FROM config WHERE key = 'time'")
+        row = cursor.fetchone()
+        if row:
+            return row[0]
+
     def save_time(self, start_time):
-        self.data = self.load_config()
-        self.data.setdefault("Config", {})["time"] = start_time
-        self.save_config(self.data)
+        cursor = self.conn.cursor()
+        cursor.execute("UPDATE config SET value = ? WHERE key = 'time'", (start_time,))
+        self.conn.commit()
+        
 
     def create_new_guild_template(self, guild_id, guild_name):
-        self.data = self.load_config()
-        self.data.setdefault("Guilds", {})[str(guild_id)] = {
-            "name": guild_name,
-            "prefix": ",",
-            "role_to_add": None,
-        }
-        self.save_config(self.data)
+        cursor = self.conn.cursor()
+        cursor.execute("INSERT INTO guilds (guild_id, name, prefix, role_to_add) VALUES (?, ?, ?, ?)",
+                       (guild_id, guild_name, ",", None))
+        self.conn.commit()
 
     def is_guild_in_config(self, guild_id):
-        self.data = self.load_config()
-        return str(guild_id) in self.data.get("Guilds", {})
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM guilds WHERE guild_id = ?", (guild_id,))
+        count = cursor.fetchone()[0]
+        return count > 0
 
     def get_guild_prefix(self, guild_id):
-        self.data = self.load_config()
-        guild_info = self.data["Guilds"].get(str(guild_id), {})
-        return guild_info.get("prefix", "")
-    
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT prefix FROM guilds WHERE guild_id = ?", (guild_id,))
+        row = cursor.fetchone()
+        if row:
+            return row[0]
+        return ""
+
     def remove_guild(self, guild_id):
-        self.data = self.load_config()
-        if str(guild_id) in self.data["Guilds"]:
-            del self.data["Guilds"][str(guild_id)]
-            self.save_config(self.data)
+        cursor = self.conn.cursor()
+        cursor.execute("DELETE FROM guilds WHERE guild_id = ?", (guild_id,))
+        self.conn.commit()
 
     def change_role_to_add(self, guild_id, new_role_id):
-        self.data = self.load_config()
-        guild_info = self.data["Guilds"].get(str(guild_id), {})
-        guild_info["role_to_add"] = str(new_role_id)
-        self.save_config(self.data)
+        cursor = self.conn.cursor()
+        cursor.execute("UPDATE guilds SET role_to_add = ? WHERE guild_id = ?", (str(new_role_id), guild_id))
+        self.conn.commit()
 
     def get_role_to_add(self, guild_id):
-        self.data = self.load_config()
-        guild_info = self.data["Guilds"].get(str(guild_id), {})
-        return guild_info.get("role_to_add", "")
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT role_to_add FROM guilds WHERE guild_id = ?", (guild_id,))
+        row = cursor.fetchone()
+        if row:
+            return row[0]
+        return ""
 
     def change_guild_prefix(self, guild_id, new_prefix):
-        self.data = self.load_config()
-        guild_info = self.data["Guilds"].get(str(guild_id), {})
-        guild_info["prefix"] = new_prefix
-        self.save_config(self.data)
+        cursor = self.conn.cursor()
+        cursor.execute("UPDATE guilds SET prefix = ? WHERE guild_id = ?", (new_prefix, guild_id))
+        self.conn.commit()
 
     def delete_user(self, user_id):
-        self.data = self.load_config()
-        user_key_to_delete = None
-
-        for user_key, user_data_list in self.data.get("User-list", {}).items():
-            for user_data in user_data_list:
-                if user_data["discord_id"] == user_id:
-                    user_key_to_delete = user_key
-                    break
-
-        if user_key_to_delete is not None:
-            del self.data["User-list"][user_key_to_delete]
-            user_keys = list(self.data["User-list"].keys())
-            for i, user_key in enumerate(user_keys):
-                new_user_key = f"User{i+1}"
-                self.data["User-list"][new_user_key] = self.data["User-list"].pop(
-                    user_key
-                )
-
-            self.save_config(self.data)
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT user_key FROM users WHERE discord_id = ?", (user_id,))
+        row = cursor.fetchone()
+        if row:
+            user_key = row[0]
+            cursor.execute("DELETE FROM users WHERE user_key = ?", (user_key,))
+            cursor.execute("SELECT user_key FROM users WHERE user_key > ?", (user_key,))
+            remaining_user_keys = cursor.fetchall()
+            for i, (new_user_key,) in enumerate(remaining_user_keys, start=1):
+                cursor.execute("UPDATE users SET user_key = ? WHERE user_key = ?", (i, new_user_key))
+            self.conn.commit()
             return True
         else:
             return False
@@ -216,12 +190,14 @@ class SQLiteConfigHandler:
             return False
 
     def get_bot_owner_id(self):
-        bot_owner_id = self.data.get("Config", {}).get("bot_owner_id", "")
-        return bot_owner_id
-    
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT value FROM config WHERE key = 'bot_owner_id'")
+        row = cursor.fetchone()
+        if row:
+            return row[0]
+        return ""
+
     def save_bot_owner_id(self, owner_id):
-        self.data = self.load_config()
-        config_data = self.data.get("Config", {})
-        config_data["bot_owner_id"] = owner_id
-        self.data["Config"] = config_data
-        self.save_config(self.data)
+        cursor = self.conn.cursor()
+        cursor.execute("UPDATE config SET value = ? WHERE key = 'bot_owner_id'", (owner_id,))
+        self.conn.commit()
