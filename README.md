@@ -51,7 +51,8 @@ Discord bot: https://discord.com/developers/applications/
 
 v2.1 06/10/2023
 
-!   Working on reload commands command
++   Added reload commands command
++   Fixed Bot not logging in when owner not in a guild with bot
 +   Fixed small issues with clear command
 +   Fixed error with mention for prefix
 +   Moved from json to Sqlite for data
