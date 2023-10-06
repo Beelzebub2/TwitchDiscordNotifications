@@ -22,6 +22,7 @@ class Clear(commands.Cog):
         help="Clears all the messages sent by the bot",
         usage="clear",
     )
+    @commands.cooldown(rate=1, per=60, type=commands.BucketType.user)
     async def clear_bot_messages(self, ctx) -> None:
         messages_to_remove = 1000
         user = await self.bot.fetch_user(ctx.author.id)
@@ -37,10 +38,11 @@ class Clear(commands.Cog):
         embed = discord.Embed(
             title="Conversation Cleared",
             description="All messages have been cleared.",
-            color=65280,
+            color=0x00FF00,
             timestamp=datetime.datetime.now()
         )
         embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
+        embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
         await ctx.send(embed=embed)
 
 

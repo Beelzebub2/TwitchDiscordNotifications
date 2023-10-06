@@ -51,6 +51,10 @@ Discord bot: https://discord.com/developers/applications/
 
 v2.1 06/10/2023
 
++   Added cooldown to clear command to prevent rate limit
+
+v2.1 06/10/2023
+
 +   Restructured main.py code
 +   Fixed List command bug
 +   Added reload commands command

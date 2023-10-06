@@ -3,8 +3,8 @@ from discord.ext import commands
 import pickle
 import discord
 from colorama import Fore
-import functions
 from functions.Sql_handler import SQLiteHandler
+import functions.others
 
 with open("variables.pkl", "rb") as file:
     variables = pickle.load(file)
@@ -65,7 +65,8 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandNotFound):
-            command = ctx.message.content
+            command = ctx.message.content.split(" ")[0]
+
             print(" " * console_width, end="\r")
             functions.others.log_print(
                 Fore.CYAN
@@ -78,12 +79,23 @@ class Events(commands.Cog):
             )
             embed = discord.Embed(
                 title="Command not found",
-                description=f"Command **__{command}__** does not exist use .help for more info.",
+                description=f"Command **__{command}__** does not exist. Use .help for more info.",
                 color=discord.Color.red(),
                 timestamp=datetime.datetime.now()
             )
             embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
             await ctx.send(embed=embed)
+
+        elif isinstance(error, commands.CommandOnCooldown):
+            remaining_time = round(error.retry_after)
+            embed = discord.Embed(
+                title="Command on Cooldown",
+                description=f"Please wait {remaining_time} seconds before trying again.",
+                color=0xFF0000
+            )
+            embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
+            await ctx.send(embed=embed)
+
         else:
             print(" " * console_width, end="\r")
             functions.others.log_print(
@@ -92,6 +104,7 @@ class Events(commands.Cog):
                 + Fore.RESET
                 + " "
                 + Fore.RED
+                + "[ERROR] "
                 + f"Error: {error}"
                 + Fore.RESET
             )
@@ -124,6 +137,10 @@ class Events(commands.Cog):
                     timestamp=datetime.datetime.now()
                 )
             await message.channel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_bot_exit(self):
+        functions.others.custom_interrupt_handler()
 
 
 async def setup(bot):
