@@ -2,6 +2,7 @@ import json
 import os
 import sqlite3
 import tempfile
+import concurrent.futures
 
 
 class SQLiteHandler:
@@ -163,9 +164,12 @@ class SQLiteHandler:
         cursor.execute("SELECT DISTINCT streamer FROM users")
         unique_streamers_set = set()
 
-        for row in cursor.fetchall():
+        def process_row(row):
             streamers = row[0].split(',')
             unique_streamers_set.update(streamers)
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+            executor.map(process_row, cursor.fetchall())
 
         unique_streamers_list = list(unique_streamers_set)
         return unique_streamers_list

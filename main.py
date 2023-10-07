@@ -164,7 +164,7 @@ class TwitchDiscordBot:
                                         + Fore.RESET
                                         + " "
                                         + Fore.LIGHTGREEN_EX
-                                        + f"Notification sent successfully for {Fore.CYAN + streamer_name + Fore.RESET}. {Fore.LIGHTGREEN_EX}to member {Fore.LIGHTCYAN_EX + member.name + Fore.RESET}"
+                                        + f"[SUCCESS] Notification sent successfully for {Fore.CYAN + streamer_name + Fore.RESET}. {Fore.LIGHTGREEN_EX}to member {Fore.LIGHTCYAN_EX + member.name + Fore.RESET}"
                                     )
                                 except discord.errors.Forbidden:
                                     print(" " * self.console_width, end="\r")
@@ -173,7 +173,8 @@ class TwitchDiscordBot:
                                         + self.others.get_timestamp()
                                         + Fore.RESET
                                         + " "
-                                        + f"Cannot send a message to user {member.name}. Missing permissions or DMs disabled."
+                                        + Fore.RED
+                                        + f"[ERROR] Cannot send a message to user {member.name}. Missing permissions or DMs disabled."
                                     )
                             else:
                                 print(" " * self.console_width, end="\r")
@@ -277,10 +278,9 @@ class TwitchDiscordBot:
                     + Fore.RESET
                     + " "
                     + Fore.LIGHTGREEN_EX
-                    + f"Currently streaming (Time taken: {elapsed_time:.2f} seconds): "
+                    + f"[SUCCESS] Currently streaming {Fore.LIGHTWHITE_EX + str(len(self.processed_streamers)) + Fore.RESET} {Fore.LIGHTGREEN_EX}Total: {Fore.LIGHTWHITE_EX + str(len(streamers)) + Fore.LIGHTGREEN_EX} (Time taken: {elapsed_time:.2f} seconds): "
                     + Fore.RESET
                     + Fore.LIGHTWHITE_EX
-                    + str(self.processed_streamers)
                     + Fore.RESET,
                     end="\r",
                 )
