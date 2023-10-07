@@ -1,6 +1,5 @@
 .env
 Twitch/
-.vscode/
 test.py
 variables.pkl
 commands/__pycache__
@@ -9,3 +8,4 @@ log.txt
 failed.py
 data.db
 tests.py
+__pycache__

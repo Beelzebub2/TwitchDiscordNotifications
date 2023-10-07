@@ -1,12 +1,10 @@
 from discord.ext import commands
 import discord
 import datetime
-import pickle
-
+import functions.others
 from functions.Sql_handler import SQLiteHandler
 
-with open("variables.pkl", "rb") as file:
-    variables = pickle.load(file)
+variables = functions.others.unpickle_variable()
 
 ch = SQLiteHandler("data.db")
 date_format = variables["date_format"]

@@ -1,3 +1,4 @@
+import concurrent.futures
 import re
 import os
 import datetime
@@ -7,14 +8,38 @@ import pickle
 import requests
 from functions.Sql_handler import SQLiteHandler
 ch = SQLiteHandler("data.db")
-try:
-    with open("variables.pkl", "rb") as file:
-        variables = pickle.load(file)
-    console_width = variables["console_width"]
-    processed_streamers = variables["processed_streamers"]
-    ch = variables["ch"]
-except:
-    pass
+
+
+def pickle_variable(data, filename="variables.pkl"):
+    """
+    Pickle one or more variables and save them to a file with a default filename.
+
+    Args:
+        *args: One or more variables to be pickled.
+        filename (str, optional): The name of the pickle file to save the variables to.
+            Default is 'data.pkl'.
+
+    Returns:
+        None
+    """
+    with open(filename, 'wb') as file:
+        pickle.dump(data, file)
+
+
+def unpickle_variable(filename="variables.pkl"):
+    """
+    Load a variable from a pickle file with a default filename and return it.
+
+    Args:
+        filename (str, optional): The name of the pickle file to load the variable from.
+            Default is 'data.pkl'.
+
+    Returns:
+        object: The unpickled variable.
+    """
+    with open(filename, 'rb') as file:
+        loaded_data = pickle.load(file)
+    return loaded_data
 
 
 def log_print(message, log_file_name="log.txt", max_lines=1000):
@@ -69,6 +94,7 @@ def generate_timestamp_string(started_at):
 
 
 def set_console_title(title):
+    variables = unpickle_variable()
     if os.name == 'nt':
         try:
             os.system(f'title {title} {variables["version"]}')
@@ -86,12 +112,16 @@ def clear_console():
 
 
 def custom_interrupt_handler(signum, frame):
+    variables = unpickle_variable()
+    console_width = variables["console_width"]
+    processed_streamers = variables["processed_streamers"]
     print(" " * console_width, end="\r")
     if len(processed_streamers) > 0:
         print(
             f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} Saving currently streaming streamers and exiting..."
         )
-        data = {"Restarted": True, "Streamers": processed_streamers}
+        data = {"Restarted": True,
+                "Streamers": processed_streamers}
         ch.save_to_temp_json(data)
         os._exit(0)
 

@@ -6,14 +6,12 @@ import discord
 from functions.Sql_handler import SQLiteHandler
 from functions.others import get_timestamp, log_print
 import re
-import pickle
+import functions.others
 
-with open("variables.pkl", "rb") as file:
-    variables = pickle.load(file)
+variables = functions.others.unpickle_variable()
 
 ch = SQLiteHandler("data.db")
 console_width = variables["console_width"]
-processed_streamers = variables["processed_streamers"]
 VERSION = variables["version"]
 AUTHORIZATION = variables["authorization"]
 CLIENT_ID = variables["client_id"]

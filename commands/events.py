@@ -1,18 +1,15 @@
 import datetime
 from discord.ext import commands
-import pickle
 import discord
 from colorama import Fore
 from functions.Sql_handler import SQLiteHandler
 import functions.others
 
-with open("variables.pkl", "rb") as file:
-    variables = pickle.load(file)
+variables = functions.others.unpickle_variable()
 
 ch = SQLiteHandler("data.db")
 console_width = variables["console_width"]
 intents = variables["intents"]
-processed_streamers = variables["processed_streamers"]
 
 
 class Events(commands.Cog):
@@ -60,6 +57,7 @@ class Events(commands.Cog):
                 await general_channel.send(
                     f"Welcome {member.mention} to the server, but the configured role with ID {role_id} does not exist. Please contact an admin to update the role ID."
                 )
+                
     # TODO Better error handler
     '''On Command Error'''
     @commands.Cog.listener()

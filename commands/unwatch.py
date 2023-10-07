@@ -5,14 +5,11 @@ import discord
 from functions.Sql_handler import SQLiteHandler
 from functions.others import get_timestamp, log_print
 import re
-import pickle
+import functions.others
 
-with open("variables.pkl", "rb") as file:
-    variables = pickle.load(file)
 
 ch = SQLiteHandler("data.db")
-console_width = variables["console_width"]
-processed_streamers = variables["processed_streamers"]
+variables = functions.others.unpickle_variable()
 VERSION = variables["version"]
 
 # TODO Accept multiple streamers
@@ -43,11 +40,8 @@ class UnWatch(commands.Cog):
             streamer_list = ch.get_streamers_for_user(user_id)
             if any(streamer_name.lower() == s.lower() for s in streamer_list):
                 ch.remove_streamer_from_user(user_id, streamer_name)
-                if (
-                    streamer_name in processed_streamers
-                    and streamer_name not in ch.get_all_streamers()
-                ):
-                    processed_streamers.remove(streamer_name.lower())
+                variables = functions.others.unpickle_variable()
+                console_width = variables["console_width"]
                 print(" " * console_width, end="\r")
                 log_print(
                     Fore.CYAN

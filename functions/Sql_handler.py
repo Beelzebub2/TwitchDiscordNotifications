@@ -5,9 +5,15 @@ import tempfile
 
 
 class SQLiteHandler:
-    def __init__(self, db_file):
-        self.db_file = db_file
-        self.conn = sqlite3.connect(db_file)
+    def __init__(self, db_file=None, conn=None):
+        if db_file:
+            self.db_file = db_file
+            self.conn = sqlite3.connect(db_file)
+        elif conn:
+            self.conn = conn
+        else:
+            raise ValueError("Either db_file or conn must be provided.")
+
         self.create_tables()
 
     def create_tables(self):
@@ -116,8 +122,10 @@ class SQLiteHandler:
 
             self.conn.commit()
             cursor.close()
+            return True
         except Exception as e:
             print(f"An error occurred: {e}")
+            return False
 
     def remove_streamer_from_user(self, discord_id, streamer):
         cursor = self.conn.cursor()
@@ -153,21 +161,32 @@ class SQLiteHandler:
     def get_all_streamers(self):
         cursor = self.conn.cursor()
         cursor.execute("SELECT DISTINCT streamer FROM users")
-        streamers = [streamer for row in cursor.fetchall()
-                     for streamer in row[0].split(',')]
-        return streamers
+        unique_streamers_set = set()
+
+        for row in cursor.fetchall():
+            streamers = row[0].split(',')
+            unique_streamers_set.update(streamers)
+
+        unique_streamers_list = list(unique_streamers_set)
+        return unique_streamers_list
 
     def get_user_ids_with_streamers(self):
         cursor = self.conn.cursor()
         cursor.execute("SELECT discord_id, streamer FROM users")
         rows = cursor.fetchall()
         user_ids_with_streamers = {}
+
         for row in rows:
-            discord_id, streamer = row
+            discord_id, streamers_string = row
+            streamers_list = streamers_string.split(
+                ',')
+
             if discord_id not in user_ids_with_streamers:
-                user_ids_with_streamers[discord_id] = [streamer]
+                user_ids_with_streamers[discord_id] = streamers_list
             else:
-                user_ids_with_streamers[discord_id].append(streamer)
+                user_ids_with_streamers[discord_id].extend(
+                    streamers_list)
+
         return user_ids_with_streamers
 
     def get_all_user_ids(self):

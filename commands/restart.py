@@ -3,14 +3,12 @@ from discord.ext import commands
 import sys
 import os
 import discord
-import pickle
 from functions.Sql_handler import SQLiteHandler
+import functions.others
 
-with open("variables.pkl", "rb") as file:
-    variables = pickle.load(file)
+variables = functions.others.unpickle_variable()
 
 ch = SQLiteHandler("data.db")
-processed_streamers = variables["processed_streamers"]
 
 class Restart(commands.Cog):
     def __init__(self, bot):
@@ -25,6 +23,7 @@ class Restart(commands.Cog):
     )
     @commands.is_owner()
     async def restart(self, ctx):
+        processed_streamers = functions.others.Processed_Streamers.get_processed_streamers()
         data = {"Restarted": True, "Streamers": processed_streamers}
         ch.save_to_temp_json(data)
         embed = discord.Embed(

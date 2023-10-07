@@ -51,6 +51,9 @@ Discord bot: https://discord.com/developers/applications/
 
 v2.1 07/10/2023
 
++   Fixed minor issues with commands
++   Implemented tests
++   Fixed send_notification bug
 +   Improved help command
 +   Better console UI
 +   Added cooldown to clear command to prevent rate limit

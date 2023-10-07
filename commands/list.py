@@ -3,7 +3,6 @@ import functions
 import discord
 import aiohttp
 import asyncio
-import pickle
 from colorama import Fore
 import math
 from PIL import Image, ImageDraw, ImageFont
@@ -14,8 +13,7 @@ import datetime
 from functions.Sql_handler import SQLiteHandler
 
 
-with open("variables.pkl", "rb") as file:
-    variables = pickle.load(file)
+variables = functions.others.unpickle_variable()
 
 ch = SQLiteHandler("data.db")
 console_width = variables["console_width"]
@@ -23,9 +21,6 @@ VERSION = variables["version"]
 intents = variables["intents"]
 HEADERS = variables["headers"]
 
-bot = commands.Bot(
-        command_prefix=commands.when_mentioned_or(ch.get_prefix), intents=intents
-    )
 
 class ListStreamers(commands.Cog):
     def __init__(self, bot):
@@ -40,7 +35,8 @@ class ListStreamers(commands.Cog):
                 data = await response.json()
                 if "data" in data and len(data["data"]) > 0:
                     streamer_data = data["data"][0]
-                    profile_picture_url = streamer_data.get("profile_image_url", "")
+                    profile_picture_url = streamer_data.get(
+                        "profile_image_url", "")
                     profile_picture_url = profile_picture_url.replace(
                         "{width}", "150"
                     ).replace("{height}", "150")
@@ -84,7 +80,8 @@ class ListStreamers(commands.Cog):
                 async with aiohttp.ClientSession() as session:
                     await asyncio.gather(
                         *[
-                            self.fetch_streamer_data(session, streamer, pfps, names)
+                            self.fetch_streamer_data(
+                                session, streamer, pfps, names)
                             for streamer in streamer_list
                         ]
                     )
@@ -107,7 +104,8 @@ class ListStreamers(commands.Cog):
                 else:
                     combined_image_width = max_images_per_row * image_width
 
-                combined_image_height = num_rows * (image_height + name_box_height)
+                combined_image_height = num_rows * \
+                    (image_height + name_box_height)
 
                 combined_image = Image.new(
                     "RGB", (combined_image_width, combined_image_height)
@@ -136,7 +134,8 @@ class ListStreamers(commands.Cog):
                     text_height = text_bbox[3] - text_bbox[1]
                     text_x = (name_box_width - text_width) // 2
                     text_y = (name_box_height - text_height) // 2
-                    draw.text((text_x, text_y), name, fill=name_text_color, font=font)
+                    draw.text((text_x, text_y), name,
+                              fill=name_text_color, font=font)
 
                     combined_image.paste(name_box, (name_x, name_y))
 
@@ -202,6 +201,7 @@ class ListStreamers(commands.Cog):
             )
             embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
             await ctx.channel.send(embed=embed)
+
 
 async def setup(bot):
     await bot.add_cog(ListStreamers(bot))
