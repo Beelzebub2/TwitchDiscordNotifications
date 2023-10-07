@@ -55,6 +55,7 @@ class UnWatch(commands.Cog):
                     + Fore.RESET
                     + " "
                     + Fore.LIGHTGREEN_EX
+                    + "[SUCCESS] "
                     + f"Removed {Fore.CYAN + streamer_name + Fore.RESET} from user {Fore.CYAN + ctx.author.name + Fore.RESET}'s watchlist."
                     + Fore.RESET
                 )
@@ -73,6 +74,8 @@ class UnWatch(commands.Cog):
                     + get_timestamp()
                     + Fore.RESET
                     + " "
+                    + Fore.RED
+                    + "[ERROR] "
                     + f"{Fore.CYAN + streamer_name + Fore.RESET} is not in user {Fore.CYAN + ctx.author.name + Fore.RESET}'s watchlist."
                 )
                 embed = discord.Embed(

@@ -233,7 +233,8 @@ class TwitchDiscordBot:
             Fore.CYAN
             + functions.others.get_timestamp()
             + Fore.RESET
-            + Fore.LIGHTGREEN_EX
+            + Fore.LIGHTYELLOW_EX
+            + " [INFO]"
             + f" Running as {Fore.LIGHTCYAN_EX + self.bot.user.name + Fore.RESET}"
         )
         activity = discord.Activity(
@@ -251,6 +252,8 @@ class TwitchDiscordBot:
                 + Fore.RESET
                 + " "
                 + Fore.LIGHTYELLOW_EX
+                + "[INFO] "
+                + Fore.RESET
                 + "Checking"
                 + Fore.RESET,
                 end="\r",
@@ -286,6 +289,8 @@ class TwitchDiscordBot:
                     Fore.CYAN
                     + functions.others.get_timestamp()
                     + Fore.RESET
+                    + Fore.LIGHTGREEN_EX
+                    + " [SUCCESS]"
                     + Fore.LIGHTWHITE_EX
                     + f" Checked {len(streamers)} streamers. Time taken: {elapsed_time:.2f} seconds"
                     + Fore.RESET,

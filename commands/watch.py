@@ -54,6 +54,7 @@ class Watch(commands.Cog):
                 + Fore.RESET
                 + " "
                 + Fore.RED
+                + "[ERROR] "
                 + f"{Fore.CYAN + streamer_name + Fore.RESET} Twitch profile not found."
                 + Fore.RESET
             )
@@ -81,6 +82,7 @@ class Watch(commands.Cog):
                     + Fore.RESET
                     + " "
                     + Fore.LIGHTGREEN_EX
+                    + "[SUCCESS] "
                     + f"Added {Fore.CYAN + streamer_name + Fore.RESET} to user {Fore.CYAN + ctx.author.name + Fore.RESET}'s watchlist."
                     + Fore.RESET
                 )
