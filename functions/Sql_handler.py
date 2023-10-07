@@ -85,6 +85,11 @@ class SQLiteHandler:
         cursor.execute('DELETE FROM users WHERE discord_id = ?', (discord_id,))
         self.conn.commit()
 
+        if cursor.rowcount > 0:
+            return True
+        else:
+            return False
+
     def add_streamer_to_user(self, discord_id, streamer):
         try:
             cursor = self.conn.cursor()

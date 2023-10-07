@@ -12,6 +12,7 @@ with open("variables.pkl", "rb") as file:
 ch = SQLiteHandler("data.db")
 console_width = variables["console_width"]
 
+
 class UnRegister(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -32,8 +33,9 @@ class UnRegister(commands.Cog):
                 + get_timestamp()
                 + Fore.RESET
                 + " "
-                + Fore.YELLOW
-                + f"{Fore.RED + ctx.author.name + Fore.RESET} Unregistered from bot."
+                + Fore.LIGHTGREEN_EX
+                + "[SUCCESS] "
+                + f"{Fore.CYAN + ctx.author.name + Fore.RESET} Unregistered from bot."
                 + Fore.RESET
             )
             embed = discord.Embed(
@@ -52,6 +54,7 @@ class UnRegister(commands.Cog):
                 + Fore.RESET
                 + " "
                 + Fore.YELLOW
+                + "[ERROR] "
                 + f"{Fore.RED + ctx.author.name + Fore.RESET} Tried to unregister from bot but wasn't registered to begin with."
                 + Fore.RESET
             )
@@ -63,6 +66,7 @@ class UnRegister(commands.Cog):
             )
             embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
             await ctx.send(embed=embed)
+
 
 async def setup(bot):
     await bot.add_cog(UnRegister(bot))

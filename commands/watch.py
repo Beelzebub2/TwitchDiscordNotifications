@@ -127,6 +127,7 @@ class Watch(commands.Cog):
                 + Fore.RESET
                 + " "
                 + Fore.LIGHTGREEN_EX
+                + "[SUCCESS] "
                 + f"Created a new watchlist for user {Fore.CYAN + ctx.author.name + Fore.RESET} and added {Fore.CYAN + streamer_name + Fore.RESET}."
                 + Fore.RESET
             )
