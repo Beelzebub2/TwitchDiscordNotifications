@@ -22,9 +22,10 @@ class TwitchDiscordBot:
         self.AUTHORIZATION = os.environ.get("authorization")
         self.TOKEN = os.environ.get("token")
         self.repo_url = "https://github.com/Beelzebub2/TwitchDiscordNotifications"
-        self.VERSION = "v" + functions.others.get_version(self.repo_url)
+        self.VERSION = "v" + self.others.get_version(self.repo_url)
         self.create_env()
         self.ch = SQLiteHandler("data.db")
+        self.others = functions.others
         self.ch.set_prefix(",")
         self.ch.set_version(self.VERSION)
         intents = Intents.all()
@@ -142,7 +143,7 @@ class TwitchDiscordBot:
                                 profile_picture_url = profile_picture_url.replace(
                                     "{width}", "300"
                                 ).replace("{height}", "300")
-                                start_time_str = functions.others.generate_timestamp_string(
+                                start_time_str = self.others.generate_timestamp_string(
                                     started_at)
                                 embed.add_field(
                                     name="Stream Title", value=title)
@@ -157,9 +158,9 @@ class TwitchDiscordBot:
                                 try:
                                     await dm_channel.send(mention, embed=embed)
                                     print(" " * self.console_width, end="\r")
-                                    functions.others.log_print(
+                                    self.others.log_print(
                                         Fore.CYAN
-                                        + functions.others.get_timestamp()
+                                        + self.others.get_timestamp()
                                         + Fore.RESET
                                         + " "
                                         + Fore.LIGHTGREEN_EX
@@ -167,18 +168,18 @@ class TwitchDiscordBot:
                                     )
                                 except discord.errors.Forbidden:
                                     print(" " * self.console_width, end="\r")
-                                    functions.others.log_print(
+                                    self.others.log_print(
                                         Fore.CYAN
-                                        + functions.others.get_timestamp()
+                                        + self.others.get_timestamp()
                                         + Fore.RESET
                                         + " "
                                         + f"Cannot send a message to user {member.name}. Missing permissions or DMs disabled."
                                     )
                             else:
                                 print(" " * self.console_width, end="\r")
-                                functions.others.log_print(
+                                self.others.log_print(
                                     Fore.CYAN
-                                    + functions.others.get_timestamp()
+                                    + self.others.get_timestamp()
                                     + Fore.RESET
                                     + " "
                                     + f"{streamer_name} is not streaming."
@@ -186,9 +187,9 @@ class TwitchDiscordBot:
                                 self.processed_streamers.remove(streamer_name)
             except discord.errors.NotFound:
                 print(" " * self.console_width, end="\r")
-                functions.others.log_print(
+                self.others.log_print(
                     Fore.CYAN
-                    + functions.others.get_timestamp()
+                    + self.others.get_timestamp()
                     + Fore.RESET
                     + " "
                     + Fore.RED
@@ -222,16 +223,16 @@ class TwitchDiscordBot:
             embed.add_field(name="Failed commands",
                             value="\n".join(self.Failed_commands))
             if not owner_in_guild:
-                functions.others.log_print(
-                    f"{functions.others.get_timestamp()}{Fore.RED} [ERROR] Warning: Owner is not in any guild where the bot is present.")
+                self.others.log_print(
+                    f"{self.others.get_timestamp()}{Fore.RED} [ERROR] Warning: Owner is not in any guild where the bot is present.")
             else:
                 await owner.send(embed=embed)
-        functions.others.clear_console()
-        functions.others.set_console_title("TwitchDiscordNotifications")
+        self.others.clear_console()
+        self.others.set_console_title("TwitchDiscordNotifications")
         print(" " * self.console_width, end="\r")
-        functions.others.log_print(
+        self.others.log_print(
             Fore.CYAN
-            + functions.others.get_timestamp()
+            + self.others.get_timestamp()
             + Fore.RESET
             + Fore.LIGHTYELLOW_EX
             + " [INFO]"
@@ -248,7 +249,7 @@ class TwitchDiscordBot:
             print(
                 "\033[K"
                 + Fore.CYAN
-                + functions.others.get_timestamp()
+                + self.others.get_timestamp()
                 + Fore.RESET
                 + " "
                 + Fore.LIGHTYELLOW_EX
@@ -272,7 +273,7 @@ class TwitchDiscordBot:
                 print(" " * self.console_width, end="\r")
                 print(
                     Fore.CYAN
-                    + functions.others.get_timestamp()
+                    + self.others.get_timestamp()
                     + Fore.RESET
                     + " "
                     + Fore.LIGHTGREEN_EX
@@ -287,7 +288,7 @@ class TwitchDiscordBot:
                 print(" " * self.console_width, end="\r")
                 print(
                     Fore.CYAN
-                    + functions.others.get_timestamp()
+                    + self.others.get_timestamp()
                     + Fore.RESET
                     + Fore.LIGHTGREEN_EX
                     + " [SUCCESS]"
@@ -331,10 +332,10 @@ class TwitchDiscordBot:
     async def load_extension(self, filename):
         try:
             await self.bot.load_extension(f'commands.{filename[:-3]}')
-            success_message = f"{functions.others.get_timestamp()} {Fore.LIGHTGREEN_EX}[SUCCESS] Loaded {Fore.LIGHTCYAN_EX}{filename}{Fore.RESET}"
+            success_message = f"{self.others.get_timestamp()} {Fore.LIGHTGREEN_EX}[SUCCESS] Loaded {Fore.LIGHTCYAN_EX}{filename}{Fore.RESET}"
             return success_message, filename
         except Exception as e:
-            error_message = f"{functions.others.get_timestamp()} {Fore.LIGHTRED_EX}[FAILED] Failed to load {Fore.LIGHTYELLOW_EX}{filename}{Fore.RESET}: {e}"
+            error_message = f"{self.others.get_timestamp()} {Fore.LIGHTRED_EX}[FAILED] Failed to load {Fore.LIGHTYELLOW_EX}{filename}{Fore.RESET}: {e}"
             return error_message, filename
 
     async def load_extensions(self):
@@ -372,7 +373,7 @@ class TwitchDiscordBot:
                 await self.load_extensions()
                 await self.bot.start(self.TOKEN)
             except discord.errors.PrivilegedIntentsRequired:
-                functions.others.clear_console()
+                self.others.clear_console()
                 print(
                     Fore.LIGHTRED_EX
                     + "[INTENTS ERROR] "
@@ -385,5 +386,5 @@ class TwitchDiscordBot:
 
 if __name__ == "__main__":
     bot_instance = TwitchDiscordBot()
-    signal.signal(signal.SIGINT, functions.others.custom_interrupt_handler)
+    signal.signal(signal.SIGINT, self.others.custom_interrupt_handler)
     asyncio.run(bot_instance.load_and_start())
