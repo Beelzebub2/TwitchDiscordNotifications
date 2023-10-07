@@ -56,7 +56,7 @@ def log_print(message, log_file_name="log.txt", max_lines=1000):
 
 def get_timestamp():
     now = datetime.datetime.now()
-    timestr = now.strftime("%Y-%m-%d %H:%M:%S")
+    timestr = now.strftime(f"%Y-%m-%d {Fore.LIGHTBLUE_EX}%H:%M:%S{Fore.RESET}")
     timestr = f"{Fore.YELLOW}[{Fore.RESET}{Fore.CYAN + timestr + Fore.RESET}{Fore.YELLOW}]{Fore.RESET}"
     return timestr
 

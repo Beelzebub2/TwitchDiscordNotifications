@@ -8,6 +8,7 @@ with open("variables.pkl", "rb") as file:
 
 VERSION = variables["version"]
 
+
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -25,7 +26,6 @@ class Help(commands.Cog):
             color=65280,
             timestamp=datetime.datetime.now()
         )
-        
 
         sorted_commands = sorted(self.bot.commands, key=lambda x: x.name)
 
@@ -34,7 +34,8 @@ class Help(commands.Cog):
                 continue
 
             description = command.help or "No description available."
-            aliases = ", ".join(command.aliases) if command.aliases else "No aliases"
+            aliases = ", ".join(
+                command.aliases) if command.aliases else "No aliases"
             usage = command.usage or f"No usage specified for {command.name}"
 
             embed.add_field(

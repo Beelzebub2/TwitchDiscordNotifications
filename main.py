@@ -326,9 +326,9 @@ class TwitchDiscordBot:
     async def load_extension(self, filename):
         try:
             await self.bot.load_extension(f'commands.{filename[:-3]}')
-            return f"Loaded {filename}"
+            return f"{Fore.LIGHTGREEN_EX}[SUCCESS] Loaded {Fore.LIGHTCYAN_EX}{filename}{Fore.RESET}"
         except Exception as e:
-            return f"Failed to load {filename}: {e}"
+            return f"{Fore.LIGHTRED_EX}[ERROR] Failed to load {Fore.LIGHTYELLOW_EX}{filename}{Fore.RESET}: {e}"
 
     async def load_extensions(self):
         extension_files = [filename for filename in os.listdir(
@@ -344,7 +344,7 @@ class TwitchDiscordBot:
         for result in results:
             print(result)
             parts = result.split(" ")
-            if len(parts) >= 2 and parts[0] == "Loaded":
+            if len(parts) >= 2 and parts[1] == "Loaded":
                 self.Loaded_commands.append(result)
             else:
                 result = result.split(":")

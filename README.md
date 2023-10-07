@@ -51,6 +51,7 @@ Discord bot: https://discord.com/developers/applications/
 
 v2.1 06/10/2023
 
++   Better console UI
 +   Added cooldown to clear command to prevent rate limit
 
 v2.1 06/10/2023
