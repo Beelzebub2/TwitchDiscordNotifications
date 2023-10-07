@@ -326,9 +326,11 @@ class TwitchDiscordBot:
     async def load_extension(self, filename):
         try:
             await self.bot.load_extension(f'commands.{filename[:-3]}')
-            return f"{functions.others.get_timestamp()} {Fore.LIGHTGREEN_EX}[SUCCESS] Loaded {Fore.LIGHTCYAN_EX}{filename}{Fore.RESET}"
+            success_message = f"{functions.others.get_timestamp()} {Fore.LIGHTGREEN_EX}[SUCCESS] Loaded {Fore.LIGHTCYAN_EX}{filename}{Fore.RESET}"
+            return success_message, filename
         except Exception as e:
-            return f"{functions.others.get_timestamp()} {Fore.LIGHTRED_EX}[ERROR] Failed to load {Fore.LIGHTYELLOW_EX}{filename}{Fore.RESET}: {e}"
+            error_message = f"{functions.others.get_timestamp()} {Fore.LIGHTRED_EX}[FAILED] Failed to load {Fore.LIGHTYELLOW_EX}{filename}{Fore.RESET}: {e}"
+            return error_message, filename
 
     async def load_extensions(self):
         extension_files = [filename for filename in os.listdir(
@@ -341,16 +343,15 @@ class TwitchDiscordBot:
 
         end_time = time.time()
         elapsed_time = end_time - start_time
-        for result in results:
+        for result, filename in results:
             print(result)
-            parts = result.split(" ")
-            if len(parts) >= 2 and parts[2] == "Loaded":
+            parts = result.split() if not isinstance(result, tuple) else result
+            if len(parts) >= 2 and parts[3] == "Loaded":
                 self.Loaded_commands.append(result)
             else:
-                result = result.split(":")
-                self.Failed_commands.append(result[0])
+                self.Failed_commands.append(filename[:-3])
 
-        print(f"Elapsed time: {elapsed_time:.4f} seconds")
+        print(f"Elapsed time: {elapsed_time:.4f} seconds\nLogging in! ...")
 
     async def get_custom_prefix(self, bot, message):
         if message.guild:
