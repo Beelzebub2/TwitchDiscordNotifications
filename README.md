@@ -49,8 +49,9 @@ Discord bot: https://discord.com/developers/applications/
 ## Changes
 ```diff
 
-v2.1 06/10/2023
+v2.1 07/10/2023
 
++   Improved help command
 +   Better console UI
 +   Added cooldown to clear command to prevent rate limit
 

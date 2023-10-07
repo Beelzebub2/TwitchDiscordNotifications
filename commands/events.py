@@ -65,7 +65,12 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandNotFound):
-            command = ctx.message.content.split(" ")[0]
+            command = ctx.message.content.split()
+            prefix = await self.bot.get_prefix(ctx.message)
+            if len(command) >= 2:
+                command = ctx.message.content.split(" ")[1]
+            else:
+                command = ctx.message.content.split(" ")[0]
 
             print(" " * console_width, end="\r")
             functions.others.log_print(

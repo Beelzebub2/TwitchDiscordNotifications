@@ -21,11 +21,11 @@ class TwitchDiscordBot:
         self.CLIENT_ID = os.environ.get("client_id")
         self.AUTHORIZATION = os.environ.get("authorization")
         self.TOKEN = os.environ.get("token")
+        self.others = functions.others
+        self.ch = SQLiteHandler("data.db")
         self.repo_url = "https://github.com/Beelzebub2/TwitchDiscordNotifications"
         self.VERSION = "v" + self.others.get_version(self.repo_url)
         self.create_env()
-        self.ch = SQLiteHandler("data.db")
-        self.others = functions.others
         self.ch.set_prefix(",")
         self.ch.set_version(self.VERSION)
         intents = Intents.all()
@@ -386,5 +386,5 @@ class TwitchDiscordBot:
 
 if __name__ == "__main__":
     bot_instance = TwitchDiscordBot()
-    signal.signal(signal.SIGINT, self.others.custom_interrupt_handler)
+    signal.signal(signal.SIGINT, functions.others.custom_interrupt_handler)
     asyncio.run(bot_instance.load_and_start())
