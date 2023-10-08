@@ -50,7 +50,7 @@ def search_for_updates(autoupdate=False):
                     functions.others.set_console_title(
                         f"Update Successfully Finished!")
                     functions.others.log_print(
-                        f"{Fore.LIGHTGREEN_EX}[SUCCESS] {Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
+                        f"{functions.others.get_timestamp()} {Fore.LIGHTGREEN_EX}[SUCCESS] {Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
                     print("Attempting to start bot...")
                     time.sleep(2)
                     return (True, current_version, online_version)
@@ -71,7 +71,7 @@ def search_for_updates(autoupdate=False):
                 functions.others.set_console_title(
                     f"Update Successfully Finished!")
                 functions.others.log_print(
-                    f"{Fore.LIGHTGREEN_EX}[SUCCESS] {Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
+                    f"{functions.others.get_timestamp()} {Fore.LIGHTGREEN_EX}[SUCCESS] {Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
                 return (True, current_version, online_version)
         else:
             return False

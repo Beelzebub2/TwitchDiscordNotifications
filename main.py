@@ -254,7 +254,7 @@ class TwitchDiscordBot:
                     f"{Fore.CYAN}{self.others.get_timestamp()}{Fore.RESET}{Fore.LIGHTGREEN_EX} [SUCCESS] "
                     f"Currently streaming {Fore.LIGHTWHITE_EX}{len(self.processed_streamers)}{Fore.RESET} "
                     f"{Fore.LIGHTGREEN_EX}Total: {Fore.LIGHTWHITE_EX}{len(streamers)}{Fore.LIGHTGREEN_EX} "
-                    f"(Time taken: {elapsed_time:.2f} seconds)",
+                    f"(Time taken: {elapsed_time:.2f} seconds){Fore.RESET}",
                     end="\r",
                 )
             else:
