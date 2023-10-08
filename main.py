@@ -180,7 +180,7 @@ class TwitchDiscordBot:
 
     async def on_ready(self):
         self.ch.save_time(str(datetime.datetime.now()))
-
+        self.bot.loop.create_task(self.check_for_updates())
         if not self.ch.check_restart_status():
             bot_owner_id = self.ch.get_bot_owner_id()
             if not bot_owner_id:
@@ -266,6 +266,11 @@ class TwitchDiscordBot:
                 )
 
             await asyncio.sleep(5)
+
+    async def check_for_updates(self):
+        while True:
+            functions.updater.search_for_updates()
+            await asyncio.sleep(1800)
 
     def create_env(self):
         if os.path.exists(".env"):
