@@ -11,6 +11,8 @@ import functions.others
 
 ch = functions.Sql_handler.SQLiteHandler("data.db")
 current_version = ch.get_version()
+var = functions.others.unpickle_variable()
+console_width = var["console_width"]
 
 
 def clear():
@@ -35,6 +37,9 @@ def search_for_updates():
     try:
         clear()
         set_console_title("Checking For Updates. . .")
+        print(" " * console_width, end="\r")
+        functions.others.log_print(
+            f"{Fore.LIGHTYELLOW_EX}[INFO] Checking for updates")
 
         if online_version != current_version:
             set_console_title("New Update Found!")
@@ -60,7 +65,7 @@ def search_for_updates():
                 clear()
                 set_console_title(f"Update Successfully Finished!")
                 functions.others.log_print(
-                    f"[SUCCESS] Updated bot from version {current_version} to {online_version}")
+                    f"{Fore.LIGHTGREEN_EXGREEN}[SUCCESS] {Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
                 print("Attempting to start bot...")
                 time.sleep(2)
                 return True

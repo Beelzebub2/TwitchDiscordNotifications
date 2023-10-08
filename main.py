@@ -270,7 +270,7 @@ class TwitchDiscordBot:
     async def check_for_updates(self):
         while True:
             functions.updater.search_for_updates()
-            await asyncio.sleep(1800)
+            await asyncio.sleep(1)
 
     def create_env(self):
         if os.path.exists(".env"):
