@@ -93,108 +93,87 @@ class TwitchDiscordBot:
             return False
 
     async def send_notification(self, streamer_name, data):
-        streamer_lists = self.ch.get_user_ids_with_streamers()
-        for user_id, streamers in streamer_lists.items():
+        for user_id, streamers in self.ch.get_user_ids_with_streamers().items():
             try:
                 member = self.bot.get_user(int(user_id))
-                if member:
-                    dm_channel = member.dm_channel
-                    if dm_channel is None:
-                        dm_channel = await member.create_dm()
-                    for streamer in streamers:
-                        if streamer_name == streamer.strip():
-                            embed = discord.Embed(
-                                title=f"{streamer_name} is streaming!",
-                                description=f"Click [here](https://www.twitch.tv/{streamer_name}) to watch the stream.",
-                                color=discord.Color.green(),
-                                timestamp=datetime.datetime.now()
-                            )
-                            if "data" in data and len(data["data"]) > 0:
-                                stream_data = data["data"][0]
-                                started_at = stream_data["started_at"]
-                                user_id = stream_data["user_id"]
-                                user_url = (
-                                    f"https://api.twitch.tv/helix/users?id={user_id}"
-                                )
-                                if (
-                                    "game_name" in stream_data
-                                    and stream_data["game_name"]
-                                ):
-                                    game = stream_data["game_name"]
-                                    embed.add_field(name="Game", value=game)
+                if not member:
+                    continue
 
-                                title = stream_data["title"]
-                                viewers = stream_data["viewer_count"]
-                                if int(viewers) == 0:
-                                    embed.add_field(
-                                        name="Viewers",
-                                        value="No viewers. Be the first!",
-                                    )
-                                else:
-                                    embed.add_field(
-                                        name="Viewers", value=viewers)
-                                user_response = requests.get(
-                                    user_url, headers=self.HEADERS)
-                                user_data = user_response.json()
-                                profile_picture_url = user_data["data"][0][
-                                    "profile_image_url"
-                                ]
-                                profile_picture_url = profile_picture_url.replace(
-                                    "{width}", "300"
-                                ).replace("{height}", "300")
-                                start_time_str = self.others.generate_timestamp_string(
-                                    started_at)
-                                embed.add_field(
-                                    name="Stream Title", value=title)
-                                embed.set_thumbnail(url=profile_picture_url)
-                                embed.set_footer(
-                                    text=f"{self.VERSION} | Made by Beelzebub2")
-                                mention = f"||{member.mention}||"
-                                embed.add_field(
-                                    name="Stream Start Time (local)",
-                                    value=start_time_str,
-                                )
-                                try:
-                                    await dm_channel.send(mention, embed=embed)
-                                    print(" " * self.console_width, end="\r")
-                                    self.others.log_print(
-                                        Fore.CYAN
-                                        + self.others.get_timestamp()
-                                        + Fore.RESET
-                                        + " "
-                                        + Fore.LIGHTGREEN_EX
-                                        + f"[SUCCESS] Notification sent successfully for {Fore.CYAN + streamer_name + Fore.RESET}. {Fore.LIGHTGREEN_EX}to member {Fore.LIGHTCYAN_EX + member.name + Fore.RESET}"
-                                    )
-                                except discord.errors.Forbidden:
-                                    print(" " * self.console_width, end="\r")
-                                    self.others.log_print(
-                                        Fore.CYAN
-                                        + self.others.get_timestamp()
-                                        + Fore.RESET
-                                        + " "
-                                        + Fore.RED
-                                        + f"[ERROR] Cannot send a message to user {member.name}. Missing permissions or DMs disabled."
-                                    )
-                            else:
-                                print(" " * self.console_width, end="\r")
-                                self.others.log_print(
-                                    Fore.CYAN
-                                    + self.others.get_timestamp()
-                                    + Fore.RESET
-                                    + " "
-                                    + f"{streamer_name} is not streaming."
-                                )
-                                self.processed_streamers.remove(streamer_name)
+                dm_channel = member.dm_channel or await member.create_dm()
+
+                for streamer in streamers:
+                    if streamer_name == streamer.strip():
+                        if "data" not in data or not data["data"]:
+                            print(" " * self.console_width, end="\r")
+                            self.others.log_print(
+                                f"{streamer_name} is not streaming."
+                            )
+                            self.processed_streamers.remove(streamer_name)
+                            continue
+
+                        stream_data = data["data"][0]
+                        started_at = stream_data.get("started_at")
+                        user_id = stream_data.get("user_id")
+
+                        if not started_at or not user_id:
+                            continue
+
+                        user_url = f"https://api.twitch.tv/helix/users?id={user_id}"
+                        user_response = requests.get(
+                            user_url, headers=self.HEADERS)
+                        user_data = user_response.json()
+                        profile_picture_url = user_data["data"][0].get(
+                            "profile_image_url")
+
+                        if profile_picture_url:
+                            profile_picture_url = profile_picture_url.replace(
+                                "{width}", "300").replace("{height}", "300")
+
+                        start_time_str = self.others.generate_timestamp_string(
+                            started_at)
+                        title = stream_data.get("title", "")
+                        viewers = stream_data.get("viewer_count", 0)
+
+                        embed = discord.Embed(
+                            title=f"{streamer_name} is streaming!",
+                            description=f"Click [here](https://www.twitch.tv/{streamer_name}) to watch the stream.",
+                            color=discord.Color.green(),
+                            timestamp=datetime.datetime.now()
+                        )
+
+                        if stream_data.get("game_name"):
+                            embed.add_field(
+                                name="Game", value=stream_data["game_name"])
+
+                        embed.add_field(
+                            name="Viewers", value="No viewers. Be the first!" if viewers == 0 else viewers)
+                        embed.set_thumbnail(url=profile_picture_url)
+                        embed.set_footer(
+                            text=f"{self.VERSION} | Made by Beelzebub2")
+                        mention = f"||{member.mention}||"
+                        embed.add_field(
+                            name="Stream Start Time (local)", value=start_time_str)
+
+                        try:
+                            await dm_channel.send(mention, embed=embed)
+                            print(" " * self.console_width, end="\r")
+                            self.others.log_print(
+                                f"{self.others.get_timestamp()} "
+                                f"{Fore.CYAN}[SUCCESS] Notification sent successfully for "
+                                f"{Fore.CYAN}{streamer_name}. {Fore.LIGHTGREEN_EX}to member "
+                                f"{Fore.LIGHTCYAN_EX + member.name + Fore.RESET}"
+                            )
+                        except discord.errors.Forbidden:
+                            print(" " * self.console_width, end="\r")
+                            self.others.log_print(
+                                f"{self.others.get_timestamp()} "
+                                f"{Fore.CYAN}[ERROR] Cannot send a message to user {member.name}. "
+                                f"Missing permissions or DMs disabled."
+                            )
             except discord.errors.NotFound:
                 print(" " * self.console_width, end="\r")
                 self.others.log_print(
-                    Fore.CYAN
-                    + self.others.get_timestamp()
-                    + Fore.RESET
-                    + " "
-                    + Fore.RED
-                    + f"User with ID {user_id} not found."
-                    + Fore.RESET
+                    f"{self.others.get_timestamp()} {Fore.CYAN}[ERROR] User with ID {user_id} not found."
                 )
 
     async def on_ready(self):
