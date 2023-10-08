@@ -269,7 +269,8 @@ class TwitchDiscordBot:
 
     async def check_for_updates(self):
         while True:
-            functions.updater.search_for_updates(autoupdate=True)
+            if functions.updater.search_for_updates(autoupdate=True):
+                
             await asyncio.sleep(10)
 
     def create_env(self):

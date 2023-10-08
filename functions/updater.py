@@ -84,6 +84,8 @@ def search_for_updates(autoupdate=False):
                 functions.others.log_print(
                     f"{Fore.LIGHTGREEN_EX}[SUCCESS] {Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
                 return True
+        else:
+            return False
     except KeyboardInterrupt:
         print(
             f"\n{Style.BRIGHT + Fore.LIGHTBLUE_EX}KeyboardInterrupt detected. Exiting gracefully.{Fore.RESET}"
