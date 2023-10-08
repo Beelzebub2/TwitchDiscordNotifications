@@ -29,7 +29,9 @@ def set_console_title(title):
         os.system("echo -ne '\033]0;" + title + "\007'")
 
 
-online_version = functions.others.get_version()
+online_version = "v" + \
+    functions.others.get_version(
+        "https://github.com/Beelzebub2/TwitchDiscordNotifications")
 
 
 def search_for_updates():

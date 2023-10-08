@@ -13,6 +13,7 @@ import requests
 from functions.Sql_handler import SQLiteHandler
 import functions.others
 import concurrent.futures
+import functions.updater
 
 
 class TwitchDiscordBot:
@@ -352,6 +353,7 @@ class TwitchDiscordBot:
 
 
 if __name__ == "__main__":
+    functions.updater.search_for_updates()
     bot_instance = TwitchDiscordBot()
     signal.signal(signal.SIGINT, functions.others.custom_interrupt_handler)
     asyncio.run(bot_instance.load_and_start())
