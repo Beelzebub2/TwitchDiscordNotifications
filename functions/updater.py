@@ -31,6 +31,8 @@ def set_console_title(title):
 online_version = "v" + \
     functions.others.get_version(
         "https://github.com/Beelzebub2/TwitchDiscordNotifications")
+print(online_version)
+print(current_version)
 
 
 def search_for_updates():
