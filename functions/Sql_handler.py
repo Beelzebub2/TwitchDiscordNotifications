@@ -125,26 +125,20 @@ class SQLiteHandler:
 
     def remove_streamer_from_user(self, discord_id, streamer):
         cursor = self.conn.cursor()
-
         cursor.execute(
             'SELECT streamer FROM users WHERE discord_id = ?', (discord_id,))
         current_value = cursor.fetchone()
 
-        if current_value is None:
-            return False
-
-        current_value = current_value[0]
-        streamers = current_value.split(',')
-
-        if streamer in streamers:
-            streamers.remove(streamer)
-
-            new_value = ','.join(streamers)
-
-            cursor.execute(
-                'UPDATE users SET streamer = ? WHERE discord_id = ?', (new_value, discord_id))
-            self.conn.commit()
-            return True
+        if current_value is not None:
+            current_value = current_value[0]
+            streamers = current_value.split(',')
+            if streamer in streamers:
+                streamers.remove(streamer)
+                new_value = ','.join(streamers)
+                cursor.execute(
+                    'UPDATE users SET streamer = ? WHERE discord_id = ?', (new_value, discord_id))
+                self.conn.commit()
+                return True
 
         return False
 

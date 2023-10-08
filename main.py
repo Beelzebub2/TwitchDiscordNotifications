@@ -64,8 +64,7 @@ class TwitchDiscordBot:
             "intents": intents,
             "headers": self.HEADERS
         }
-        with open("variables.pkl", "wb") as file:
-            pickle.dump(self.shared_variables, file)
+        self.others.pickle_variable(self.shared_variables)
 
     async def check_stream(self, session, streamer_name):
         if not streamer_name:

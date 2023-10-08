@@ -51,6 +51,7 @@ Discord bot: https://discord.com/developers/applications/
 
 v2.1 07/10/2023
 
++   Increased SQLhandler performance
 +   Fixed minor issues with commands
 +   Implemented tests
 +   Fixed send_notification bug

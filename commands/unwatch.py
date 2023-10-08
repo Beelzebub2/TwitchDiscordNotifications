@@ -36,12 +36,12 @@ class UnWatch(commands.Cog):
 
         user_id = str(ctx.author.id)
         user_ids = ch.get_all_user_ids()
+        variables = functions.others.unpickle_variable()
+        console_width = variables["console_width"]
         if user_id in user_ids:
             streamer_list = ch.get_streamers_for_user(user_id)
             if any(streamer_name.lower() == s.lower() for s in streamer_list):
                 ch.remove_streamer_from_user(user_id, streamer_name)
-                variables = functions.others.unpickle_variable()
-                console_width = variables["console_width"]
                 print(" " * console_width, end="\r")
                 log_print(
                     Fore.CYAN
@@ -62,6 +62,7 @@ class UnWatch(commands.Cog):
                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
                 await ctx.channel.send(embed=embed)
             else:
+
                 print(" " * console_width, end="\r")
                 log_print(
                     Fore.CYAN
@@ -75,10 +76,11 @@ class UnWatch(commands.Cog):
                 embed = discord.Embed(
                     title="Stream Watchlist",
                     description=f"{streamer_name} is not in your watchlist.",
-                    color=16759808,
+                    color=discord.Color.red(),
                     timestamp=datetime.datetime.now()
                 )
                 embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
+                embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
                 await ctx.channel.send(embed=embed)
 
 
