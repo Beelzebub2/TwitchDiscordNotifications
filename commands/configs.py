@@ -1,11 +1,12 @@
 from discord.ext import commands
 import discord
-from functions.Sql_handler import SQLiteHandler
+from Functions.Sql_handler import SQLiteHandler
 
 ch = SQLiteHandler("data.db")
 
 '''This class has 2 different commands
    for the sake of simplicity'''
+
 
 class Configs(commands.Cog):
     def __init__(self, bot):
@@ -13,10 +14,10 @@ class Configs(commands.Cog):
 
     '''Configrole command'''
     @commands.command(
-    name="configrole",
-    aliases=["cr"],
-    usage="configrole <@role>",
-    help="Change the role to add in the server configuration",
+        name="configrole",
+        aliases=["cr"],
+        usage="configrole <@role>",
+        help="Change the role to add in the server configuration",
     )
     async def prefix_config_role(self, ctx, role: discord.Role):
         if not ctx.author.guild_permissions.administrator:

@@ -2,7 +2,7 @@ import json
 import os
 import sqlite3
 import tempfile
-from functions.Sql_handler import SQLiteHandler
+from Functions.Sql_handler import SQLiteHandler
 import unittest
 
 

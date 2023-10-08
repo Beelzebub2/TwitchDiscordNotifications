@@ -2,15 +2,9 @@ import datetime
 from discord.ext import commands
 from colorama import Fore
 import discord
-from functions.Sql_handler import SQLiteHandler
-from functions.others import log_print, get_timestamp
+from Functions.Sql_handler import SQLiteHandler
+import Functions.others
 import pickle
-
-with open("variables.pkl", "rb") as file:
-    variables = pickle.load(file)
-
-ch = SQLiteHandler("data.db")
-console_width = variables["console_width"]
 
 
 class UnRegister(commands.Cog):
@@ -25,12 +19,16 @@ class UnRegister(commands.Cog):
     )
     async def unregister_user(self, ctx):
         user_id = str(ctx.author.id)
+        variables = Functions.others.unpickle_variable()
+
+        ch = SQLiteHandler("data.db")
+        console_width = variables["console_width"]
 
         if ch.delete_user(user_id):
             print(" " * console_width, end="\r")
-            log_print(
+            Functions.others.log_print(
                 Fore.CYAN
-                + get_timestamp()
+                + Functions.others.get_timestamp()
                 + Fore.RESET
                 + " "
                 + Fore.LIGHTGREEN_EX
@@ -48,9 +46,9 @@ class UnRegister(commands.Cog):
             await ctx.send(embed=embed)
         else:
             print(" " * console_width, end="\r")
-            log_print(
+            Functions.others.log_print(
                 Fore.CYAN
-                + get_timestamp()
+                + Functions.others.get_timestamp()
                 + Fore.RESET
                 + " "
                 + Fore.YELLOW

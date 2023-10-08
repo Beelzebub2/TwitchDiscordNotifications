@@ -1,5 +1,5 @@
 from discord.ext import commands
-import functions
+import Functions
 import discord
 import aiohttp
 import asyncio
@@ -10,10 +10,10 @@ import requests
 import io
 import os
 import datetime
-from functions.Sql_handler import SQLiteHandler
+from Functions.Sql_handler import SQLiteHandler
 
 
-variables = functions.others.unpickle_variable()
+variables = Functions.others.unpickle_variable()
 
 ch = SQLiteHandler("data.db")
 console_width = variables["console_width"]
@@ -44,8 +44,8 @@ class ListStreamers(commands.Cog):
                     names.append(streamer_data["display_name"])
                 else:
                     print(" " * console_width, end="\r")
-                    functions.others.log_print(
-                        f"{functions.others.get_timestamp()} No data found for streamer: {streamer_name}"
+                    Functions.others.log_print(
+                        f"{Functions.others.get_timestamp()} No data found for streamer: {streamer_name}"
                     )
 
     @commands.command(
@@ -64,10 +64,10 @@ class ListStreamers(commands.Cog):
             if streamer_list:
                 streamer_names = ", ".join(streamer_list)
                 print(" " * console_width, end="\r")
-                functions.others.log_print(
+                Functions.others.log_print(
                     "\033[K"
                     + Fore.CYAN
-                    + functions.others.get_timestamp()
+                    + Functions.others.get_timestamp()
                     + Fore.RESET
                     + " "
                     + Fore.LIGHTYELLOW_EX
@@ -165,9 +165,9 @@ class ListStreamers(commands.Cog):
 
             else:
                 print(" " * console_width, end="\r")
-                functions.others.log_print(
+                Functions.others.log_print(
                     Fore.CYAN
-                    + functions.others.get_timestamp()
+                    + Functions.others.get_timestamp()
                     + Fore.RESET
                     + " "
                     + Fore.YELLOW
@@ -184,9 +184,9 @@ class ListStreamers(commands.Cog):
                 await ctx.channel.send(embed=embed)
         else:
             print(" " * console_width, end="\r")
-            functions.others.log_print(
+            Functions.others.log_print(
                 Fore.CYAN
-                + functions.others.get_timestamp()
+                + Functions.others.get_timestamp()
                 + Fore.RESET
                 + " "
                 + Fore.RED

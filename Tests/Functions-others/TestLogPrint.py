@@ -2,7 +2,7 @@ import unittest
 import os
 import re
 from unittest.mock import patch
-from functions.others import log_print
+from Functions.others import log_print
 
 
 class TestLogPrint(unittest.TestCase):

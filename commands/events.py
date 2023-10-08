@@ -2,10 +2,10 @@ import datetime
 from discord.ext import commands
 import discord
 from colorama import Fore
-from functions.Sql_handler import SQLiteHandler
-import functions.others
+from Functions.Sql_handler import SQLiteHandler
+import Functions.others
 
-variables = functions.others.unpickle_variable()
+variables = Functions.others.unpickle_variable()
 
 ch = SQLiteHandler("data.db")
 console_width = variables["console_width"]
@@ -50,8 +50,8 @@ class Events(commands.Cog):
                 if role not in member.roles:
                     await member.add_roles(role)
                     print(" " * console_width, end="\r")
-                    functions.others.log_print(
-                        f"{functions.others.get_timestamp()} Assigned role named {role.name} to {member.display_name} in the target guild."
+                    Functions.others.log_print(
+                        f"{Functions.others.get_timestamp()} Assigned role named {role.name} to {member.display_name} in the target guild."
                     )
             else:
                 await general_channel.send(
@@ -71,9 +71,9 @@ class Events(commands.Cog):
                 command = ctx.message.content.split(" ")[0]
 
             print(" " * console_width, end="\r")
-            functions.others.log_print(
+            Functions.others.log_print(
                 Fore.CYAN
-                + functions.others.get_timestamp()
+                + Functions.others.get_timestamp()
                 + Fore.RESET
                 + " "
                 + Fore.RED
@@ -102,9 +102,9 @@ class Events(commands.Cog):
 
         else:
             print(" " * console_width, end="\r")
-            functions.others.log_print(
+            Functions.others.log_print(
                 Fore.CYAN
-                + functions.others.get_timestamp()
+                + Functions.others.get_timestamp()
                 + Fore.RESET
                 + " "
                 + Fore.RED
@@ -144,7 +144,7 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_bot_exit(self):
-        functions.others.custom_interrupt_handler()
+        Functions.others.custom_interrupt_handler()
 
 
 async def setup(bot):

@@ -1,11 +1,12 @@
 from discord.ext import commands
 import discord
 import datetime
-import functions.others
+import Functions.others
 
-variables = functions.others.unpickle_variable()
+variables = Functions.others.unpickle_variable()
 
 VERSION = variables["version"]
+
 
 class Invite(commands.Cog):
     def __init__(self, bot):
@@ -27,6 +28,7 @@ class Invite(commands.Cog):
         embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
 
         await ctx.send(embed=embed)
+
 
 async def setup(bot):
     await bot.add_cog(Invite(bot))

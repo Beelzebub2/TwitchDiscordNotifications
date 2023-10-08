@@ -1,6 +1,6 @@
 import unittest
 import datetime
-from functions.others import generate_timestamp_string
+from Functions.others import generate_timestamp_string
 
 
 class TestGenerateTimestampString(unittest.TestCase):

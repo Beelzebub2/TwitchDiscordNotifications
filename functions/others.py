@@ -6,8 +6,6 @@ from colorama import Fore
 import sys
 import pickle
 import requests
-from functions.Sql_handler import SQLiteHandler
-ch = SQLiteHandler("data.db")
 
 
 def pickle_variable(data, filename="variables.pkl"):
@@ -109,26 +107,6 @@ def set_console_title(title):
 
 def clear_console():
     os.system("cls" if os.name == "nt" else "clear")
-
-
-def custom_interrupt_handler(signum, frame):
-    variables = unpickle_variable()
-    console_width = variables["console_width"]
-    processed_streamers = variables["processed_streamers"]
-    print(" " * console_width, end="\r")
-    if len(processed_streamers) > 0:
-        print(
-            f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} Saving currently streaming streamers and exiting..."
-        )
-        data = {"Restarted": True,
-                "Streamers": processed_streamers}
-        ch.save_to_temp_json(data)
-        os._exit(0)
-
-    print(
-        f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} No streamers currently streaming. exiting..."
-    )
-    os._exit(0)
 
 
 def get_version(repo_url):

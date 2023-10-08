@@ -2,13 +2,14 @@ import os
 from discord.ext import commands
 import discord
 import datetime
-from functions.Sql_handler import SQLiteHandler
+from Functions.Sql_handler import SQLiteHandler
 
 ch = SQLiteHandler("data.db")
 
+
 class Reload(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot      
+        self.bot = bot
 
     @commands.command(name="reload", aliases=["r"], description="reloads cogs")
     @commands.is_owner()
@@ -16,7 +17,8 @@ class Reload(commands.Cog):
         Loaded_commands = []
         Failed_commands = []
 
-        extension_files = [filename[:-3] for filename in os.listdir('./commands') if filename.endswith('.py')]
+        extension_files = [filename[:-3]
+                           for filename in os.listdir('./commands') if filename.endswith('.py')]
         for filename in extension_files:
             try:
                 await self.bot.reload_extension(f'commands.{filename}')
@@ -54,7 +56,6 @@ class Reload(commands.Cog):
         embed.add_field(name="Failed",
                         value=value)
         await owner.send(embed=embed)
-        
 
 
 async def setup(bot):

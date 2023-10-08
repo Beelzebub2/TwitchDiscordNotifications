@@ -10,19 +10,22 @@ from discord.ext import commands
 from discord import Intents
 from colorama import Fore
 import requests
-from functions.Sql_handler import SQLiteHandler
-import functions.others
+from Functions.Sql_handler import SQLiteHandler
+import Functions.others
 import concurrent.futures
-import functions.updater
+import Utilities.updater
+import Utilities.custom_decorators
 
 
 class TwitchDiscordBot:
     def __init__(self):
+        signal.signal(signal.SIGINT, self.custom_interrupt_handler)
         self.CLIENT_ID = os.environ.get("client_id")
         self.AUTHORIZATION = os.environ.get("authorization")
         self.TOKEN = os.environ.get("token")
-        self.others = functions.others
+        self.others = Functions.others
         self.ch = SQLiteHandler("data.db")
+        self.autoupdate = True
         self.repo_url = "https://github.com/Beelzebub2/TwitchDiscordNotifications"
         self.VERSION = "v" + self.others.get_version(self.repo_url)
         self.create_env()
@@ -66,6 +69,7 @@ class TwitchDiscordBot:
         }
         self.others.pickle_variable(self.shared_variables)
 
+    @Utilities.custom_decorators.performance_tracker
     async def check_stream(self, session, streamer_name):
         if not streamer_name:
             return False
@@ -95,7 +99,7 @@ class TwitchDiscordBot:
             return False
 
     async def send_notification(self, streamer_name, data):
-        for user_id, streamers in self.ch.get_user_ids_with_streamers().items():
+        for user_id, streamers in self.ids_with_streamers:
             try:
                 member = self.bot.get_user(int(user_id))
                 if not member:
@@ -239,7 +243,7 @@ class TwitchDiscordBot:
             )
 
             streamers = self.ch.get_all_streamers()
-
+            self.ids_with_streamers = self.ch.get_user_ids_with_streamers().items()
             async with aiohttp.ClientSession() as session:
                 await asyncio.gather(
                     *[self.check_stream(session, streamer) for streamer in streamers]
@@ -269,8 +273,7 @@ class TwitchDiscordBot:
 
     async def check_for_updates(self):
         while True:
-            result = functions.updater.search_for_updates(
-                autoupdate=True)
+            result = Utilities.updater.search_for_updates(self.autoupdate)
             if result:
                 embed = discord.Embed(
                     title="Update Successful",
@@ -283,6 +286,25 @@ class TwitchDiscordBot:
                 embed.add_field(name="To", value=result[2])
                 await self.owner.send(embed=embed)
             await asyncio.sleep(1800)
+
+    def custom_interrupt_handler(self, signum, frame):
+        variables = self.others.unpickle_variable()
+        console_width = variables["console_width"]
+        processed_streamers = variables["processed_streamers"]
+        print(" " * console_width, end="\r")
+        if len(processed_streamers) > 0:
+            print(
+                f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} Saving currently streaming streamers and exiting..."
+            )
+            data = {"Restarted": True,
+                    "Streamers": processed_streamers}
+            self.ch.save_to_temp_json(data)
+            os._exit(0)
+
+        print(
+            f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} No streamers currently streaming. exiting..."
+        )
+        os._exit(0)
 
     def create_env(self):
         if os.path.exists(".env"):
@@ -370,7 +392,6 @@ class TwitchDiscordBot:
 
 
 if __name__ == "__main__":
-    functions.updater.search_for_updates()
+    Utilities.custom_decorators.debug = True
     bot_instance = TwitchDiscordBot()
-    signal.signal(signal.SIGINT, functions.others.custom_interrupt_handler)
     asyncio.run(bot_instance.load_and_start())

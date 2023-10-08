@@ -2,14 +2,7 @@ import asyncio
 from discord.ext import commands
 import discord
 import datetime
-import pickle
-import functions.others
-
-variables = functions.others.unpickle_variable()
-
-VERSION = variables["version"]
-HEADERS = variables["headers"]
-console_width = variables["console_width"]
+import Functions.others
 
 
 class Clear(commands.Cog):
@@ -24,6 +17,9 @@ class Clear(commands.Cog):
     )
     @commands.cooldown(rate=1, per=60, type=commands.BucketType.user)
     async def clear_bot_messages(self, ctx) -> None:
+        variables = Functions.others.unpickle_variable()
+
+        VERSION = variables["version"]
         messages_to_remove = 1000
         user = await self.bot.fetch_user(ctx.author.id)
 

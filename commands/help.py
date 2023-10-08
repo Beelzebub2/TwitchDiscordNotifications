@@ -2,14 +2,16 @@ from discord.ext import commands
 import discord
 import datetime
 import pickle
-import functions.others
+import Functions.others
 
-variables = functions.others.unpickle_variable()
+variables = Functions.others.unpickle_variable()
 
 VERSION = variables["version"]
 
+
 class CommandNotFoundError(commands.CommandNotFound):
     pass
+
 
 class Help(commands.Cog):
     def __init__(self, bot):

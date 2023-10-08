@@ -3,10 +3,9 @@ from discord.ext import commands
 import sys
 import os
 import discord
-from functions.Sql_handler import SQLiteHandler
-import functions.others
+from Functions.Sql_handler import SQLiteHandler
+import Functions.others
 
-variables = functions.others.unpickle_variable()
 
 ch = SQLiteHandler("data.db")
 
@@ -24,6 +23,7 @@ class Restart(commands.Cog):
     )
     @commands.is_owner()
     async def restart(self, ctx):
+        variables = Functions.others.unpickle_variable()
         processed_streamers = variables["processed_streamers"]
         data = {"Restarted": True, "Streamers": processed_streamers}
         ch.save_to_temp_json(data)

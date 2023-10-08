@@ -4,7 +4,7 @@ import pickle
 
 # Import the functions to be tested
 # Replace 'your_module' with the actual module name
-from functions.others import pickle_variable, unpickle_variable
+from Functions.others import pickle_variable, unpickle_variable
 
 
 class TestPickleFunctions(unittest.TestCase):

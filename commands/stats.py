@@ -1,8 +1,8 @@
 from discord.ext import commands
 import discord
 import datetime
-import functions.others
-from functions.Sql_handler import SQLiteHandler
+import Functions.others
+from Functions.Sql_handler import SQLiteHandler
 import os
 
 
@@ -15,7 +15,7 @@ class Stats(commands.Cog):
 
     @commands.command(name="stats", aliases=["st"], help="Shows Bots stats.", usage="stats")
     async def stats(self, ctx):
-        variables = functions.others.unpickle_variable()
+        variables = Functions.others.unpickle_variable()
         working_commands = variables["loaded_commands"]
         failed_commands = variables["failed_commands"]
         date_format = variables["date_format"]

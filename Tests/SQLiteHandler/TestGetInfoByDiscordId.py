@@ -1,5 +1,5 @@
 import sqlite3
-from functions.Sql_handler import SQLiteHandler
+from Functions.Sql_handler import SQLiteHandler
 import unittest
 
 
@@ -32,7 +32,6 @@ class TestGetInfoByDiscordId(unittest.TestCase):
         # Check if the result is as expected
         expected_result = [(1, '123456789', 'TwitchStreamer1', 'User1')]
         self.assertEqual(result, expected_result)
-
 
 
 if __name__ == '__main__':

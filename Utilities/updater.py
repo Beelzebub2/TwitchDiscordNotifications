@@ -6,26 +6,22 @@ import os
 import shutil
 from zipfile import ZipFile
 from colorama import Fore, Style
-import functions.Sql_handler
-import functions.others
+import Functions.Sql_handler
+import Functions.others
 
-ch = functions.Sql_handler.SQLiteHandler("data.db")
-
-var = functions.others.unpickle_variable()
-console_width = var["console_width"]
+ch = Functions.Sql_handler.SQLiteHandler("data.db")
 
 
 def search_for_updates(autoupdate=False):
     try:
+        variables = Functions.others.unpickle_variable()
         current_version = ch.get_version()
         online_version = "v" + \
-            functions.others.get_version(
+            Functions.others.get_version(
                 "https://github.com/Beelzebub2/TwitchDiscordNotifications")
-        functions.others.set_console_title("Checking For Updates. . .")
-        print(" " * console_width, end="\r\r")
-
+        Functions.others.set_console_title("Checking For Updates. . .")
         if online_version != current_version:
-            functions.others.set_console_title("New Update Found!")
+            Functions.others.set_console_title("New Update Found!")
             if not autoupdate:
                 choice = input(
                     f"{Fore.GREEN}[{Fore.YELLOW}>>>{Fore.GREEN}] {Fore.RESET}You want to update to the latest version? (Y to update): {Fore.RED}"
@@ -33,7 +29,7 @@ def search_for_updates(autoupdate=False):
 
                 if choice.lower() == "y" or choice.lower() == "yes":
                     print(f"{Fore.WHITE}\nUpdating. . .")
-                    functions.others.set_console_title("Updating...")
+                    Functions.others.set_console_title("Updating...")
                     new = requests.get(
                         f"https://github.com/Beelzebub2/TwitchDiscordNotifications/archive/refs/heads/main.zip"
                     )
@@ -46,11 +42,11 @@ def search_for_updates(autoupdate=False):
                     shutil.copytree(cwd, os.getcwd(), dirs_exist_ok=True)
                     shutil.rmtree(cwd)
                     ch.set_version(online_version)
-                    functions.others.clear_console()
-                    functions.others.set_console_title(
+                    Functions.others.clear_console()
+                    Functions.others.set_console_title(
                         f"Update Successfully Finished!")
-                    functions.others.log_print(
-                        f"{functions.others.get_timestamp()} {Fore.LIGHTGREEN_EX}[SUCCESS] {Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
+                    Functions.others.log_print(
+                        f"{Functions.others.get_timestamp()} {Fore.LIGHTGREEN_EX}[SUCCESS] {Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
                     print("Attempting to start bot...")
                     time.sleep(2)
                     return (True, current_version, online_version)
@@ -67,11 +63,11 @@ def search_for_updates(autoupdate=False):
                 shutil.copytree(cwd, os.getcwd(), dirs_exist_ok=True)
                 shutil.rmtree(cwd)
                 ch.set_version(online_version)
-                functions.others.clear_console()
-                functions.others.set_console_title(
+                Functions.others.clear_console()
+                Functions.others.set_console_title(
                     f"Update Successfully Finished!")
-                functions.others.log_print(
-                    f"{functions.others.get_timestamp()} {Fore.LIGHTGREEN_EX}[SUCCESS] {Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
+                Functions.others.log_print(
+                    f"{Functions.others.get_timestamp()} {Fore.LIGHTGREEN_EX}[SUCCESS] {Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
                 return (True, current_version, online_version)
         else:
             return False

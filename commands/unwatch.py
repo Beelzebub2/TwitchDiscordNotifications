@@ -2,15 +2,11 @@ import datetime
 from discord.ext import commands
 from colorama import Fore
 import discord
-from functions.Sql_handler import SQLiteHandler
-from functions.others import get_timestamp, log_print
+from Functions.Sql_handler import SQLiteHandler
+from Functions.others import get_timestamp, log_print
 import re
-import functions.others
+import Functions.others
 
-
-ch = SQLiteHandler("data.db")
-variables = functions.others.unpickle_variable()
-VERSION = variables["version"]
 
 # TODO Accept multiple streamers
 
@@ -26,6 +22,9 @@ class UnWatch(commands.Cog):
         help="Removes the streamer from your watch list (provide either streamer name or link)",
     )
     async def unwatch(self, ctx, streamer_name_or_link: str):
+        ch = SQLiteHandler("data.db")
+        variables = Functions.others.unpickle_variable()
+        VERSION = variables["version"]
         if "https://www.twitch.tv/" in streamer_name_or_link:
             streamer_name = re.search(
                 r"https://www.twitch.tv/([^\s/]+)", streamer_name_or_link
@@ -36,7 +35,7 @@ class UnWatch(commands.Cog):
 
         user_id = str(ctx.author.id)
         user_ids = ch.get_all_user_ids()
-        variables = functions.others.unpickle_variable()
+        variables = Functions.others.unpickle_variable()
         console_width = variables["console_width"]
         if user_id in user_ids:
             streamer_list = ch.get_streamers_for_user(user_id)

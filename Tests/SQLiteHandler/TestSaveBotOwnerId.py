@@ -1,6 +1,7 @@
 import sqlite3
-from functions.Sql_handler import SQLiteHandler
+from Functions.Sql_handler import SQLiteHandler
 import unittest
+
 
 class TestSaveBotOwnerId(unittest.TestCase):
 

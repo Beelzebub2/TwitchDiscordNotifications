@@ -3,18 +3,11 @@ from discord.ext import commands
 import requests
 from colorama import Fore
 import discord
-from functions.Sql_handler import SQLiteHandler
-from functions.others import get_timestamp, log_print
+from Functions.Sql_handler import SQLiteHandler
+from Functions.others import get_timestamp, log_print
 import re
-import functions.others
+import Functions.others
 
-variables = functions.others.unpickle_variable()
-
-ch = SQLiteHandler("data.db")
-console_width = variables["console_width"]
-VERSION = variables["version"]
-AUTHORIZATION = variables["authorization"]
-CLIENT_ID = variables["client_id"]
 
 # TODO Accept multiple streamers
 
@@ -30,6 +23,13 @@ class Watch(commands.Cog):
         help="Add a streamer to your watch list (provide either streamer name or link)",
     )
     async def watch(self, ctx, streamer_name_or_link: str):
+        variables = Functions.others.unpickle_variable()
+
+        ch = SQLiteHandler("data.db")
+        console_width = variables["console_width"]
+        VERSION = variables["version"]
+        AUTHORIZATION = variables["authorization"]
+        CLIENT_ID = variables["client_id"]
         if "https://www.twitch.tv/" in streamer_name_or_link:
             streamer_name = re.search(
                 r"https://www.twitch.tv/([^\s/]+)", streamer_name_or_link

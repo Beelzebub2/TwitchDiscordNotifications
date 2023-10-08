@@ -1,7 +1,7 @@
 import unittest
 import os
 from unittest.mock import patch
-from functions.others import clear_console
+from Functions.others import clear_console
 
 
 class TestClearConsole(unittest.TestCase):
