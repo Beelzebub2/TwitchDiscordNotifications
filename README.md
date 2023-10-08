@@ -43,6 +43,7 @@ Discord bot: https://discord.com/developers/applications/
 **Ungerister** - Permanently deletes user's watchlist and data.  
 **Stats** - Shows bots stats.  
 **Restart** - Restarts the bot (available only to bot host).  
+**Reload** - Reloads all the commands (available only to bot host)
 #### Replit
 **It should create the secrets automatically so just change the filler text in there**
 
