@@ -65,7 +65,7 @@ def search_for_updates(autoupdate=False):
                         f"{Fore.LIGHTGREEN_EX}[SUCCESS] {Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
                     print("Attempting to start bot...")
                     time.sleep(2)
-                    return True
+                    return True, (current_version, online_version)
             if autoupdate:
                 new = requests.get(
                     f"https://github.com/Beelzebub2/TwitchDiscordNotifications/archive/refs/heads/main.zip"
@@ -83,7 +83,7 @@ def search_for_updates(autoupdate=False):
                 set_console_title(f"Update Successfully Finished!")
                 functions.others.log_print(
                     f"{Fore.LIGHTGREEN_EX}[SUCCESS] {Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
-                return True
+                return True, (current_version, online_version)
         else:
             return False
     except KeyboardInterrupt:

@@ -187,13 +187,13 @@ class TwitchDiscordBot:
                 bot_info = await self.bot.application_info()
                 owner_id = str(bot_info.owner.id)
                 self.ch.save_bot_owner_id(owner_id)
-                owner = self.bot.get_user(int(owner_id))
+                self.owner = self.bot.get_user(int(owner_id))
             else:
-                owner = self.bot.get_user(int(bot_owner_id))
+                self.owner = self.bot.get_user(int(bot_owner_id))
 
             bot_guilds = self.bot.guilds
             owner_in_guild = any(
-                owner in guild.members for guild in bot_guilds)
+                self.owner in guild.members for guild in bot_guilds)
 
             embed = discord.Embed(
                 title="Initialization Successful",
@@ -213,7 +213,7 @@ class TwitchDiscordBot:
                     f"{self.others.get_timestamp()}{Fore.RED} [ERROR] Warning: Owner is not in any guild where the bot is present."
                 )
             else:
-                await owner.send(embed=embed)
+                await self.owner.send(embed=embed)
 
         self.others.clear_console()
         self.others.set_console_title("TwitchDiscordNotifications")
@@ -269,8 +269,19 @@ class TwitchDiscordBot:
 
     async def check_for_updates(self):
         while True:
-            if functions.updater.search_for_updates(autoupdate=True):
-                
+            updated, from_version, to_version = functions.updater.search_for_updates(
+                autoupdate=True)
+            if updated:
+                embed = discord.Embed(
+                    title="Update Successful",
+                    description="Bot Updated successfully.",
+                    color=0x00FF00,
+                    timestamp=datetime.datetime.now()
+                )
+                embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
+                embed.add_field(name="From", value=from_version)
+                embed.add_field(name="To", value=to_version)
+                await self.owner.send(embed=embed)
             await asyncio.sleep(10)
 
     def create_env(self):
