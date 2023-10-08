@@ -59,6 +59,8 @@ def search_for_updates():
                 ch.set_version(online_version)
                 clear()
                 set_console_title(f"Update Successfully Finished!")
+                functions.others.log_print(
+                    f"[SUCCESS] Updated bot from version {current_version} to {online_version}")
                 print("Attempting to start bot...")
                 time.sleep(2)
                 return True
