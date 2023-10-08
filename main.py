@@ -70,6 +70,8 @@ class TwitchDiscordBot:
         if not streamer_name:
             return False
 
+        streamer_name = streamer_name.lower()
+
         params = {
             "user_login": streamer_name,
         }
@@ -80,15 +82,15 @@ class TwitchDiscordBot:
             if response.status == 200:
                 data = await response.json()
 
-                if "data" in data and len(data["data"]) > 0:
-                    if streamer_name.lower() not in self.processed_streamers:
+                if "data" in data and data["data"]:
+                    if streamer_name not in self.processed_streamers:
                         asyncio.create_task(
                             self.send_notification(streamer_name.strip(), data)
                         )
-                        self.processed_streamers.append(streamer_name.lower())
+                        self.processed_streamers.append(streamer_name)
                     return True
-                if streamer_name.lower() in self.processed_streamers:
-                    self.processed_streamers.remove(streamer_name.lower())
+                if streamer_name in self.processed_streamers:
+                    self.processed_streamers.remove(streamer_name)
 
             return False
 
@@ -106,7 +108,7 @@ class TwitchDiscordBot:
                         if "data" not in data or not data["data"]:
                             print(" " * self.console_width, end="\r")
                             self.others.log_print(
-                                f"{streamer_name} is not streaming."
+                                f"{Fore.RED}[ERROR] {streamer_name} is no longer streaming."
                             )
                             self.processed_streamers.remove(streamer_name)
                             continue
@@ -178,6 +180,7 @@ class TwitchDiscordBot:
 
     async def on_ready(self):
         self.ch.save_time(str(datetime.datetime.now()))
+
         if not self.ch.check_restart_status():
             bot_owner_id = self.ch.get_bot_owner_id()
             if not bot_owner_id:
@@ -187,39 +190,43 @@ class TwitchDiscordBot:
                 owner = self.bot.get_user(int(owner_id))
             else:
                 owner = self.bot.get_user(int(bot_owner_id))
+
             bot_guilds = self.bot.guilds
             owner_in_guild = any(
                 owner in guild.members for guild in bot_guilds)
+
             embed = discord.Embed(
                 title="Initialization Successful",
                 description="Bot started successfully.",
                 color=0x00FF00,
                 timestamp=datetime.datetime.now()
             )
+
             embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
             embed.add_field(name="Loaded commands",
                             value=len(self.Loaded_commands))
             embed.add_field(name="Failed commands",
                             value="\n".join(self.Failed_commands))
+
             if not owner_in_guild:
                 self.others.log_print(
-                    f"{self.others.get_timestamp()}{Fore.RED} [ERROR] Warning: Owner is not in any guild where the bot is present.")
+                    f"{self.others.get_timestamp()}{Fore.RED} [ERROR] Warning: Owner is not in any guild where the bot is present."
+                )
             else:
                 await owner.send(embed=embed)
+
         self.others.clear_console()
         self.others.set_console_title("TwitchDiscordNotifications")
         print(" " * self.console_width, end="\r")
         self.others.log_print(
-            Fore.CYAN
-            + self.others.get_timestamp()
-            + Fore.RESET
-            + Fore.LIGHTYELLOW_EX
-            + " [INFO]"
-            + f" Running as {Fore.LIGHTCYAN_EX + self.bot.user.name + Fore.RESET}"
+            f"{Fore.CYAN}{self.others.get_timestamp()}{Fore.RESET}{Fore.LIGHTYELLOW_EX} [INFO]"
+            f"{Fore.RESET} Running as {Fore.LIGHTCYAN_EX + self.bot.user.name + Fore.RESET}"
         )
+
         activity = discord.Activity(
             type=discord.ActivityType.watching, name="Mention me to see my prefix"
         )
+
         await self.bot.change_presence(activity=activity)
 
         while True:
@@ -227,19 +234,12 @@ class TwitchDiscordBot:
             print(" " * self.console_width, end="\r")
             print(
                 "\033[K"
-                + Fore.CYAN
-                + self.others.get_timestamp()
-                + Fore.RESET
-                + " "
-                + Fore.LIGHTYELLOW_EX
-                + "[INFO] "
-                + Fore.RESET
-                + "Checking"
-                + Fore.RESET,
+                + f"{Fore.CYAN}{self.others.get_timestamp()}{Fore.RESET}{Fore.LIGHTYELLOW_EX} [INFO] {Fore.RESET} Checking",
                 end="\r",
             )
 
             streamers = self.ch.get_all_streamers()
+
             async with aiohttp.ClientSession() as session:
                 await asyncio.gather(
                     *[self.check_stream(session, streamer) for streamer in streamers]
@@ -251,28 +251,17 @@ class TwitchDiscordBot:
             if len(self.processed_streamers) != 0:
                 print(" " * self.console_width, end="\r")
                 print(
-                    Fore.CYAN
-                    + self.others.get_timestamp()
-                    + Fore.RESET
-                    + " "
-                    + Fore.LIGHTGREEN_EX
-                    + f"[SUCCESS] Currently streaming {Fore.LIGHTWHITE_EX + str(len(self.processed_streamers)) + Fore.RESET} {Fore.LIGHTGREEN_EX}Total: {Fore.LIGHTWHITE_EX + str(len(streamers)) + Fore.LIGHTGREEN_EX} (Time taken: {elapsed_time:.2f} seconds): "
-                    + Fore.RESET
-                    + Fore.LIGHTWHITE_EX
-                    + Fore.RESET,
+                    f"{Fore.CYAN}{self.others.get_timestamp()}{Fore.RESET}{Fore.LIGHTGREEN_EX} [SUCCESS] "
+                    f"Currently streaming {Fore.LIGHTWHITE_EX}{len(self.processed_streamers)}{Fore.RESET} "
+                    f"{Fore.LIGHTGREEN_EX}Total: {Fore.LIGHTWHITE_EX}{len(streamers)}{Fore.LIGHTGREEN_EX} "
+                    f"(Time taken: {elapsed_time:.2f} seconds)",
                     end="\r",
                 )
             else:
                 print(" " * self.console_width, end="\r")
                 print(
-                    Fore.CYAN
-                    + self.others.get_timestamp()
-                    + Fore.RESET
-                    + Fore.LIGHTGREEN_EX
-                    + " [SUCCESS]"
-                    + Fore.LIGHTWHITE_EX
-                    + f" Checked {len(streamers)} streamers. Time taken: {elapsed_time:.2f} seconds"
-                    + Fore.RESET,
+                    f"{Fore.CYAN}{self.others.get_timestamp()}{Fore.RESET}{Fore.LIGHTGREEN_EX} [SUCCESS] "
+                    f"Checked {len(streamers)} streamers. Time taken: {elapsed_time:.2f} seconds",
                     end="\r",
                 )
 
