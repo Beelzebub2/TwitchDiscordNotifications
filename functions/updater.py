@@ -35,11 +35,10 @@ online_version = "v" + \
 
 def search_for_updates():
     try:
-        clear()
         set_console_title("Checking For Updates. . .")
         print(" " * console_width, end="\r")
         functions.others.log_print(
-            f"{Fore.LIGHTYELLOW_EX}[INFO] Checking for updates")
+            f"{Fore.LIGHTYELLOW_EX}[INFO] Checking for updates{Fore.RESET}")
 
         if online_version != current_version:
             set_console_title("New Update Found!")
