@@ -51,6 +51,7 @@ Discord bot: https://discord.com/developers/applications/
 
 v2.1 07/10/2023
 
++   Added more information to stats command
 +   Improved send_notification
 
 v2.1 07/10/2023

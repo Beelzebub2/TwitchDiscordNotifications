@@ -323,6 +323,7 @@ class TwitchDiscordBot:
                 self.Loaded_commands.append(result)
             else:
                 self.Failed_commands.append(filename[:-3])
+        self.others.pickle_variable(self.shared_variables)
 
         print(f"Elapsed time: {elapsed_time:.4f} seconds\nLogging in! ...")
 

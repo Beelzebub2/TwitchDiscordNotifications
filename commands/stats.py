@@ -3,11 +3,10 @@ import discord
 import datetime
 import functions.others
 from functions.Sql_handler import SQLiteHandler
+import os
 
-variables = functions.others.unpickle_variable()
 
 ch = SQLiteHandler("data.db")
-date_format = variables["date_format"]
 
 
 class Stats(commands.Cog):
@@ -16,6 +15,12 @@ class Stats(commands.Cog):
 
     @commands.command(name="stats", aliases=["st"], help="Shows Bots stats.", usage="stats")
     async def stats(self, ctx):
+        variables = functions.others.unpickle_variable()
+        working_commands = variables["loaded_commands"]
+        failed_commands = variables["failed_commands"]
+        date_format = variables["date_format"]
+        db_size = os.path.getsize("data.db")
+        db_size = db_size / (1024 * 1024)
         current_time = datetime.datetime.now()
         start_time = datetime.datetime.strptime(ch.get_time(), date_format)
         uptime = current_time - start_time
@@ -25,6 +30,9 @@ class Stats(commands.Cog):
         embed.add_field(name="Uptime", value=f"My current uptime is {uptime}")
         embed.add_field(name="Users", value=len(ch.get_all_user_ids()))
         embed.add_field(name="Streamers", value=len(ch.get_all_streamers()))
+        embed.add_field(name="Loaded commands", value=len(working_commands))
+        embed.add_field(name="Failed commands", value=len(failed_commands))
+        embed.add_field(name="Database Size", value=f"{db_size:.2f}mb")
         await ctx.send(embed=embed)
 
 
