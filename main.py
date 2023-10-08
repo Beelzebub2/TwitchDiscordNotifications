@@ -269,9 +269,9 @@ class TwitchDiscordBot:
 
     async def check_for_updates(self):
         while True:
-            updated, from_version, to_version = functions.updater.search_for_updates(
+            result = functions.updater.search_for_updates(
                 autoupdate=True)
-            if updated:
+            if result:
                 embed = discord.Embed(
                     title="Update Successful",
                     description="Bot Updated successfully.",
@@ -279,8 +279,8 @@ class TwitchDiscordBot:
                     timestamp=datetime.datetime.now()
                 )
                 embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
-                embed.add_field(name="From", value=from_version)
-                embed.add_field(name="To", value=to_version)
+                embed.add_field(name="From", value=result[1])
+                embed.add_field(name="To", value=result[2])
                 await self.owner.send(embed=embed)
             await asyncio.sleep(10)
 
