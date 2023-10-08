@@ -1,5 +1,5 @@
 # **TwitchDiscordNotifications**
-![Static Badge](https://img.shields.io/badge/Version-v2.1-8ebff1?style=for-the-badge&logo=v)
+![Static Badge](https://img.shields.io/badge/Version-v2.2-8ebff1?style=for-the-badge&logo=v)
 ![Static Badge](https://img.shields.io/badge/Language-python-3776ab?style=for-the-badge&logo=python)
 ![Static Badge](https://img.shields.io/badge/License-GNU%20GPL%20v3-blue.svg?style=for-the-badge)  
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/S6S8HV2DY)
@@ -49,8 +49,9 @@ Discord bot: https://discord.com/developers/applications/
 ## Changes
 ```diff
 
-v2.1 07/10/2023
+v2.2 07/10/2023
 
++   Added autoupdater
 +   Added more information to stats command
 +   Improved send_notification
 
