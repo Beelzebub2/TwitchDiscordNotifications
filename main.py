@@ -245,7 +245,7 @@ class TwitchDiscordBot:
         await self.bot.change_presence(activity=activity)
 
         while True:
-            start_time = time.time()
+            start_time = time.perf_counter()
             print(" " * self.console_width, end="\r")
             print(
                 "\033[K"
@@ -267,7 +267,7 @@ class TwitchDiscordBot:
                     *[self.check_stream(session, streamer) for streamer in streamers]
                 )
 
-            end_time = time.time()
+            end_time = time.perf_counter()
             elapsed_time = end_time - start_time
 
             if len(self.processed_streamers) != 0:
@@ -342,12 +342,12 @@ class TwitchDiscordBot:
         extension_files = [filename for filename in os.listdir(
             './commands') if filename.endswith('.py')]
         workers = len(extension_files) + 1
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
             results = await asyncio.gather(*[self.load_extension(filename) for filename in extension_files])
 
-        end_time = time.time()
+        end_time = time.perf_counter()
         elapsed_time = end_time - start_time
         for result, filename in results:
             print(result)

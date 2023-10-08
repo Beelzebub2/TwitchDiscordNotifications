@@ -10,6 +10,7 @@ variables = functions.others.unpickle_variable()
 
 ch = SQLiteHandler("data.db")
 
+
 class Restart(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -23,7 +24,7 @@ class Restart(commands.Cog):
     )
     @commands.is_owner()
     async def restart(self, ctx):
-        processed_streamers = functions.others.Processed_Streamers.get_processed_streamers()
+        processed_streamers = variables["processed_streamers"]
         data = {"Restarted": True, "Streamers": processed_streamers}
         ch.save_to_temp_json(data)
         embed = discord.Embed(
@@ -38,6 +39,7 @@ class Restart(commands.Cog):
         python = sys.executable
         print(python)
         os.execl(python, python, *sys.argv)
+
 
 async def setup(bot):
     await bot.add_cog(Restart(bot))

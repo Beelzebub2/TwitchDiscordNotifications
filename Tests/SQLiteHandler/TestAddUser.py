@@ -29,7 +29,7 @@ class TestAddUser(unittest.TestCase):
         result = self.sql_handler.add_user(user_data)
 
         # Check if the result is as expected
-        expected_result = "User added successfully."
+        expected_result = True
         self.assertEqual(result, expected_result)
 
         # Verify that the user exists in the 'users' table
@@ -63,7 +63,7 @@ class TestAddUser(unittest.TestCase):
         result = self.sql_handler.add_user(user_data)
 
         # Check if the result is as expected
-        expected_result = "User already exists."
+        expected_result = False
         self.assertEqual(result, expected_result)
 
 

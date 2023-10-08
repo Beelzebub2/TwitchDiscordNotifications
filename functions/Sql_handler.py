@@ -16,6 +16,7 @@ class SQLiteHandler:
             raise ValueError("Either db_file or conn must be provided.")
 
         self.create_tables()
+        self.create_indexes()
 
     def create_tables(self):
         cursor = self.conn.cursor()
@@ -46,6 +47,13 @@ class SQLiteHandler:
         ''')
         self.conn.commit()
 
+    def create_indexes(self):
+        cursor = self.conn.cursor()
+        cursor.execute('''
+            CREATE INDEX IF NOT EXISTS streamer_index ON users (streamer);
+        ''')
+        self.conn.commit()
+
     def get_info_by_discord_id(self, discord_id):
         cursor = self.conn.cursor()
         cursor.execute(
@@ -55,44 +63,34 @@ class SQLiteHandler:
 
     def get_username_by_discord_id(self, discord_id):
         cursor = self.conn.cursor()
-
         cursor.execute(
             'SELECT username FROM users WHERE discord_id = ?', (discord_id,))
         row = cursor.fetchone()
-
-        # Return the retrieved username
-        if row is not None:
-            return row[0]
-        else:
-            return None
+        return row[0] if row else None
 
     def add_user(self, user_data):
         cursor = self.conn.cursor()
-        cursor.execute('SELECT id FROM users WHERE discord_id = ?',
-                       (user_data['discord_id'],))
-        existing_user = cursor.fetchone()
+        cursor.execute('''
+            INSERT OR IGNORE INTO users (discord_id, streamer, username)
+            VALUES (?, ?, ?)
+        ''', (
+            user_data['discord_id'],
+            user_data['streamer_list'][0],
+            user_data['discord_username']
+        ))
 
-        if existing_user is None:
-            cursor.execute('''
-                INSERT INTO users (discord_id, streamer, username)
-                VALUES (?, ?, ?)
-            ''', (
-                user_data['discord_id'],
-                user_data['streamer_list'][0],
-                user_data['discord_username']
-            ))
-
+        if cursor.rowcount > 0:
             self.conn.commit()
-            return "User added successfully."
+            return True
         else:
-            return "User already exists."
+            return False
 
     def delete_user(self, discord_id):
         cursor = self.conn.cursor()
         cursor.execute('DELETE FROM users WHERE discord_id = ?', (discord_id,))
-        self.conn.commit()
 
         if cursor.rowcount > 0:
+            self.conn.commit()
             return True
         else:
             return False
@@ -105,22 +103,19 @@ class SQLiteHandler:
             current_value = cursor.fetchone()
 
             if current_value is None:
-                cursor.execute(
-                    'INSERT INTO users (discord_id, streamer) VALUES (?, ?)', (discord_id, streamer))
+                new_value = streamer
             else:
                 current_value = current_value[0]
-                if current_value is not None:
-                    streamers = current_value.split(',')
-                else:
-                    streamers = []
-                if streamer not in streamers:
-                    if current_value is not None:
-                        new_value = current_value + ',' + streamer
-                    else:
-                        new_value = streamer
-                    cursor.execute(
-                        'UPDATE users SET streamer = ? WHERE discord_id = ?', (new_value, discord_id))
+                streamers = current_value.split(',') if current_value else []
 
+                if streamer not in streamers:
+                    streamers.append(streamer)
+                    new_value = ','.join(streamers)
+                else:
+                    new_value = current_value
+
+            cursor.execute(
+                'UPDATE users SET streamer = ? WHERE discord_id = ?', (new_value, discord_id))
             self.conn.commit()
             cursor.close()
             return True
@@ -130,20 +125,26 @@ class SQLiteHandler:
 
     def remove_streamer_from_user(self, discord_id, streamer):
         cursor = self.conn.cursor()
+
         cursor.execute(
             'SELECT streamer FROM users WHERE discord_id = ?', (discord_id,))
         current_value = cursor.fetchone()
 
-        if current_value is not None:
-            current_value = current_value[0]
-            streamers = current_value.split(',')
-            if streamer in streamers:
-                streamers.remove(streamer)
-                new_value = ','.join(streamers)
-                cursor.execute(
-                    'UPDATE users SET streamer = ? WHERE discord_id = ?', (new_value, discord_id))
-                self.conn.commit()
-                return True
+        if current_value is None:
+            return False
+
+        current_value = current_value[0]
+        streamers = current_value.split(',')
+
+        if streamer in streamers:
+            streamers.remove(streamer)
+
+            new_value = ','.join(streamers)
+
+            cursor.execute(
+                'UPDATE users SET streamer = ? WHERE discord_id = ?', (new_value, discord_id))
+            self.conn.commit()
+            return True
 
         return False
 
@@ -153,23 +154,16 @@ class SQLiteHandler:
             "SELECT streamer FROM users WHERE discord_id = ?", (discord_id,))
         streamers_string = cursor.fetchone()
 
-        if streamers_string is not None:
-            streamers_list = streamers_string[0].split(',')
-            return streamers_list
-        else:
-            return []
+        return streamers_string[0].split(',') if streamers_string else []
 
     def get_all_streamers(self):
         cursor = self.conn.cursor()
         cursor.execute("SELECT DISTINCT streamer FROM users")
         unique_streamers_set = set()
 
-        def process_row(row):
+        for row in cursor.fetchall():
             streamers = row[0].split(',')
             unique_streamers_set.update(streamers)
-
-        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
-            executor.map(process_row, cursor.fetchall())
 
         unique_streamers_list = list(unique_streamers_set)
         return unique_streamers_list
@@ -178,127 +172,104 @@ class SQLiteHandler:
         cursor = self.conn.cursor()
         cursor.execute("SELECT discord_id, streamer FROM users")
         rows = cursor.fetchall()
+
         user_ids_with_streamers = {}
 
-        for row in rows:
+        def process_row(row):
             discord_id, streamers_string = row
-            streamers_list = streamers_string.split(
-                ',')
+            streamers_list = streamers_string.split(',')
 
             if discord_id not in user_ids_with_streamers:
                 user_ids_with_streamers[discord_id] = streamers_list
             else:
-                user_ids_with_streamers[discord_id].extend(
-                    streamers_list)
+                user_ids_with_streamers[discord_id].extend(streamers_list)
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+            executor.map(process_row, rows)
 
         return user_ids_with_streamers
 
     def get_all_user_ids(self):
         cursor = self.conn.cursor()
         cursor.execute("SELECT DISTINCT discord_id FROM users")
-        user_ids = [row[0] for row in cursor.fetchall()]
+        user_ids = [row[0] for row in cursor]
         return user_ids
 
     def set_version(self, new_version):
         cursor = self.conn.cursor()
-        cursor.execute("""
-            INSERT INTO Config (id, version) VALUES (?, ?)
-            ON CONFLICT(id) DO UPDATE SET version = excluded.version
-            """, (1, new_version))
+        cursor.execute(
+            "REPLACE INTO Config (id, version) VALUES (?, ?)", (1, new_version))
         self.conn.commit()
 
     def get_version(self):
         cursor = self.conn.cursor()
         cursor.execute('SELECT version FROM config')
         version = cursor.fetchone()
-        if version is not None:
-            return version[0]
-        else:
-            return "No version found"
+        return version[0] if version is not None else "No version found"
 
     def set_prefix(self, prefix):
         cursor = self.conn.cursor()
-        cursor.execute("""
-            INSERT INTO Config (id, prefix) VALUES (?, ?)
-            ON CONFLICT(id) DO UPDATE SET prefix = excluded.prefix
-            """, (1, prefix))
+        cursor.execute(
+            "REPLACE INTO Config (id, prefix) VALUES (?, ?)", (1, prefix))
         self.conn.commit()
 
     def get_prefix(self):
         cursor = self.conn.cursor()
         cursor.execute('SELECT prefix FROM config')
         prefix = cursor.fetchone()
-        if prefix is not None:
-            return prefix[0]
-        else:
-            return "No prefix found"
+        return prefix[0] if prefix else "No prefix found"
 
     def get_time(self):
         cursor = self.conn.cursor()
         cursor.execute('SELECT time FROM config')
-        prefix = cursor.fetchone()
-        if prefix is not None:
-            return prefix[0]
-        else:
-            return "No time found"
+        time_value = cursor.fetchone()
+        return time_value[0] if time_value else "No time found"
 
     def save_time(self, time):
         cursor = self.conn.cursor()
-        cursor.execute("""
-            INSERT INTO Config (id, time) VALUES (?, ?)
-            ON CONFLICT(id) DO UPDATE SET time = excluded.time
-            """, (1, time))
+        cursor.execute(
+            "REPLACE INTO Config (id, time) VALUES (?, ?)", (1, time))
         self.conn.commit()
 
     def get_bot_owner_id(self):
         cursor = self.conn.cursor()
         cursor.execute('SELECT bot_owner_id FROM config')
         owner_id = cursor.fetchone()
-        if owner_id is not None:
-            return owner_id[0]
-        else:
-            return "No owner ID found"
+        return owner_id[0] if owner_id else "No owner ID found"
 
     def save_bot_owner_id(self, owner_id):
         cursor = self.conn.cursor()
-        cursor.execute("""
-            INSERT INTO Config (id, bot_owner_id) VALUES (?, ?)
-            ON CONFLICT(id) DO UPDATE SET bot_owner_id = excluded.bot_owner_id
-            """, (1, owner_id))
+        cursor.execute(
+            "REPLACE INTO Config (id, bot_owner_id) VALUES (?, ?)", (1, owner_id))
         self.conn.commit()
 
     def create_new_guild_template(self, guild_id, guild_name):
         try:
             cursor = self.conn.cursor()
 
-            cursor.execute(
-                "SELECT guild_id FROM guilds WHERE guild_id = ?", (guild_id,))
-            existing_guild = cursor.fetchone()
+            cursor.execute("INSERT OR IGNORE INTO guilds (guild_id, name, prefix, role_to_add) VALUES (?, ?, ?, ?)",
+                           (guild_id, guild_name, ",", None))
+            self.conn.commit()
 
-            if existing_guild is None:
-                cursor.execute("INSERT INTO guilds (guild_id, name, prefix, role_to_add) VALUES (?, ?, ?, ?)",
-                               (guild_id, guild_name, ",", None))
-                self.conn.commit()
-
-            cursor.close()
         except Exception as e:
             print(f"An error occurred: {e}")
+
+        finally:
+            cursor.close()
 
     def is_guild_in_config(self, guild_id):
         cursor = self.conn.cursor()
         cursor.execute(
-            "SELECT COUNT(*) FROM guilds WHERE guild_id = ?", (guild_id,))
-        count = cursor.fetchone()[0]
-        return count > 0
+            "SELECT EXISTS (SELECT 1 FROM guilds WHERE guild_id = ?)", (guild_id,))
+        exists = cursor.fetchone()[0]
+        return exists
 
     def get_guild_prefix(self, guild_id):
         cursor = self.conn.cursor()
         cursor.execute(
             "SELECT prefix FROM guilds WHERE guild_id = ?", (guild_id,))
         row = cursor.fetchone()
-        if row:
-            return row[0]
-        return ""
+        return row[0] if row else ""
 
     def remove_guild(self, guild_id):
         cursor = self.conn.cursor()
@@ -316,9 +287,7 @@ class SQLiteHandler:
         cursor.execute(
             "SELECT role_to_add FROM guilds WHERE guild_id = ?", (guild_id,))
         row = cursor.fetchone()
-        if row:
-            return row[0]
-        return ""
+        return row[0] if row else ""
 
     def change_guild_prefix(self, guild_id, new_prefix):
         cursor = self.conn.cursor()
