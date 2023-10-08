@@ -192,70 +192,93 @@ class SQLiteHandler:
     def get_all_user_ids(self):
         cursor = self.conn.cursor()
         cursor.execute("SELECT DISTINCT discord_id FROM users")
-        user_ids = [row[0] for row in cursor]
+        user_ids = [row[0] for row in cursor.fetchall()]
         return user_ids
 
     def set_version(self, new_version):
         cursor = self.conn.cursor()
-        cursor.execute(
-            "REPLACE INTO Config (id, version) VALUES (?, ?)", (1, new_version))
+        cursor.execute("""
+            INSERT INTO Config (id, version) VALUES (?, ?)
+            ON CONFLICT(id) DO UPDATE SET version = excluded.version
+            """, (1, new_version))
         self.conn.commit()
 
     def get_version(self):
         cursor = self.conn.cursor()
         cursor.execute('SELECT version FROM config')
         version = cursor.fetchone()
-        return version[0] if version is not None else "No version found"
+        if version is not None:
+            return version[0]
+        else:
+            return "No version found"
 
     def set_prefix(self, prefix):
         cursor = self.conn.cursor()
-        cursor.execute(
-            "REPLACE INTO Config (id, prefix) VALUES (?, ?)", (1, prefix))
+        cursor.execute("""
+            INSERT INTO Config (id, prefix) VALUES (?, ?)
+            ON CONFLICT(id) DO UPDATE SET prefix = excluded.prefix
+            """, (1, prefix))
         self.conn.commit()
 
     def get_prefix(self):
         cursor = self.conn.cursor()
         cursor.execute('SELECT prefix FROM config')
         prefix = cursor.fetchone()
-        return prefix[0] if prefix else "No prefix found"
+        if prefix is not None:
+            return prefix[0]
+        else:
+            return "No prefix found"
 
     def get_time(self):
         cursor = self.conn.cursor()
         cursor.execute('SELECT time FROM config')
-        time_value = cursor.fetchone()
-        return time_value[0] if time_value else "No time found"
+        prefix = cursor.fetchone()
+        if prefix is not None:
+            return prefix[0]
+        else:
+            return "No time found"
 
     def save_time(self, time):
         cursor = self.conn.cursor()
-        cursor.execute(
-            "REPLACE INTO Config (id, time) VALUES (?, ?)", (1, time))
+        cursor.execute("""
+            INSERT INTO Config (id, time) VALUES (?, ?)
+            ON CONFLICT(id) DO UPDATE SET time = excluded.time
+            """, (1, time))
         self.conn.commit()
 
     def get_bot_owner_id(self):
         cursor = self.conn.cursor()
         cursor.execute('SELECT bot_owner_id FROM config')
         owner_id = cursor.fetchone()
-        return owner_id[0] if owner_id else "No owner ID found"
+        if owner_id is not None:
+            return owner_id[0]
+        else:
+            return "No owner ID found"
 
     def save_bot_owner_id(self, owner_id):
         cursor = self.conn.cursor()
-        cursor.execute(
-            "REPLACE INTO Config (id, bot_owner_id) VALUES (?, ?)", (1, owner_id))
+        cursor.execute("""
+            INSERT INTO Config (id, bot_owner_id) VALUES (?, ?)
+            ON CONFLICT(id) DO UPDATE SET bot_owner_id = excluded.bot_owner_id
+            """, (1, owner_id))
         self.conn.commit()
 
     def create_new_guild_template(self, guild_id, guild_name):
         try:
             cursor = self.conn.cursor()
 
-            cursor.execute("INSERT OR IGNORE INTO guilds (guild_id, name, prefix, role_to_add) VALUES (?, ?, ?, ?)",
-                           (guild_id, guild_name, ",", None))
-            self.conn.commit()
+            cursor.execute(
+                "SELECT guild_id FROM guilds WHERE guild_id = ?", (guild_id,))
+            existing_guild = cursor.fetchone()
 
+            if existing_guild is None:
+                cursor.execute("INSERT INTO guilds (guild_id, name, prefix, role_to_add) VALUES (?, ?, ?, ?)",
+                               (guild_id, guild_name, ",", None))
+                self.conn.commit()
+
+            cursor.close()
         except Exception as e:
             print(f"An error occurred: {e}")
-
-        finally:
-            cursor.close()
 
     def is_guild_in_config(self, guild_id):
         cursor = self.conn.cursor()
