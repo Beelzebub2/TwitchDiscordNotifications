@@ -64,7 +64,7 @@ def search_for_updates():
                 clear()
                 set_console_title(f"Update Successfully Finished!")
                 functions.others.log_print(
-                    f"{Fore.LIGHTGREEN_EXGREEN}[SUCCESS] {Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
+                    f"{Fore.LIGHTGREEN_EX}[SUCCESS] {Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
                 print("Attempting to start bot...")
                 time.sleep(2)
                 return True
