@@ -10,9 +10,6 @@ import functions.Sql_handler
 import functions.others
 
 ch = functions.Sql_handler.SQLiteHandler("data.db")
-repository_owner = "Beelzebub2"
-repository_name = "BeelProxy"
-file_path = "config.json"
 current_version = ch.get_version()
 
 
@@ -23,9 +20,9 @@ def clear():
 def set_console_title(title):
     system_type = os.name
 
-    if system_type == "nt":  # Windows
+    if system_type == "nt":
         os.system("title " + title)
-    else:  # Unix-like systems
+    else:
         os.system("echo -ne '\033]0;" + title + "\007'")
 
 
@@ -62,7 +59,7 @@ def search_for_updates():
                 ch.set_version(online_version)
                 clear()
                 set_console_title(f"Update Successfully Finished!")
-                print("Attempting to restart...")
+                print("Attempting to start bot...")
                 time.sleep(2)
                 return True
     except KeyboardInterrupt:
