@@ -282,7 +282,7 @@ class TwitchDiscordBot:
                 embed.add_field(name="From", value=result[1])
                 embed.add_field(name="To", value=result[2])
                 await self.owner.send(embed=embed)
-            await asyncio.sleep(10)
+            await asyncio.sleep(1800)
 
     def create_env(self):
         if os.path.exists(".env"):
