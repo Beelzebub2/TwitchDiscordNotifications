@@ -3,7 +3,6 @@ import datetime
 import aiohttp
 import asyncio
 import os
-import pickle
 import shutil
 import time
 import signal
