@@ -49,8 +49,11 @@ Discord bot: https://discord.com/developers/applications/
 ## Changes
 ```diff
 
-v2.2 07/10/2023
+v2.2 08/10/2023
 
++   Improved overall performance
++   Fixed streamers not leaving processed_streamers
++   Added custom decorator for debbugging
 +   Added autoupdater
 +   Added more information to stats command
 +   Improved send_notification

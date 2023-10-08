@@ -69,7 +69,6 @@ class TwitchDiscordBot:
         }
         self.others.pickle_variable(self.shared_variables)
 
-    @Utilities.custom_decorators.performance_tracker
     async def check_stream(self, session, streamer_name):
         if not streamer_name:
             return False
@@ -251,7 +250,7 @@ class TwitchDiscordBot:
 
             end_time = time.perf_counter()
             elapsed_time = end_time - start_time
-
+            self.remove_old_streamers(streamers)
             if len(self.processed_streamers) != 0:
                 print(" " * self.console_width, end="\r")
                 print(
@@ -305,6 +304,14 @@ class TwitchDiscordBot:
             f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} No streamers currently streaming. exiting..."
         )
         os._exit(0)
+
+    @Utilities.custom_decorators.run_in_thread
+    def remove_old_streamers(self, streamers):
+        streamers_set = set(map(str.lower, streamers))
+        processed_streamers_set = set(map(str.lower, self.processed_streamers))
+        items_to_remove = processed_streamers_set - streamers_set
+        self.processed_streamers = [
+            s for s in self.processed_streamers if s.lower() not in items_to_remove]
 
     def create_env(self):
         if os.path.exists(".env"):
@@ -364,7 +371,8 @@ class TwitchDiscordBot:
                 self.Failed_commands.append(filename[:-3])
         self.others.pickle_variable(self.shared_variables)
 
-        print(f"Elapsed time: {elapsed_time:.4f} seconds\nLogging in! ...")
+        print(
+            f"{self.others.get_timestamp()} {Fore.LIGHTMAGENTA_EX}[PERFORMANCE] Elapsed time: {Fore.LIGHTYELLOW_EX}{elapsed_time:.4f} seconds\n{Fore.LIGHTWHITE_EX}Logging in! ...")
 
     async def get_custom_prefix(self, bot, message):
         if message.guild:
@@ -392,6 +400,6 @@ class TwitchDiscordBot:
 
 
 if __name__ == "__main__":
-    Utilities.custom_decorators.debug = True
+    Utilities.custom_decorators.debug = False
     bot_instance = TwitchDiscordBot()
     asyncio.run(bot_instance.load_and_start())
