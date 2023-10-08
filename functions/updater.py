@@ -34,8 +34,6 @@ def search_for_updates(autoupdate=False):
         online_version = "v" + \
             functions.others.get_version(
                 "https://github.com/Beelzebub2/TwitchDiscordNotifications")
-        print(online_version)
-        print(current_version)
         set_console_title("Checking For Updates. . .")
         print(" " * console_width, end="\r\r")
 
@@ -85,8 +83,6 @@ def search_for_updates(autoupdate=False):
                 set_console_title(f"Update Successfully Finished!")
                 functions.others.log_print(
                     f"{Fore.LIGHTGREEN_EX}[SUCCESS] {Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
-                print("Attempting to start bot...")
-                time.sleep(2)
                 return True
     except KeyboardInterrupt:
         print(
