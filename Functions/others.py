@@ -1,4 +1,3 @@
-import concurrent.futures
 import re
 import os
 import datetime
@@ -6,6 +5,7 @@ from colorama import Fore
 import sys
 import pickle
 import requests
+import Utilities.custom_decorators
 
 
 def pickle_variable(data, filename="variables.pkl"):
@@ -40,11 +40,13 @@ def unpickle_variable(filename="variables.pkl"):
     return loaded_data
 
 
-def log_print(message, log_file_name="log.txt", max_lines=1000):
+@Utilities.custom_decorators.run_in_thread
+def log_print(message, log_file_name="log.txt", max_lines=1000, show_message=True):
     def remove_color_codes(text):
         color_pattern = re.compile(r"(\x1b\[[0-9;]*m)|(\033\[K)")
         return color_pattern.sub("", text)
 
+    @Utilities.custom_decorators.run_in_thread
     def trim_log_file():
         try:
             with open(log_file_name, "r") as original_file:
@@ -62,7 +64,8 @@ def log_print(message, log_file_name="log.txt", max_lines=1000):
     original_stdout = sys.stdout
 
     try:
-        print(message)
+        if show_message:
+            print(message)
 
         with open(log_file_name, "a") as log_file:
             sys.stdout = log_file
@@ -124,3 +127,15 @@ def get_version(repo_url):
             return "Version not found"
     else:
         return f"Version not found"
+
+# TODO Im way to lazy to change all the prints to use this i'll do it eventually
+
+
+def holders(type):
+    match type:
+        case 1:
+            return "[SUCCESS] "
+        case 2:
+            return "[ERROR] "
+        case 3:
+            return "[INFO] "

@@ -11,26 +11,23 @@ import io
 import os
 import datetime
 from Functions.Sql_handler import SQLiteHandler
-
-
-variables = Functions.others.unpickle_variable()
-
 ch = SQLiteHandler("data.db")
-console_width = variables["console_width"]
-VERSION = variables["version"]
-intents = variables["intents"]
-HEADERS = variables["headers"]
 
 
 class ListStreamers(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.others = Functions.others
+        variables = self.others.unpickle_variable()
+        self.console_width = variables["console_width"]
+        self.VERSION = variables["version"]
+        self.HEADERS = variables["headers"]
 
     async def fetch_streamer_data(self, session, streamer_name, pfps, names):
         streamer_name = streamer_name.replace(" ", "")
         url = f"https://api.twitch.tv/helix/users?login={streamer_name}"
 
-        async with session.get(url, headers=HEADERS) as response:
+        async with session.get(url, headers=self.HEADERS) as response:
             if response.status == 200:
                 data = await response.json()
                 if "data" in data and len(data["data"]) > 0:
@@ -43,9 +40,9 @@ class ListStreamers(commands.Cog):
                     pfps.append(profile_picture_url)
                     names.append(streamer_data["display_name"])
                 else:
-                    print(" " * console_width, end="\r")
-                    Functions.others.log_print(
-                        f"{Functions.others.get_timestamp()} No data found for streamer: {streamer_name}"
+                    print(" " * self.console_width, end="\r")
+                    self.others.log_print(
+                        f"{self.others.get_timestamp()} No data found for streamer: {streamer_name}"
                     )
 
     @commands.command(
@@ -63,17 +60,19 @@ class ListStreamers(commands.Cog):
 
             if streamer_list:
                 streamer_names = ", ".join(streamer_list)
-                print(" " * console_width, end="\r")
-                Functions.others.log_print(
+                print(" " * self.console_width, end="\r")
+                self.others.log_print(
                     "\033[K"
                     + Fore.CYAN
-                    + Functions.others.get_timestamp()
+                    + self.others.get_timestamp()
                     + Fore.RESET
                     + " "
                     + Fore.LIGHTYELLOW_EX
+                    + self.others.holders(3)
                     + ctx.author.name
                     + Fore.RESET
-                    + f" requested their streamers: {len(streamer_list)}"
+                    + f" requested their streamers: {len(streamer_list)}",
+                    show_message=False
                 )
                 pfps = []
                 names = []
@@ -153,7 +152,7 @@ class ListStreamers(commands.Cog):
                     color=10242047,
                     timestamp=datetime.datetime.now()
                 )
-                embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
+                embed.set_footer(text=f"{self.VERSION} | Made by Beelzebub2")
                 embed.set_image(url="attachment://combined_image.png")
 
                 with open("combined_image.png", "rb") as img_file:
@@ -164,10 +163,10 @@ class ListStreamers(commands.Cog):
                 return streamer_names, combined_image
 
             else:
-                print(" " * console_width, end="\r")
-                Functions.others.log_print(
+                print(" " * self.console_width, end="\r")
+                self.others.log_print(
                     Fore.CYAN
-                    + Functions.others.get_timestamp()
+                    + self.others.get_timestamp()
                     + Fore.RESET
                     + " "
                     + Fore.YELLOW
@@ -180,13 +179,13 @@ class ListStreamers(commands.Cog):
                     color=16759808,
                     timestamp=datetime.datetime.now()
                 )
-                embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
+                embed.set_footer(text=f"{self.VERSION} | Made by Beelzebub2")
                 await ctx.channel.send(embed=embed)
         else:
-            print(" " * console_width, end="\r")
-            Functions.others.log_print(
+            print(" " * self.console_width, end="\r")
+            self.others.log_print(
                 Fore.CYAN
-                + Functions.others.get_timestamp()
+                + self.others.get_timestamp()
                 + Fore.RESET
                 + " "
                 + Fore.RED
@@ -199,7 +198,7 @@ class ListStreamers(commands.Cog):
                 color=16711680,
                 timestamp=datetime.datetime.now()
             )
-            embed.set_footer(text=f"{VERSION} | Made by Beelzebub2")
+            embed.set_footer(text=f"{self.VERSION} | Made by Beelzebub2")
             await ctx.channel.send(embed=embed)
 
 

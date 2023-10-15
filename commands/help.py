@@ -18,7 +18,7 @@ class Help(commands.Cog):
         usage="help [command]",
         help="Shows all the available commands and their descriptions, or specific command information if a command is provided.",
     )
-    async def list_commands(self, ctx, command=None):
+    async def help(self, ctx, command=None):
         variables = Functions.others.unpickle_variable()
         VERSION = variables["version"]
         if not command:
