@@ -1,12 +1,7 @@
 from discord.ext import commands
 import discord
 import datetime
-import pickle
 import Functions.others
-
-variables = Functions.others.unpickle_variable()
-
-VERSION = variables["version"]
 
 
 class CommandNotFoundError(commands.CommandNotFound):
@@ -24,6 +19,8 @@ class Help(commands.Cog):
         help="Shows all the available commands and their descriptions, or specific command information if a command is provided.",
     )
     async def list_commands(self, ctx, command=None):
+        variables = Functions.others.unpickle_variable()
+        VERSION = variables["version"]
         if not command:
             # Display all commands
             embed = discord.Embed(

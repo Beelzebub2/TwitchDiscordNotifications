@@ -15,6 +15,7 @@ import Functions.others
 import concurrent.futures
 import Utilities.updater
 import Utilities.custom_decorators
+from dotenv import load_dotenv
 
 
 class TwitchDiscordBot:
@@ -36,7 +37,8 @@ class TwitchDiscordBot:
         self.Loaded_commands = []
         self.Failed_commands = []
         self.bot = commands.Bot(
-            command_prefix=commands.when_mentioned_or(self.ch.get_prefix()), intents=intents
+            command_prefix=commands.when_mentioned_or(self.ch.get_prefix()),
+            intents=intents,
         )
         self.bot.add_listener(self.on_ready)
         try:
@@ -65,7 +67,7 @@ class TwitchDiscordBot:
             "loaded_commands": self.Loaded_commands,
             "failed_commands": self.Failed_commands,
             "intents": intents,
-            "headers": self.HEADERS
+            "headers": self.HEADERS,
         }
         self.others.pickle_variable(self.shared_variables)
 
@@ -128,14 +130,17 @@ class TwitchDiscordBot:
                             user_url, headers=self.HEADERS)
                         user_data = user_response.json()
                         profile_picture_url = user_data["data"][0].get(
-                            "profile_image_url")
+                            "profile_image_url"
+                        )
 
                         if profile_picture_url:
                             profile_picture_url = profile_picture_url.replace(
-                                "{width}", "300").replace("{height}", "300")
+                                "{width}", "300"
+                            ).replace("{height}", "300")
 
                         start_time_str = self.others.generate_timestamp_string(
-                            started_at)
+                            started_at
+                        )
                         title = stream_data.get("title", "")
                         viewers = stream_data.get("viewer_count", 0)
 
@@ -143,7 +148,7 @@ class TwitchDiscordBot:
                             title=f"{streamer_name} is streaming!",
                             description=f"Click [here](https://www.twitch.tv/{streamer_name}) to watch the stream.",
                             color=discord.Color.green(),
-                            timestamp=datetime.datetime.now()
+                            timestamp=datetime.datetime.now(),
                         )
 
                         if stream_data.get("game_name"):
@@ -151,13 +156,18 @@ class TwitchDiscordBot:
                                 name="Game", value=stream_data["game_name"])
 
                         embed.add_field(
-                            name="Viewers", value="No viewers. Be the first!" if viewers == 0 else viewers)
+                            name="Viewers",
+                            value="No viewers. Be the first!"
+                            if viewers == 0
+                            else viewers,
+                        )
                         embed.set_thumbnail(url=profile_picture_url)
                         embed.set_footer(
                             text=f"{self.VERSION} | Made by Beelzebub2")
                         mention = f"||{member.mention}||"
                         embed.add_field(
-                            name="Stream Start Time (local)", value=start_time_str)
+                            name="Stream Start Time (local)", value=start_time_str
+                        )
 
                         try:
                             await dm_channel.send(mention, embed=embed)
@@ -202,14 +212,15 @@ class TwitchDiscordBot:
                 title="Initialization Successful",
                 description="Bot started successfully.",
                 color=0x00FF00,
-                timestamp=datetime.datetime.now()
+                timestamp=datetime.datetime.now(),
             )
 
             embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
             embed.add_field(name="Loaded commands",
                             value=len(self.Loaded_commands))
-            embed.add_field(name="Failed commands",
-                            value="\n".join(self.Failed_commands))
+            embed.add_field(
+                name="Failed commands", value="\n".join(self.Failed_commands)
+            )
 
             if not owner_in_guild:
                 self.others.log_print(
@@ -278,7 +289,7 @@ class TwitchDiscordBot:
                     title="Update Successful",
                     description="Bot Updated successfully.",
                     color=0x00FF00,
-                    timestamp=datetime.datetime.now()
+                    timestamp=datetime.datetime.now(),
                 )
                 embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
                 embed.add_field(name="From", value=result[1])
@@ -295,8 +306,7 @@ class TwitchDiscordBot:
             print(
                 f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} Saving currently streaming streamers and exiting..."
             )
-            data = {"Restarted": True,
-                    "Streamers": processed_streamers}
+            data = {"Restarted": True, "Streamers": processed_streamers}
             self.ch.save_to_temp_json(data)
             os._exit(0)
 
@@ -311,7 +321,8 @@ class TwitchDiscordBot:
         processed_streamers_set = set(map(str.lower, self.processed_streamers))
         items_to_remove = processed_streamers_set - streamers_set
         self.processed_streamers = [
-            s for s in self.processed_streamers if s.lower() not in items_to_remove]
+            s for s in self.processed_streamers if s.lower() not in items_to_remove
+        ]
 
     def create_env(self):
         if os.path.exists(".env"):
@@ -344,7 +355,7 @@ class TwitchDiscordBot:
 
     async def load_extension(self, filename):
         try:
-            await self.bot.load_extension(f'commands.{filename[:-3]}')
+            await self.bot.load_extension(f"commands.{filename[:-3]}")
             success_message = f"{self.others.get_timestamp()} {Fore.LIGHTGREEN_EX}[SUCCESS] Loaded {Fore.LIGHTCYAN_EX}{filename}{Fore.RESET}"
             return success_message, filename
         except Exception as e:
@@ -352,13 +363,18 @@ class TwitchDiscordBot:
             return error_message, filename
 
     async def load_extensions(self):
-        extension_files = [filename for filename in os.listdir(
-            './commands') if filename.endswith('.py')]
+        extension_files = [
+            filename
+            for filename in os.listdir("./commands")
+            if filename.endswith(".py")
+        ]
         workers = len(extension_files) + 1
         start_time = time.perf_counter()
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-            results = await asyncio.gather(*[self.load_extension(filename) for filename in extension_files])
+            results = await asyncio.gather(
+                *[self.load_extension(filename) for filename in extension_files]
+            )
 
         end_time = time.perf_counter()
         elapsed_time = end_time - start_time
@@ -372,7 +388,8 @@ class TwitchDiscordBot:
         self.others.pickle_variable(self.shared_variables)
 
         print(
-            f"{self.others.get_timestamp()} {Fore.LIGHTMAGENTA_EX}[PERFORMANCE] Elapsed time: {Fore.LIGHTYELLOW_EX}{elapsed_time:.4f} seconds\n{Fore.LIGHTWHITE_EX}Logging in! ...")
+            f"{self.others.get_timestamp()} {Fore.LIGHTMAGENTA_EX}[PERFORMANCE] Elapsed time: {Fore.LIGHTYELLOW_EX}{elapsed_time:.4f} seconds\n{Fore.LIGHTWHITE_EX}Logging in! ..."
+        )
 
     async def get_custom_prefix(self, bot, message):
         if message.guild:
@@ -400,6 +417,7 @@ class TwitchDiscordBot:
 
 
 if __name__ == "__main__":
+    load_dotenv()
     Utilities.custom_decorators.debug = False
     bot_instance = TwitchDiscordBot()
     asyncio.run(bot_instance.load_and_start())
