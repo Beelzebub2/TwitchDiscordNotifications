@@ -22,7 +22,6 @@ class Help(commands.Cog):
         variables = Functions.others.unpickle_variable()
         VERSION = variables["version"]
         if not command:
-            # Display all commands
             embed = discord.Embed(
                 title="Bot Commands",
                 description="Here are the available commands, their descriptions, and usage:",
