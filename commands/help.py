@@ -16,11 +16,18 @@ class Help(commands.Cog):
         name="help",
         aliases=["h", "commands", "command"],
         usage="help [command]",
-        help="Shows all the available commands and their descriptions, or specific command information if a command is provided.",
+        help="Shows all available commands and their descriptions or provides specific command information if a command is provided.",
     )
     async def help(self, ctx, command=None):
         variables = Functions.others.unpickle_variable()
         VERSION = variables["version"]
+
+        def get_command_info(cmd):
+            description = cmd.help or "No description available."
+            aliases = ", ".join(cmd.aliases) if cmd.aliases else "No aliases"
+            usage = cmd.usage or f"No usage specified for {cmd.name}"
+            return description, aliases, usage
+
         if not command:
             embed = discord.Embed(
                 title="Bot Commands",
@@ -35,10 +42,7 @@ class Help(commands.Cog):
                 if cmd.hidden:
                     continue
 
-                description = cmd.help or "No description available."
-                aliases = ", ".join(
-                    cmd.aliases) if cmd.aliases else "No aliases"
-                usage = cmd.usage or f"No usage specified for {cmd.name}"
+                description, aliases, usage = get_command_info(cmd)
 
                 embed.add_field(
                     name=f"**{cmd.name.capitalize()}**",
@@ -52,16 +56,14 @@ class Help(commands.Cog):
             cmd = self.bot.get_command(command)
 
             if cmd:
+                description, aliases, usage = get_command_info(cmd)
+
                 embed = discord.Embed(
                     title=f"Command: {cmd.name.capitalize()}",
-                    description=cmd.help or "No description available.",
+                    description=description,
                     color=65280,
                     timestamp=datetime.datetime.now()
                 )
-
-                aliases = ", ".join(
-                    cmd.aliases) if cmd.aliases else "No aliases"
-                usage = cmd.usage or f"No usage specified for {cmd.name}"
 
                 embed.add_field(
                     name="Usage",
