@@ -1,5 +1,3 @@
-from base64 import b64decode
-import json
 import time
 import requests
 import os
@@ -14,7 +12,6 @@ ch = Functions.Sql_handler.SQLiteHandler("data.db")
 
 def search_for_updates(autoupdate=False):
     try:
-        variables = Functions.others.unpickle_variable()
         current_version = ch.get_version()
         online_version = "v" + \
             Functions.others.get_version(

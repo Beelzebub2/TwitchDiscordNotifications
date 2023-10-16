@@ -295,6 +295,7 @@ class TwitchDiscordBot:
                 embed.add_field(name="From", value=result[1])
                 embed.add_field(name="To", value=result[2])
                 await self.owner.send(embed=embed)
+                self.others.pickle_variable(self.shared_variables)
             await asyncio.sleep(1800)
 
     def custom_interrupt_handler(self, signum, frame):
