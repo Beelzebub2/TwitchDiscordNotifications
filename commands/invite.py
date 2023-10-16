@@ -3,9 +3,7 @@ import discord
 import datetime
 import Functions.others
 
-variables = Functions.others.unpickle_variable()
 
-VERSION = variables["version"]
 
 
 class Invite(commands.Cog):
@@ -19,6 +17,8 @@ class Invite(commands.Cog):
         usage="invite",
     )
     async def invite(self, ctx):
+        variables = Functions.others.unpickle_variable()
+        VERSION = variables["version"]
         embed = discord.Embed(
             title="Invite Me!",
             description=f"[Click here](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)",

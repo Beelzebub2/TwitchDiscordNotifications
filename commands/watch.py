@@ -8,6 +8,7 @@ from Functions.others import get_timestamp, log_print
 import re
 import Functions.others
 
+ch = SQLiteHandler("data.db")
 
 # TODO Accept multiple streamers
 
@@ -25,7 +26,6 @@ class Watch(commands.Cog):
     async def watch(self, ctx, streamer_name_or_link: str):
         variables = Functions.others.unpickle_variable()
 
-        ch = SQLiteHandler("data.db")
         console_width = variables["console_width"]
         VERSION = variables["version"]
         AUTHORIZATION = variables["authorization"]

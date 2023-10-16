@@ -4,7 +4,8 @@ from colorama import Fore
 import discord
 from Functions.Sql_handler import SQLiteHandler
 import Functions.others
-import pickle
+
+ch = SQLiteHandler("data.db")
 
 
 class UnRegister(commands.Cog):
@@ -21,7 +22,6 @@ class UnRegister(commands.Cog):
         user_id = str(ctx.author.id)
         variables = Functions.others.unpickle_variable()
 
-        ch = SQLiteHandler("data.db")
         console_width = variables["console_width"]
 
         if ch.delete_user(user_id):

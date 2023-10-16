@@ -298,15 +298,12 @@ class TwitchDiscordBot:
             await asyncio.sleep(1800)
 
     def custom_interrupt_handler(self, signum, frame):
-        variables = self.others.unpickle_variable()
-        console_width = variables["console_width"]
-        processed_streamers = variables["processed_streamers"]
-        print(" " * console_width, end="\r")
-        if len(processed_streamers) > 0:
+        print(" " * self.console_width, end="\r")
+        if len(self.processed_streamers) > 0:
             print(
                 f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} Saving currently streaming streamers and exiting..."
             )
-            data = {"Restarted": True, "Streamers": processed_streamers}
+            data = {"Restarted": True, "Streamers": self.processed_streamers}
             self.ch.save_to_temp_json(data)
             os._exit(0)
 

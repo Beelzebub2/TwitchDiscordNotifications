@@ -7,6 +7,7 @@ from Functions.others import get_timestamp, log_print
 import re
 import Functions.others
 
+ch = SQLiteHandler("data.db")
 
 # TODO Accept multiple streamers
 
@@ -22,7 +23,7 @@ class UnWatch(commands.Cog):
         help="Removes the streamer from your watch list (provide either streamer name or link)",
     )
     async def unwatch(self, ctx, streamer_name_or_link: str):
-        ch = SQLiteHandler("data.db")
+
         variables = Functions.others.unpickle_variable()
         VERSION = variables["version"]
         if "https://www.twitch.tv/" in streamer_name_or_link:

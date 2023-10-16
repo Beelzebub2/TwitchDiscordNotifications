@@ -4,10 +4,6 @@ from Functions.Sql_handler import SQLiteHandler
 
 ch = SQLiteHandler("data.db")
 
-'''This class has 2 different commands
-   for the sake of simplicity'''
-
-
 class Configs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot

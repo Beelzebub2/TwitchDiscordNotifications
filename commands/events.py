@@ -83,7 +83,7 @@ class Events(commands.Cog):
             )
             embed = discord.Embed(
                 title="Command not found",
-                description=f"Command **__{command}__** does not exist. Use .help for more info.",
+                description=f"Command **__{command}__** does not exist. Use {ctx.prefix}help for more info.",
                 color=discord.Color.red(),
                 timestamp=datetime.datetime.now()
             )
