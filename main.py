@@ -241,7 +241,7 @@ class TwitchDiscordBot:
         print(" " * self.console_width, end="\r")
         self.others.log_print(
             f"{Fore.CYAN}{self.others.get_timestamp()}{Fore.RESET}{Fore.LIGHTYELLOW_EX} [INFO]"
-            f"{Fore.RESET} Running as {Fore.LIGHTCYAN_EX + self.bot.user.name + Fore.RESET}"
+            f"{Fore.RESET} Running as {Fore.LIGHTCYAN_EX + self.bot.user.name + Fore.RESET} {self.VERSION}"
         )
 
         activity = discord.Activity(
