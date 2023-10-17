@@ -223,9 +223,8 @@ class TwitchDiscordBot:
             embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
             embed.add_field(name="Loaded commands",
                             value=len(self.Loaded_commands))
-            embed.add_field(
-                name="Failed commands", value="\n".join(self.Failed_commands)
-            )
+            embed.add_field(name="Failed commands",
+                            value=len(self.Failed_commands))
 
             if not owner_in_guild:
                 self.others.log_print(
