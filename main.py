@@ -1,3 +1,4 @@
+import sys
 import discord
 import datetime
 import aiohttp
@@ -306,7 +307,9 @@ class TwitchDiscordBot:
                 data = {"Restarted": True,
                         "Streamers": self.processed_streamers}
                 self.ch.save_to_temp_json(data)
-                os._exit(0)
+                python = sys.executable
+                print(python)
+                os.execl(python, python, *sys.argv)
             await asyncio.sleep(1800)
 
     def custom_interrupt_handler(self, signum, frame):
