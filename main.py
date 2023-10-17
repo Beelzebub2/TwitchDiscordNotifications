@@ -303,6 +303,10 @@ class TwitchDiscordBot:
                 embed.add_field(name="To", value=result[2])
                 await self.owner.send(embed=embed)
                 self.others.pickle_variable(self.shared_variables)
+                data = {"Restarted": True,
+                        "Streamers": self.processed_streamers}
+                self.ch.save_to_temp_json(data)
+                os._exit(0)
             await asyncio.sleep(1800)
 
     def custom_interrupt_handler(self, signum, frame):
