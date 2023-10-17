@@ -5,11 +5,8 @@ from colorama import Fore
 from Functions.Sql_handler import SQLiteHandler
 import Functions.others
 
-variables = Functions.others.unpickle_variable()
 
 ch = SQLiteHandler("data.db")
-console_width = variables["console_width"]
-intents = variables["intents"]
 
 
 class Events(commands.Cog):
@@ -35,6 +32,9 @@ class Events(commands.Cog):
     '''On Member Join'''
     @commands.Cog.listener()
     async def on_member_join(self, member):
+        variables = Functions.others.unpickle_variable()
+        console_width = variables["console_width"]
+
         guild_id = member.guild.id
 
         role_id = int(ch.get_role_to_add(guild_id))
@@ -62,6 +62,8 @@ class Events(commands.Cog):
     '''On Command Error'''
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
+        variables = Functions.others.unpickle_variable()
+        console_width = variables["console_width"]
         if isinstance(error, commands.CommandNotFound):
             command = ctx.message.content.split()
             prefix = await self.bot.get_prefix(ctx.message)
@@ -79,7 +81,8 @@ class Events(commands.Cog):
                 + Fore.RED
                 + "[ERROR] "
                 + f"Command {Fore.CYAN + command + Fore.RESET} doesn't exist."
-                + Fore.RESET
+                + Fore.RESET,
+                show_message=False
             )
             embed = discord.Embed(
                 title="Command not found",
