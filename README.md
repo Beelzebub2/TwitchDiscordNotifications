@@ -52,6 +52,7 @@ Discord bot: https://discord.com/developers/applications/
 
 v2.3.1 17/10/2023
 
++   Fixed a major issue with autoupdater
 +   Fixed a bug with auto updater
 +   Fixed some small issues
 +   Fixed a bug with keyboard interrupt handler
