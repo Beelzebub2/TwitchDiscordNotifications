@@ -112,21 +112,26 @@ def clear_console():
     os.system("cls" if os.name == "nt" else "clear")
 
 
-def get_version(repo_url):
-    readme_url = f"{repo_url}/blob/main/README.md"
-    response = requests.get(readme_url)
-    if response.status_code == 200:
-        readme_content = response.text
-        pattern = r"Version-v([\d.]+)"
-        match = re.search(pattern, readme_content)
-
-        if match:
-            version = match.group(1)
-            return version
+def get_version(repo_url, from_file=False):
+    if from_file:
+        with open("README.md", "r") as file:
+            readme_content = file.read()
+    else:
+        readme_url = f"{repo_url}/blob/main/README.md"
+        response = requests.get(readme_url)
+        if response.status_code == 200:
+            readme_content = response.text
         else:
             return "Version not found"
+
+    pattern = r"Version-v([\d.]+)"
+    match = re.search(pattern, readme_content)
+
+    if match:
+        version = match.group(1)
+        return version
     else:
-        return f"Version not found"
+        return "Version not found"
 
 # TODO Im way to lazy to change all the prints to use this i'll do it eventually
 

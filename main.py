@@ -29,7 +29,7 @@ class TwitchDiscordBot:
         self.ch = SQLiteHandler("data.db")
         self.autoupdate = True
         self.repo_url = "https://github.com/Beelzebub2/TwitchDiscordNotifications"
-        self.VERSION = "v" + self.others.get_version(self.repo_url)
+        self.VERSION = "v" + self.others.get_version(self.repo_url, True)
         self.create_env()
         self.ch.set_prefix(",")
         self.ch.set_version(self.VERSION)
@@ -162,10 +162,7 @@ class TwitchDiscordBot:
                             if viewers == 0
                             else viewers,
                         )
-                        embed.add_field(
-                            name="Title",
-                            value=title
-                        )
+                        embed.add_field(name="Title", value=title)
                         embed.set_thumbnail(url=profile_picture_url)
                         embed.set_footer(
                             text=f"{self.VERSION} | Made by Beelzebub2")
@@ -182,7 +179,7 @@ class TwitchDiscordBot:
                                 f"{Fore.CYAN}[SUCCESS] Notification sent successfully for "
                                 f"{Fore.CYAN}{streamer_name}. {Fore.LIGHTGREEN_EX}to member "
                                 f"{Fore.LIGHTCYAN_EX + member.name + Fore.RESET}",
-                                show_message=False
+                                show_message=False,
                             )
                         except discord.errors.Forbidden:
                             print(" " * self.console_width, end="\r")
@@ -190,13 +187,13 @@ class TwitchDiscordBot:
                                 f"{self.others.get_timestamp()} "
                                 f"{Fore.CYAN}[ERROR] Cannot send a message to user {member.name}. "
                                 f"Missing permissions or DMs disabled.",
-                                show_message=False
+                                show_message=False,
                             )
             except discord.errors.NotFound:
                 print(" " * self.console_width, end="\r")
                 self.others.log_print(
                     f"{self.others.get_timestamp()} {Fore.CYAN}[ERROR] User with ID {user_id} not found.",
-                    show_message=False
+                    show_message=False,
                 )
 
     async def on_ready(self):
