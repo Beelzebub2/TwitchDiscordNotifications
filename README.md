@@ -65,7 +65,7 @@ Discord bot: https://discord.com/developers/applications/
 +   Fixed a bug with keyboard interrupt handler
 +   Fixed a small issue with command not found 
 
-v2.2 08/10/2023
+### v2.2 08/10/2023
 
 +   Improved overall performance
 +   Fixed streamers not leaving processed_streamers
@@ -74,7 +74,7 @@ v2.2 08/10/2023
 +   Added more information to stats command
 +   Improved send_notification
 
-v2.1 07/10/2023
+### v2.1 07/10/2023
 
 +   Increased SQLhandler performance
 +   Fixed minor issues with commands
@@ -84,7 +84,7 @@ v2.1 07/10/2023
 +   Better console UI
 +   Added cooldown to clear command to prevent rate limit
 
-v2.1 06/10/2023
+### v2.1 06/10/2023
 
 +   Restructured main.py code
 +   Fixed List command bug
@@ -94,7 +94,7 @@ v2.1 06/10/2023
 +   Fixed error with mention for prefix
 +   Moved from json to Sqlite for data
 
-v2.0 05/10/2023 Thanks to CDJuaum
+### v2.0 05/10/2023 Thanks to CDJuaum
 
 !   Working on Slash Commands
 !   Working on a better log system
@@ -112,19 +112,19 @@ v2.0 05/10/2023 Thanks to CDJuaum
 +   Completely reorganized the code into subsections in different files
 +   Bot expansion easier 
 
-v1.9 04/10/2023
+### v1.9 04/10/2023
 
 +   Moved Config Handler to it's own file
 +   Made a better guild detector
 +   Fixed some small issues
 
-v1.9 30/09/2023
+### v1.9 30/09/2023
 
 +   Made log_print limit logged lines to 1k
 +   Fixed a bug with log_print
 +   Added Streamer names to top of pfp on list command
 
-v1.9 29/09/2023
+### v1.9 29/09/2023
 
 +   Removed unecessary request on send_notification
 +   Added custom keyboard interrupt handler
@@ -134,7 +134,7 @@ v1.9 29/09/2023
 +   Added some missing embeds
 +   Added a log system (early stages)
 
-v1.8 25/09/2023
+### v1.8 25/09/2023
 
 +   Added username to console UI sucessfull notification message
 +   Fixed small bug with send_notifications
@@ -143,7 +143,7 @@ v1.8 25/09/2023
 +   Made some console UI changes
 +   Fixed minor bug in check_stream
 
-v1.7 24/09/2023
+### v1.7 24/09/2023
 
 +   Cleaner console UI
 +   General optimization
@@ -151,11 +151,11 @@ v1.7 24/09/2023
 +   Huge list command speed increase
 +   Fixed some small bugs
 
-v1.6 23/09/2023
+### v1.6 23/09/2023
 
 +   Fixed some bugs with mention bot for prefix
 
-v1.6 22/09/2023
+### v1.6 22/09/2023
 
 +   Made some config commands
 +   Fixed some typos
@@ -163,13 +163,13 @@ v1.6 22/09/2023
 +   Added missing command descriptions
 +   Fixed wrong time being shown on local timestamp
 
-v1.5 19/09/2023
+### v1.5 19/09/2023
 
 +   Made the streamer checker faster
 +   Made list image generation faster
 +   Fixed some bugs
 
-v1.4 17/09/2023
+### v1.4 17/09/2023
 
 +   Added invite me command
 +   Fixed the local timezone being wrong on replit and for users with different timezone from script host
@@ -178,7 +178,7 @@ v1.4 17/09/2023
 +   Changed the way the bot works to function with commands instead of plain messages
 +   Complete rewrite of code
 
-v1.3 02/09/2023
+### v1.3 02/09/2023
 
 !   Working on better config/data handler
 +   Made list command show image of combined streamers profile pictures
@@ -186,7 +186,7 @@ v1.3 02/09/2023
 +   Added stream game to notifications embed
 +   Added stream title to notification embed
 
-v1.2 04/07/2023
+### v1.2 04/07/2023
 
 +   Fixed streamers added after bot initialization not getting checked
 +   Made console interface better, showing checking when checking streamer and showing currently streaming streamers
@@ -195,13 +195,13 @@ v1.2 04/07/2023
 +   Added stream started at, local  time to notification
 
 
-v1.1 03/07/2023
+### v1.1 03/07/2023
 
 +   Added option to use watch with streamername or streamer link
 +   Made the notification embeds prettier
 +   Added clear command to delete all notifications sent by the bot
 
-v1.0 02/07/2023
+### v1.0 02/07/2023
 
 +   Created discord bot handling
 +   Fixed duplication of notifications
