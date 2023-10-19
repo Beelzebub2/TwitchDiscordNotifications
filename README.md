@@ -50,14 +50,14 @@ Discord bot: https://discord.com/developers/applications/
 ## Changes
 ```diff
 
-v2.3.2 19/10/2023
+### v2.3.2 19/10/2023
 
 +   Added multiple streamer input on watch command
 +   Improved Stats command filesize display
 +   Improved command loader performance counter
 +   Removed unecessary repetition of print(" " * console_width, end="\r")
 
-v2.3.1 17/10/2023
+### v2.3.1 17/10/2023
 
 +   Fixed a major issue with autoupdater
 +   Fixed a bug with auto updater
