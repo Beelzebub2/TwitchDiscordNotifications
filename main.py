@@ -198,7 +198,7 @@ class TwitchDiscordBot:
 
     async def on_ready(self):
         self.ch.save_time(str(datetime.datetime.now()))
-        self.bot.loop.create_task(self.check_for_updates())
+        self.bot.loop.create_task(self.check_for_updates()).
         if not self.ch.check_restart_status():
             bot_owner_id = self.ch.get_bot_owner_id()
             if not bot_owner_id:

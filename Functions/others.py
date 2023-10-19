@@ -137,7 +137,7 @@ def get_version(repo_url, from_file=False):
 def get_changelog(repo_url):
     raw_readme_url = f"{repo_url}/raw/main/README.md"
     response = requests.get(raw_readme_url)
-    version = get_version(repo_url)
+    version = "v" + get_version(repo_url)
 
     if response.status_code == 200:
         readme_content = response.text
