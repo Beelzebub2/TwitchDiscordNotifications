@@ -112,7 +112,7 @@ class TwitchDiscordBot:
                 for streamer in streamers:
                     if streamer_name == streamer.strip():
                         if "data" not in data or not data["data"]:
-                            print(" " * self.console_width, end="\r")
+
                             self.others.log_print(
                                 f"{Fore.RED}[ERROR] {streamer_name} is no longer streaming."
                             )
@@ -173,7 +173,7 @@ class TwitchDiscordBot:
 
                         try:
                             await dm_channel.send(mention, embed=embed)
-                            print(" " * self.console_width, end="\r")
+
                             self.others.log_print(
                                 f"{self.others.get_timestamp()} "
                                 f"{Fore.CYAN}[SUCCESS] Notification sent successfully for "
@@ -182,7 +182,7 @@ class TwitchDiscordBot:
                                 show_message=False,
                             )
                         except discord.errors.Forbidden:
-                            print(" " * self.console_width, end="\r")
+
                             self.others.log_print(
                                 f"{self.others.get_timestamp()} "
                                 f"{Fore.CYAN}[ERROR] Cannot send a message to user {member.name}. "
@@ -190,7 +190,7 @@ class TwitchDiscordBot:
                                 show_message=False,
                             )
             except discord.errors.NotFound:
-                print(" " * self.console_width, end="\r")
+
                 self.others.log_print(
                     f"{self.others.get_timestamp()} {Fore.CYAN}[ERROR] User with ID {user_id} not found.",
                     show_message=False,
@@ -235,7 +235,7 @@ class TwitchDiscordBot:
 
         self.others.clear_console()
         self.others.set_console_title("TwitchDiscordNotifications")
-        print(" " * self.console_width, end="\r")
+
         self.others.log_print(
             f"{Fore.CYAN}{self.others.get_timestamp()}{Fore.RESET}{Fore.LIGHTYELLOW_EX} [INFO]"
             f"{Fore.RESET} Running as {Fore.LIGHTCYAN_EX + self.bot.user.name + Fore.RESET} {Fore.LIGHTYELLOW_EX + self.VERSION + Fore.RESET}"
@@ -249,7 +249,7 @@ class TwitchDiscordBot:
 
         while True:
             start_time = time.perf_counter()
-            print(" " * self.console_width, end="\r")
+
             print(
                 "\033[K"
                 + f"{Fore.CYAN}{self.others.get_timestamp()}{Fore.RESET}{Fore.LIGHTYELLOW_EX} [INFO] {Fore.RESET} Checking",
@@ -267,7 +267,7 @@ class TwitchDiscordBot:
             elapsed_time = end_time - start_time
             self.remove_old_streamers(streamers)
             if len(self.processed_streamers) != 0:
-                print(" " * self.console_width, end="\r")
+
                 print(
                     f"{Fore.CYAN}{self.others.get_timestamp()}{Fore.RESET}{Fore.LIGHTGREEN_EX} [SUCCESS] "
                     f"Currently streaming {Fore.LIGHTWHITE_EX}{len(self.processed_streamers)}{Fore.RESET} "
@@ -276,7 +276,7 @@ class TwitchDiscordBot:
                     end="\r",
                 )
             else:
-                print(" " * self.console_width, end="\r")
+
                 print(
                     f"{Fore.CYAN}{self.others.get_timestamp()}{Fore.RESET}{Fore.LIGHTGREEN_EX} [SUCCESS] "
                     f"Checked {len(streamers)} streamers. Time taken: {elapsed_time:.2f} seconds",
@@ -309,7 +309,7 @@ class TwitchDiscordBot:
             await asyncio.sleep(1800)
 
     def custom_interrupt_handler(self, signum, frame):
-        print(" " * self.console_width, end="\r")
+
         if len(self.processed_streamers) > 0:
             print(
                 f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} Saving currently streaming streamers and exiting..."
@@ -361,13 +361,41 @@ class TwitchDiscordBot:
             )
             os._exit(0)
 
+    def format_elapsed_time(self, elapsed_time):
+        if elapsed_time < 1:
+            elapsed_time_ms = int(elapsed_time * 1000)
+            return f"{elapsed_time_ms:2} ms"
+        elif elapsed_time < 60:
+            return f"{elapsed_time:.2f} seconds"
+        else:
+            minutes = int(elapsed_time // 60)
+            seconds = int(elapsed_time % 60)
+            return f"{minutes:2} min {seconds:2} sec"
+
     async def load_extension(self, filename):
         try:
+            start_time = time.perf_counter()
             await self.bot.load_extension(f"commands.{filename[:-3]}")
-            success_message = f"{self.others.get_timestamp()} {Fore.LIGHTGREEN_EX}[SUCCESS] Loaded {Fore.LIGHTCYAN_EX}{filename}{Fore.RESET}"
+            end_time = time.perf_counter()
+            elapsed_time = end_time - start_time
+
+            formatted_time = self.format_elapsed_time(elapsed_time)
+
+            max_extension_width = max(
+                len(filename[:-3]), self.max_extension_width)
+            formatted_filename = f"{filename[:-3]:<{max_extension_width}}"
+            formatted_in = "in"
+
+            success_message = (
+                f"{self.others.get_timestamp()} {Fore.LIGHTGREEN_EX}[SUCCESS] Loaded "
+                f"{Fore.LIGHTCYAN_EX}{formatted_filename} {formatted_in} {formatted_time:>2}"
+            )
             return success_message, filename
         except Exception as e:
-            error_message = f"{self.others.get_timestamp()} {Fore.LIGHTRED_EX}[FAILED] Failed to load {Fore.LIGHTYELLOW_EX}{filename}{Fore.RESET}: {e}"
+            error_message = (
+                f"{self.others.get_timestamp()} {Fore.LIGHTRED_EX}[FAILED] Failed to load "
+                f"{Fore.LIGHTYELLOW_EX}{filename}{Fore.RESET}: {e}"
+            )
             return error_message, filename
 
     async def load_extensions(self):
@@ -379,6 +407,9 @@ class TwitchDiscordBot:
         workers = len(extension_files) + 1
         start_time = time.perf_counter()
 
+        self.max_extension_width = max(
+            len(filename[:-3]) for filename in extension_files)
+
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
             results = await asyncio.gather(
                 *[self.load_extension(filename) for filename in extension_files]
@@ -386,6 +417,8 @@ class TwitchDiscordBot:
 
         end_time = time.perf_counter()
         elapsed_time = end_time - start_time
+        formatted_total_time = self.format_elapsed_time(elapsed_time)
+
         for result, filename in results:
             print(result)
             parts = result.split() if not isinstance(result, tuple) else result
@@ -396,7 +429,8 @@ class TwitchDiscordBot:
         self.others.pickle_variable(self.shared_variables)
 
         print(
-            f"{self.others.get_timestamp()} {Fore.LIGHTMAGENTA_EX}[PERFORMANCE] Elapsed time: {Fore.LIGHTYELLOW_EX}{elapsed_time:.4f} seconds\n{Fore.LIGHTWHITE_EX}Logging in! ..."
+            f"{self.others.get_timestamp()} {Fore.LIGHTMAGENTA_EX}[PERFORMANCE] Elapsed time: "
+            f"{Fore.LIGHTYELLOW_EX}{formatted_total_time}\n{Fore.LIGHTWHITE_EX}Logging in! ..."
         )
 
     async def get_custom_prefix(self, bot, message):

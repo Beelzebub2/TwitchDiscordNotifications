@@ -20,11 +20,12 @@ class Stats(commands.Cog):
         failed_commands = variables["failed_commands"]
         date_format = variables["date_format"]
         db_size = os.path.getsize("data.db")
-        db_size = db_size / (1024 * 1024)
+        formatted_db_size = self.format_file_size(db_size)
         current_time = datetime.datetime.now()
         start_time = datetime.datetime.strptime(ch.get_time(), date_format)
         uptime = current_time - start_time
         uptime = str(uptime).split(".")[0]
+
         embed = discord.Embed(title="Bot Stats", color=discord.Color.green(
         ), timestamp=datetime.datetime.now())
         embed.add_field(name="Uptime", value=f"My current uptime is {uptime}")
@@ -32,8 +33,17 @@ class Stats(commands.Cog):
         embed.add_field(name="Streamers", value=len(ch.get_all_streamers()))
         embed.add_field(name="Loaded commands", value=len(working_commands))
         embed.add_field(name="Failed commands", value=len(failed_commands))
-        embed.add_field(name="Database Size", value=f"{db_size:.2f}mb")
+        embed.add_field(name="Database Size", value=formatted_db_size)
         await ctx.send(embed=embed)
+
+    def format_file_size(self, size_in_bytes):
+        size_in_bytes = float(size_in_bytes)
+        size_units = ["B", "KB", "MB", "GB", "TB"]
+        unit_index = 0
+        while size_in_bytes >= 1024 and unit_index < len(size_units) - 1:
+            size_in_bytes /= 1024
+            unit_index += 1
+        return f"{size_in_bytes:.2f} {size_units[unit_index]}"
 
 
 async def setup(bot):

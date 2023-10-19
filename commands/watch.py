@@ -45,7 +45,7 @@ class Watch(commands.Cog):
         response = requests.get(url, headers=headers)
         data = response.json()
         if not data["data"]:
-            print(" " * console_width, end="\r")
+
             log_print(
                 Fore.CYAN
                 + get_timestamp()
@@ -73,7 +73,7 @@ class Watch(commands.Cog):
             if streamer_name.lower() not in [s.lower().strip() for s in streamer_list]:
                 ch.add_streamer_to_user(user_id, streamer_name.strip())
                 streamer_list.append(streamer_name.strip())
-                print(" " * console_width, end="\r")
+
                 log_print(
                     Fore.CYAN
                     + get_timestamp()
@@ -94,7 +94,7 @@ class Watch(commands.Cog):
                 embed.set_thumbnail(url=pfp)
                 await ctx.send(embed=embed)
             else:
-                print(" " * console_width, end="\r")
+
                 log_print(
                     Fore.CYAN
                     + get_timestamp()
@@ -118,7 +118,7 @@ class Watch(commands.Cog):
                     "streamer_list": [streamer_name.strip()],
                 }
             )
-            print(" " * console_width, end="\r")
+
             log_print(
                 Fore.CYAN
                 + get_timestamp()

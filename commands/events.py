@@ -49,7 +49,7 @@ class Events(commands.Cog):
             if role:
                 if role not in member.roles:
                     await member.add_roles(role)
-                    print(" " * console_width, end="\r")
+
                     Functions.others.log_print(
                         f"{Functions.others.get_timestamp()} Assigned role named {role.name} to {member.display_name} in the target guild."
                     )
@@ -63,16 +63,13 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         variables = Functions.others.unpickle_variable()
-        console_width = variables["console_width"]
         if isinstance(error, commands.CommandNotFound):
             command = ctx.message.content.split()
-            prefix = await self.bot.get_prefix(ctx.message)
             if len(command) >= 2:
                 command = ctx.message.content.split(" ")[1]
             else:
                 command = ctx.message.content.split(" ")[0]
 
-            print(" " * console_width, end="\r")
             Functions.others.log_print(
                 Fore.CYAN
                 + Functions.others.get_timestamp()
@@ -104,7 +101,7 @@ class Events(commands.Cog):
             await ctx.send(embed=embed)
 
         else:
-            print(" " * console_width, end="\r")
+
             Functions.others.log_print(
                 Fore.CYAN
                 + Functions.others.get_timestamp()

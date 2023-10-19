@@ -40,9 +40,10 @@ class ListStreamers(commands.Cog):
                     pfps.append(profile_picture_url)
                     names.append(streamer_data["display_name"])
                 else:
-                    print(" " * self.console_width, end="\r")
+
                     self.others.log_print(
-                        f"{self.others.get_timestamp()} No data found for streamer: {streamer_name}"
+                        f"{self.others.get_timestamp()} No data found for streamer: {streamer_name}",
+                        show_message=False
                     )
 
     @commands.command(
@@ -60,7 +61,7 @@ class ListStreamers(commands.Cog):
 
             if streamer_list:
                 streamer_names = ", ".join(streamer_list)
-                print(" " * self.console_width, end="\r")
+
                 self.others.log_print(
                     "\033[K"
                     + Fore.CYAN
@@ -163,7 +164,7 @@ class ListStreamers(commands.Cog):
                 return streamer_names, combined_image
 
             else:
-                print(" " * self.console_width, end="\r")
+
                 self.others.log_print(
                     Fore.CYAN
                     + self.others.get_timestamp()
@@ -171,7 +172,8 @@ class ListStreamers(commands.Cog):
                     + " "
                     + Fore.YELLOW
                     + f"{Fore.CYAN + ctx.author.name + Fore.RESET} requested their streamers, but the watchlist is empty."
-                    + Fore.RESET
+                    + Fore.RESET,
+                    show_message=False
                 )
                 embed = discord.Embed(
                     title="Stream Watchlist",
@@ -182,7 +184,7 @@ class ListStreamers(commands.Cog):
                 embed.set_footer(text=f"{self.VERSION} | Made by Beelzebub2")
                 await ctx.channel.send(embed=embed)
         else:
-            print(" " * self.console_width, end="\r")
+
             self.others.log_print(
                 Fore.CYAN
                 + self.others.get_timestamp()
@@ -190,7 +192,8 @@ class ListStreamers(commands.Cog):
                 + " "
                 + Fore.RED
                 + f"{Fore.CYAN + ctx.author.name + Fore.RESET} requested their streamers, but they don't have a watchlist yet."
-                + Fore.RESET
+                + Fore.RESET,
+                show_message=False
             )
             embed = discord.Embed(
                 title="Stream Watchlist",

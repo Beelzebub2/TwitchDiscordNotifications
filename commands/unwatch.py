@@ -42,7 +42,7 @@ class UnWatch(commands.Cog):
             streamer_list = ch.get_streamers_for_user(user_id)
             if any(streamer_name.lower() == s.lower() for s in streamer_list):
                 ch.remove_streamer_from_user(user_id, streamer_name)
-                print(" " * console_width, end="\r")
+
                 log_print(
                     Fore.CYAN
                     + get_timestamp()
@@ -51,7 +51,8 @@ class UnWatch(commands.Cog):
                     + Fore.LIGHTGREEN_EX
                     + "[SUCCESS] "
                     + f"Removed {Fore.CYAN + streamer_name + Fore.RESET} from user {Fore.CYAN + ctx.author.name + Fore.RESET}'s watchlist."
-                    + Fore.RESET
+                    + Fore.RESET,
+                    show_message=False
                 )
                 embed = discord.Embed(
                     title="Stream Watchlist",
@@ -63,7 +64,6 @@ class UnWatch(commands.Cog):
                 await ctx.channel.send(embed=embed)
             else:
 
-                print(" " * console_width, end="\r")
                 log_print(
                     Fore.CYAN
                     + get_timestamp()
@@ -71,7 +71,8 @@ class UnWatch(commands.Cog):
                     + " "
                     + Fore.RED
                     + "[ERROR] "
-                    + f"{Fore.CYAN + streamer_name + Fore.RESET} is not in user {Fore.CYAN + ctx.author.name + Fore.RESET}'s watchlist."
+                    + f"{Fore.CYAN + streamer_name + Fore.RESET} is not in user {Fore.CYAN + ctx.author.name + Fore.RESET}'s watchlist.",
+                    show_message=False
                 )
                 embed = discord.Embed(
                     title="Stream Watchlist",

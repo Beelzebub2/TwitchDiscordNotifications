@@ -65,6 +65,8 @@ def log_print(message, log_file_name="log.txt", max_lines=1000, show_message=Tru
 
     try:
         if show_message:
+            console_width = unpickle_variable()["console_width"]
+            print(" " * console_width, end="\r")
             print(message)
 
         with open(log_file_name, "a") as log_file:

@@ -25,7 +25,7 @@ class UnRegister(commands.Cog):
         console_width = variables["console_width"]
 
         if ch.delete_user(user_id):
-            print(" " * console_width, end="\r")
+
             Functions.others.log_print(
                 Fore.CYAN
                 + Functions.others.get_timestamp()
@@ -34,7 +34,8 @@ class UnRegister(commands.Cog):
                 + Fore.LIGHTGREEN_EX
                 + "[SUCCESS] "
                 + f"{Fore.CYAN + ctx.author.name + Fore.RESET} Unregistered from bot."
-                + Fore.RESET
+                + Fore.RESET,
+                show_message=False
             )
             embed = discord.Embed(
                 title="Unregistration Successful",
@@ -45,7 +46,7 @@ class UnRegister(commands.Cog):
             embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
             await ctx.send(embed=embed)
         else:
-            print(" " * console_width, end="\r")
+
             Functions.others.log_print(
                 Fore.CYAN
                 + Functions.others.get_timestamp()
@@ -54,7 +55,8 @@ class UnRegister(commands.Cog):
                 + Fore.YELLOW
                 + "[ERROR] "
                 + f"{Fore.RED + ctx.author.name + Fore.RESET} Tried to unregister from bot but wasn't registered to begin with."
-                + Fore.RESET
+                + Fore.RESET,
+                show_message=False
             )
             embed = discord.Embed(
                 title="Unregistration Error",
