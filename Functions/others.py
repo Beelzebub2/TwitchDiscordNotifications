@@ -135,9 +135,13 @@ def get_version(repo_url, from_file=False):
 
 
 def get_changelog(repo_url):
+    version = "v" + get_version(repo_url)
+
+    if version is None:
+        return "Changelog not found"
+
     raw_readme_url = f"{repo_url}/raw/main/README.md"
     response = requests.get(raw_readme_url)
-    version = "v" + get_version(repo_url)
 
     if response.status_code == 200:
         readme_content = response.text
@@ -157,7 +161,10 @@ def get_changelog(repo_url):
             changelog += line + "\n"
 
     if changelog:
-        return changelog
+        # Remove the date and "### version" lines
+        changelog = re.sub(r'\d{2}/\d{2}/\d{4}\n', '', changelog)
+        changelog = re.sub(fr'###\s*{re.escape(version)}', '', changelog)
+        return changelog.strip()
     else:
         return f"Changelog for version {version} not found"
 
