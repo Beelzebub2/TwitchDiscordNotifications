@@ -299,7 +299,11 @@ class TwitchDiscordBot:
                 embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
                 embed.add_field(name="From", value=result[1])
                 embed.add_field(name="To", value=result[2])
-                embed.add_field(name="Changelog", value=change_log)
+                embed.add_field(
+                    name="Diff Style",
+                    value=f"```{change_log}```",
+                    inline=False
+                )
                 await self.owner.send(embed=embed)
                 self.others.pickle_variable(self.shared_variables)
                 data = {"Restarted": True,
