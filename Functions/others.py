@@ -133,6 +133,34 @@ def get_version(repo_url, from_file=False):
     else:
         return "Version not found"
 
+
+def get_changelog(repo_url):
+    raw_readme_url = f"{repo_url}/raw/main/README.md"
+    response = requests.get(raw_readme_url)
+    version = get_version(repo_url)
+
+    if response.status_code == 200:
+        readme_content = response.text
+    else:
+        return "Changelog not found"
+
+    changelog = ""
+    version_found = False
+
+    for line in readme_content.split('\n'):
+        if line.startswith(f"### {version}"):
+            version_found = True
+        elif line.startswith("### v"):
+            version_found = False
+
+        if version_found:
+            changelog += line + "\n"
+
+    if changelog:
+        return changelog
+    else:
+        return f"Changelog for version {version} not found"
+
 # TODO Im way to lazy to change all the prints to use this i'll do it eventually
 
 

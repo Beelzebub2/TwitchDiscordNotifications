@@ -295,9 +295,11 @@ class TwitchDiscordBot:
                     color=0x00FF00,
                     timestamp=datetime.datetime.now(),
                 )
+                change_log = self.others.get_changelog(self.repo_url)
                 embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
                 embed.add_field(name="From", value=result[1])
                 embed.add_field(name="To", value=result[2])
+                embed.add_field(name="Changelog", value=change_log)
                 await self.owner.send(embed=embed)
                 self.others.pickle_variable(self.shared_variables)
                 data = {"Restarted": True,

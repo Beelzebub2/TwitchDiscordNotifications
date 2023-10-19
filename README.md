@@ -52,6 +52,7 @@ Discord bot: https://discord.com/developers/applications/
 
 ### v2.4 19/10/2023
 
++   Added changelog to the update embed
 +   Added multiple streamer input on watch command
 +   Improved Stats command filesize display
 +   Improved command loader performance counter
