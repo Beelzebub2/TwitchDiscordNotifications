@@ -300,7 +300,7 @@ class TwitchDiscordBot:
                 embed.add_field(name="From", value=result[1])
                 embed.add_field(name="To", value=result[2])
                 embed.add_field(
-                    name="Diff Style",
+                    name="Changelog",
                     value=f"```{change_log}```",
                     inline=False
                 )
