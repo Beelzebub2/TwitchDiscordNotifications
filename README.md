@@ -52,6 +52,7 @@ Discord bot: https://discord.com/developers/applications/
 
 v2.3.2 19/10/2023
 
++   Added multiple streamer input on watch command
 +   Improved Stats command filesize display
 +   Improved command loader performance counter
 +   Removed unecessary repetition of print(" " * console_width, end="\r")

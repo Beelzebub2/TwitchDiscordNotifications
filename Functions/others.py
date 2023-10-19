@@ -42,11 +42,12 @@ def unpickle_variable(filename="variables.pkl"):
 
 @Utilities.custom_decorators.run_in_thread
 def log_print(message, log_file_name="log.txt", max_lines=1000, show_message=True):
+    console_width = unpickle_variable()["console_width"]
+
     def remove_color_codes(text):
         color_pattern = re.compile(r"(\x1b\[[0-9;]*m)|(\033\[K)")
         return color_pattern.sub("", text)
 
-    @Utilities.custom_decorators.run_in_thread
     def trim_log_file():
         try:
             with open(log_file_name, "r") as original_file:
@@ -65,7 +66,6 @@ def log_print(message, log_file_name="log.txt", max_lines=1000, show_message=Tru
 
     try:
         if show_message:
-            console_width = unpickle_variable()["console_width"]
             print(" " * console_width, end="\r")
             print(message)
 
@@ -73,13 +73,11 @@ def log_print(message, log_file_name="log.txt", max_lines=1000, show_message=Tru
             sys.stdout = log_file
             message_without_colors = remove_color_codes(message)
             print(message_without_colors)
-        trim_log_file()
-
     except Exception as e:
-        sys.stdout = original_stdout
         print(f"Error logging to file: {e}")
     finally:
         sys.stdout = original_stdout
+        trim_log_file()
 
 
 def get_timestamp():
