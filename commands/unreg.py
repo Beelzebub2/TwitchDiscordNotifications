@@ -20,9 +20,6 @@ class UnRegister(commands.Cog):
     )
     async def unregister_user(self, ctx):
         user_id = str(ctx.author.id)
-        variables = Functions.others.unpickle_variable()
-
-        console_width = variables["console_width"]
 
         if ch.delete_user(user_id):
 
