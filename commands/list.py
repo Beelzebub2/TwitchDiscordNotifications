@@ -1,5 +1,5 @@
 from discord.ext import commands
-import Functions
+import Functions.others
 import discord
 import aiohttp
 import asyncio
@@ -18,33 +18,35 @@ class ListStreamers(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.others = Functions.others
-        variables = self.others.unpickle_variable()
-        self.console_width = variables["console_width"]
-        self.VERSION = variables["version"]
-        self.HEADERS = variables["headers"]
 
     async def fetch_streamer_data(self, session, streamer_name, pfps, names):
         streamer_name = streamer_name.replace(" ", "")
-        url = f"https://api.twitch.tv/helix/users?login={streamer_name}"
 
-        async with session.get(url, headers=self.HEADERS) as response:
-            if response.status == 200:
-                data = await response.json()
-                if "data" in data and len(data["data"]) > 0:
-                    streamer_data = data["data"][0]
-                    profile_picture_url = streamer_data.get(
-                        "profile_image_url", "")
-                    profile_picture_url = profile_picture_url.replace(
-                        "{width}", "150"
-                    ).replace("{height}", "150")
-                    pfps.append(profile_picture_url)
-                    names.append(streamer_data["display_name"])
-                else:
-
-                    self.others.log_print(
-                        f"{self.others.get_timestamp()} No data found for streamer: {streamer_name}",
-                        show_message=False
-                    )
+        if streamer_name in self.streamer_data_cache:
+            streamer_data = self.streamer_data_cache[streamer_name]
+            profile_picture_url = streamer_data.get("profile_image_url", "")
+            profile_picture_url = profile_picture_url.replace(
+                "{width}", "150").replace("{height}", "150")
+            pfps.append(profile_picture_url)
+            names.append(streamer_data["display_name"])
+        else:
+            url = f"https://api.twitch.tv/helix/users?login={streamer_name}"
+            async with session.get(url, headers=self.HEADERS) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if "data" in data and len(data["data"]) > 0:
+                        streamer_data = data["data"][0]
+                        profile_picture_url = streamer_data.get(
+                            "profile_image_url", "")
+                        profile_picture_url = profile_picture_url.replace(
+                            "{width}", "150").replace("{height}", "150")
+                        pfps.append(profile_picture_url)
+                        names.append(streamer_data["display_name"])
+                    else:
+                        self.others.log_print(
+                            f"{self.others.get_timestamp()} No data found for streamer: {streamer_name}",
+                            show_message=False
+                        )
 
     @commands.command(
         name="list",
@@ -55,6 +57,10 @@ class ListStreamers(commands.Cog):
     async def list_streamers(self, ctx):
         user_id = str(ctx.author.id)
         user_ids = ch.get_all_user_ids()
+        variables = self.others.unpickle_variable()
+        self.VERSION = variables["version"]
+        self.HEADERS = variables["headers"]
+        self.streamer_data_cache = variables["streamers_cache"]
 
         if user_id in user_ids:
             streamer_list = ch.get_streamers_for_user(user_id)

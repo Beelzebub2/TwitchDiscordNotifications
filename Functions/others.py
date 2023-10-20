@@ -50,13 +50,13 @@ def log_print(message, log_file_name="log.txt", max_lines=1000, show_message=Tru
 
     def trim_log_file():
         try:
-            with open(log_file_name, "r") as original_file:
+            with open(log_file_name, "r", encoding="utf-8") as original_file:
                 lines = original_file.readlines()
 
             if len(lines) >= max_lines:
                 lines_to_remove = len(lines) - max_lines + 1
                 new_lines = lines[lines_to_remove:]
-                with open(log_file_name, "w") as updated_file:
+                with open(log_file_name, "w", encoding="utf-8") as updated_file:
                     updated_file.writelines(new_lines)
 
         except Exception as e:
@@ -69,7 +69,7 @@ def log_print(message, log_file_name="log.txt", max_lines=1000, show_message=Tru
             print(" " * console_width, end="\r")
             print(message)
 
-        with open(log_file_name, "a") as log_file:
+        with open(log_file_name, "a", encoding="utf-8") as log_file:
             sys.stdout = log_file
             message_without_colors = remove_color_codes(message)
             print(message_without_colors)

@@ -26,7 +26,7 @@ class Watch(commands.Cog):
     @commands.command(
         name="watch",
         aliases=["w"],
-        usage="watch <streamername_or_link> [<streamername_or_link>...]",
+        usage="watch <streamername_or_link> [<streamername_or_link> <streamername_or_link>...]",
         help="Add streamers to your watch list (provide one or more streamer names or links)",
     )
     async def watch(self, ctx, *args):
@@ -34,6 +34,7 @@ class Watch(commands.Cog):
         self.VERSION = variables["version"]
         AUTHORIZATION = variables["authorization"]
         CLIENT_ID = variables["client_id"]
+        self.streamer_data_cache = variables["streamers_cache"]
 
         streamers_data = []
         failed_streamers = set()
@@ -48,28 +49,33 @@ class Watch(commands.Cog):
                 streamer_name = streamer_name.lower()
             else:
                 streamer_name = streamer_name_or_link.lower()
-            url = f"https://api.twitch.tv/helix/users?login={streamer_name}"
-            headers = {
-                "Client-ID": f"{CLIENT_ID}",
-                "Authorization": f"Bearer {AUTHORIZATION}",
-            }
-            async with session.get(url, headers=headers) as response:
-                data = await response.json()
-            if not data["data"]:
-                Functions.others.log_print(
-                    Fore.CYAN
-                    + Functions.others.get_timestamp()
-                    + Fore.RESET
-                    + " "
-                    + Fore.RED
-                    + "[ERROR] "
-                    + f"{Fore.CYAN + streamer_name + Fore.RESET} Twitch profile not found."
-                    + Fore.RESET,
-                    show_message=False
-                )
-                failed_streamers.add(streamer_name)
-                return
-            pfp = data["data"][0]["profile_image_url"]
+
+            if streamer_name in self.streamer_data_cache:
+                pfp = self.streamer_data_cache[streamer_name]["profile_image_url"]
+            else:
+                url = f"https://api.twitch.tv/helix/users?login={streamer_name}"
+                headers = {
+                    "Client-ID": f"{CLIENT_ID}",
+                    "Authorization": f"Bearer {AUTHORIZATION}",
+                }
+                async with session.get(url, headers=headers) as response:
+                    data = await response.json()
+
+                if not data["data"]:
+                    Functions.others.log_print(
+                        Fore.CYAN
+                        + Functions.others.get_timestamp()
+                        + Fore.RESET
+                        + " "
+                        + Fore.RED
+                        + "[ERROR] "
+                        + f"{Fore.CYAN + streamer_name + Fore.RESET} Twitch profile not found."
+                        + Fore.RESET,
+                        show_message=False
+                    )
+                    failed_streamers.add(streamer_name)
+                    return
+                pfp = data["data"][0]["profile_image_url"]
             user_id = str(ctx.author.id)
             user_ids = ch.get_all_user_ids()
             if user_id in user_ids:

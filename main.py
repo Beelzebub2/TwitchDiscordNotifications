@@ -37,6 +37,7 @@ class TwitchDiscordBot:
         intents.dm_messages = True
         self.Loaded_commands = []
         self.Failed_commands = []
+        self.streamer_data_cache = {}
         self.bot = commands.Bot(
             command_prefix=commands.when_mentioned_or(self.ch.get_prefix()),
             intents=intents,
@@ -69,6 +70,7 @@ class TwitchDiscordBot:
             "failed_commands": self.Failed_commands,
             "intents": intents,
             "headers": self.HEADERS,
+            "streamers_cache": self.streamer_data_cache,
         }
         self.others.pickle_variable(self.shared_variables)
 
@@ -199,6 +201,7 @@ class TwitchDiscordBot:
     async def on_ready(self):
         self.ch.save_time(str(datetime.datetime.now()))
         self.bot.loop.create_task(self.check_for_updates())
+        self.bot.loop.create_task(self.cache_streamer_data())
         if not self.ch.check_restart_status():
             bot_owner_id = self.ch.get_bot_owner_id()
             if not bot_owner_id:
@@ -313,6 +316,31 @@ class TwitchDiscordBot:
                 print(python)
                 os.execl(python, python, *sys.argv)
             await asyncio.sleep(1800)
+
+    async def cache_streamer_data(self):
+        while True:
+            streamer_list = self.ch.get_all_streamers()
+
+            async with aiohttp.ClientSession() as session:
+                await asyncio.gather(
+                    *[self.fetch_and_cache_streamer_data(session, streamer) for streamer in streamer_list]
+                )
+            self.others.pickle_variable(self.shared_variables)
+            await asyncio.sleep(600)
+
+    async def fetch_and_cache_streamer_data(self, session, streamer_name):
+        streamer_name = streamer_name.replace(" ", "")
+        url = f"https://api.twitch.tv/helix/users?login={streamer_name}"
+
+        if streamer_name in self.streamer_data_cache:
+            return
+
+        async with session.get(url, headers=self.HEADERS) as response:
+            if response.status == 200:
+                data = await response.json()
+                if "data" in data and len(data["data"]) > 0:
+                    streamer_data = data["data"][0]
+                    self.streamer_data_cache[streamer_name] = streamer_data
 
     def custom_interrupt_handler(self, signum, frame):
 

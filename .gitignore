@@ -10,3 +10,5 @@ data.db
 tests.py
 __pycache__
 Tests/
+UI.py
+Utilities/banner.png
