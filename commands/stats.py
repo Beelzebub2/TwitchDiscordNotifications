@@ -19,6 +19,7 @@ class Stats(commands.Cog):
         working_commands = variables["loaded_commands"]
         failed_commands = variables["failed_commands"]
         date_format = variables["date_format"]
+        cached_streamers = variables["streamers_cache"]
         db_size = os.path.getsize("data.db")
         formatted_db_size = self.format_file_size(db_size)
         current_time = datetime.datetime.now()
@@ -34,6 +35,7 @@ class Stats(commands.Cog):
         embed.add_field(name="Loaded commands", value=len(working_commands))
         embed.add_field(name="Failed commands", value=len(failed_commands))
         embed.add_field(name="Database Size", value=formatted_db_size)
+        embed.add_field(name="Cached Streamers", value="")
         await ctx.send(embed=embed)
 
     def format_file_size(self, size_in_bytes):
