@@ -35,7 +35,7 @@ class Stats(commands.Cog):
         embed.add_field(name="Loaded commands", value=len(working_commands))
         embed.add_field(name="Failed commands", value=len(failed_commands))
         embed.add_field(name="Database Size", value=formatted_db_size)
-        embed.add_field(name="Cached Streamers", value="")
+        embed.add_field(name="Cached Streamers", value=len(cached_streamers))
         await ctx.send(embed=embed)
 
     def format_file_size(self, size_in_bytes):
