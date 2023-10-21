@@ -251,9 +251,10 @@ class TwitchDiscordBot:
         activity = discord.Activity(
             type=discord.ActivityType.watching, name="Mention me to see my prefix"
         )
-
         await self.bot.change_presence(activity=activity)
+        self.bot.loop.create_task(self.check_streamers())
 
+    async def check_streamers(self):
         while True:
             start_time = time.perf_counter()
 
@@ -327,7 +328,6 @@ class TwitchDiscordBot:
                 heartbeat_file.write(str(time.time()))
             await asyncio.sleep(2)
 
-            
     async def cache_streamer_data(self):
         while True:
             streamer_list = self.ch.get_all_streamers()
@@ -337,7 +337,7 @@ class TwitchDiscordBot:
                     *[self.fetch_and_cache_streamer_data(session, streamer) for streamer in streamer_list]
                 )
             self.others.pickle_variable(self.shared_variables)
-            await asyncio.sleep(600)
+            await asyncio.sleep(60)
 
     async def fetch_and_cache_streamer_data(self, session, streamer_name):
         streamer_name = streamer_name.replace(" ", "")

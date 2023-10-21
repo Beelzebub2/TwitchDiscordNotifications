@@ -40,7 +40,6 @@ def unpickle_variable(filename="variables.pkl"):
     return loaded_data
 
 
-@Utilities.custom_decorators.run_in_thread
 def log_print(message, log_file_name="log.txt", max_lines=1000, show_message=True):
     console_width = unpickle_variable()["console_width"]
 
@@ -48,6 +47,7 @@ def log_print(message, log_file_name="log.txt", max_lines=1000, show_message=Tru
         color_pattern = re.compile(r"(\x1b\[[0-9;]*m)|(\033\[K)")
         return color_pattern.sub("", text)
 
+    @Utilities.custom_decorators.run_in_thread
     def trim_log_file():
         try:
             with open(log_file_name, "r", encoding="utf-8") as original_file:

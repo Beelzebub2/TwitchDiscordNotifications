@@ -1,5 +1,5 @@
 # **TwitchDiscordNotifications**
-![Static Badge](https://img.shields.io/badge/Version-v2.5-8ebff1?style=for-the-badge&logo=v)
+![Static Badge](https://img.shields.io/badge/Version-v2.6-8ebff1?style=for-the-badge&logo=v)
 ![Static Badge](https://img.shields.io/badge/Language-python-3776ab?style=for-the-badge&logo=python)
 ![Static Badge](https://img.shields.io/badge/License-GNU%20GPL%20v3-blue.svg?style=for-the-badge)  
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/S6S8HV2DY)
@@ -50,16 +50,19 @@ Discord bot: https://discord.com/developers/applications/
 ## Changes
 ```diff
 
+### v2.6 21/10/2023
+
++   Optimized code on main.py
++   Added CPU and Memory usage to stats command
++   Fixed some bugs with log_print
++   Modified intents error catcher
+
 ### v2.5 20/10/2023
 
 !   Working on a UI
-
-+   Added CPU and Memory usage to stats command
 +   Fixed some minor issues
-+   Modified intents error catcher
 +   Added a cache system to reduce de number of requests
 +   Added multiple streamer input on unwatch command
-+   Fixed a bug with log_print
 
 ### v2.4 19/10/2023
 
