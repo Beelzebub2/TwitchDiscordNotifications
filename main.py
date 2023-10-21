@@ -192,11 +192,11 @@ class TwitchDiscordBot:
                                 show_message=False,
                             )
             except discord.errors.NotFound:
-
                 self.others.log_print(
                     f"{self.others.get_timestamp()} {Fore.CYAN}[ERROR] User with ID {user_id} not found.",
                     show_message=False,
                 )
+                continue
 
     async def on_ready(self):
         self.ch.save_time(str(datetime.datetime.now()))

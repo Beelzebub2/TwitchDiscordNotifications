@@ -59,25 +59,22 @@ def log_print(message, log_file_name="log.txt", max_lines=1000, show_message=Tru
                 with open(log_file_name, "w", encoding="utf-8") as updated_file:
                     updated_file.writelines(new_lines)
 
-        except Exception as e:
-            print(f"Error trimming log file: {e}")
+        except:
+            pass
 
     original_stdout = sys.stdout
 
+    if show_message:
+        print(" " * console_width, end="\r")
+        print(message)
     try:
-        if show_message:
-            print(" " * console_width, end="\r")
-            print(message)
-
         with open(log_file_name, "a", encoding="utf-8") as log_file:
             sys.stdout = log_file
             message_without_colors = remove_color_codes(message)
             print(message_without_colors)
-    except Exception as e:
-        print(f"Error logging to file: {e}")
+        trim_log_file()
     finally:
         sys.stdout = original_stdout
-        trim_log_file()
 
 
 def get_timestamp():
