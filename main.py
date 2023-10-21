@@ -484,9 +484,9 @@ class TwitchDiscordBot:
                 self.others.clear_console()
                 print(
                     Fore.LIGHTRED_EX
-                    + "[INTENTS ERROR] "
+                    + "[ERROR] "
                     + Fore.LIGHTYELLOW_EX
-                    + "Please grant all the intents to your bot on https://discord.com/developers/applications/YourBotId/bot"
+                    + f"Please grant all the intents to your bot on https://discord.com/developers/applications/{self.bot.user.id}/bot"
                     + Fore.RESET
                 )
                 os._exit(0)
