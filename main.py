@@ -320,7 +320,7 @@ class TwitchDiscordBot:
                 python = sys.executable
                 print(python)
                 os.execl(python, python, *sys.argv)
-            await asyncio.sleep(3)
+            await asyncio.sleep(600)
 
     async def heart_beat(self):
         while True:
