@@ -53,6 +53,8 @@ Discord bot: https://discord.com/developers/applications/
 ### v2.5 20/10/2023
 
 !   Working on a UI
+
++   Added CPU and Memory usage to stats command
 +   Fixed some minor issues
 +   Modified intents error catcher
 +   Added a cache system to reduce de number of requests

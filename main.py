@@ -1,4 +1,5 @@
 import sys
+import tempfile
 import discord
 import datetime
 import aiohttp
@@ -42,6 +43,8 @@ class TwitchDiscordBot:
             command_prefix=commands.when_mentioned_or(self.ch.get_prefix()),
             intents=intents,
         )
+        self.temp_dir = tempfile.gettempdir()
+        self.heartbeat_file_path = os.path.join(self.temp_dir, "heartbeat.txt")
         self.bot.add_listener(self.on_ready)
         try:
             self.console_width = shutil.get_terminal_size().columns
@@ -202,6 +205,7 @@ class TwitchDiscordBot:
         self.ch.save_time(str(datetime.datetime.now()))
         self.bot.loop.create_task(self.check_for_updates())
         self.bot.loop.create_task(self.cache_streamer_data())
+        self.bot.loop.create_task(self.heart_beat())
         if not self.ch.check_restart_status():
             bot_owner_id = self.ch.get_bot_owner_id()
             if not bot_owner_id:
@@ -315,8 +319,15 @@ class TwitchDiscordBot:
                 python = sys.executable
                 print(python)
                 os.execl(python, python, *sys.argv)
-            await asyncio.sleep(1800)
+            await asyncio.sleep(3)
 
+    async def heart_beat(self):
+        while True:
+            with open(self.heartbeat_file_path, "w") as heartbeat_file:
+                heartbeat_file.write(str(time.time()))
+            await asyncio.sleep(2)
+
+            
     async def cache_streamer_data(self):
         while True:
             streamer_list = self.ch.get_all_streamers()
