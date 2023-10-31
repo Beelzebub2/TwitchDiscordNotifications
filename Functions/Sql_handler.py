@@ -9,8 +9,11 @@ import Utilities.custom_decorators
 class SQLiteHandler:
     def __init__(self, db_file=None, conn=None):
         app_data_dir = os.getenv('APPDATA')
-        default_db_file = os.path.join(
-            app_data_dir, "TwitchDiscordNotifications", "data.db")
+        db_folder = os.path.join(app_data_dir, "TwitchDiscordNotifications")
+        default_db_file = os.path.join(db_folder, "data.db")
+
+        if not os.path.exists(db_folder):
+            os.makedirs(db_folder)
 
         if db_file:
             self.db_file = db_file
