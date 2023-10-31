@@ -56,7 +56,6 @@ class Watch(commands.Cog):
                 }
                 async with session.get(url, headers=headers) as response:
                     data = await response.json()
-                print(data)
 
                 if not data["data"]:
                     Functions.others.log_print(
