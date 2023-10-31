@@ -10,6 +10,9 @@ import Utilities.custom_decorators
 from Functions.Json_config_hanldler import JsonConfigHandler
 from tzlocal import get_localzone
 
+chj = JsonConfigHandler(
+    os.path.join(cwd, "UI\\config.json"))
+
 
 def pickle_variable(data, folder="TwitchDiscordNotifications", filename="variables.pkl"):
     """
@@ -59,8 +62,7 @@ def unpickle_variable(folder="TwitchDiscordNotifications", filename="variables.p
 
 def log_print(message, log_file_name="log.txt", show_message=True):
     cwd = os.getcwd()
-    chj = JsonConfigHandler(
-        os.path.join(cwd, "UI\\config.json"))
+
     console_width = unpickle_variable()["console_width"]
     max_lines = chj.get_max_lines()
     logs_folder = os.path.join(cwd, "Logs")
@@ -140,30 +142,26 @@ def clear_console():
     os.system("cls" if os.name == "nt" else "clear")
 
 
-def get_version(repo_url, from_file=False):
-    if from_file:
-        with open("README.md", "r") as file:
-            readme_content = file.read()
+def get_version():
+
+    url = "https://github.com/Beelzebub2/TwitchDiscordNotifications/raw/main/UI/config.json"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        config_data = response.json()
     else:
-        readme_url = f"{repo_url}/blob/main/README.md"
-        response = requests.get(readme_url)
-        if response.status_code == 200:
-            readme_content = response.text
-        else:
-            return "Version not found"
+        return "Version not found"
 
-    pattern = r"Version-v([\d.]+)"
-    match = re.search(pattern, readme_content)
-
-    if match:
-        version = match.group(1)
+    if "config" in config_data and "version" in config_data["config"]:
+        version = config_data["config"]["version"]
         return version
     else:
         return "Version not found"
 
 
-def get_changelog(repo_url):
-    version = "v" + get_version(repo_url)
+def get_changelog():
+    version = chj.get_version()
+    repo_url = "https://github.com/Beelzebub2/TwitchDiscordNotifications"
 
     if version is None:
         return "Changelog not found"
@@ -189,7 +187,6 @@ def get_changelog(repo_url):
             changelog += line + "\n"
 
     if changelog:
-        # Remove the date and "### version" lines
         changelog = re.sub(r'\d{2}/\d{2}/\d{4}\n', '', changelog)
         changelog = re.sub(fr'###\s*{re.escape(version)}', '', changelog)
         return changelog.strip()

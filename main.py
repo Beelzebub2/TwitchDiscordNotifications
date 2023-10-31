@@ -350,7 +350,7 @@ class TwitchDiscordBot:
                     color=0x00FF00,
                     timestamp=datetime.datetime.now(),
                 )
-                change_log = self.others.get_changelog(self.repo_url)
+                change_log = self.others.get_changelog()
                 embed.set_thumbnail(url="https://i.imgur.com/TavP95o.png")
                 embed.add_field(name="From", value=result[1])
                 embed.add_field(name="To", value=result[2])

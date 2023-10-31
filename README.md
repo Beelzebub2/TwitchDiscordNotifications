@@ -1,5 +1,5 @@
 # **TwitchDiscordNotifications**
-![Static Badge](https://img.shields.io/badge/Version-v2.7.1-8ebff1?style=for-the-badge&logo=v)
+![Static Badge](https://img.shields.io/badge/Version-v2.7-8ebff1?style=for-the-badge&logo=v)
 ![Static Badge](https://img.shields.io/badge/Language-python-3776ab?style=for-the-badge&logo=python)
 ![Static Badge](https://img.shields.io/badge/License-GNU%20GPL%20v3-blue.svg?style=for-the-badge)  
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/S6S8HV2DY)
@@ -50,14 +50,8 @@ Discord bot: https://discord.com/developers/applications/
 ## Changes
 ```diff
 
-### v2.7.1 31/10/2023
 
-+   Fixed issues with required folders not being made
-+   Added more information to the .env error
-+   Improved on_error event
-
-
-### v2.7 21/10/2023
+### v2.7 31/10/2023
 
 -   Removed image generation from List and Watch for optimization
 +   Made commands case insensitive 
@@ -68,7 +62,10 @@ Discord bot: https://discord.com/developers/applications/
 +   Improved Stats command
 +   Fixed some small bugs
 +   Organized files
-
++   Fixed issues with required folders not being made
++   Added more information to the .env error
++   Improved on_error event
++   Fixed get_version and get_changelog
 
 ### v2.6 21/10/2023
 
