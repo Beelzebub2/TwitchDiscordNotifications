@@ -12,3 +12,4 @@ __pycache__
 Tests/
 temp.py
 Performance_debug.txt
+.vscode
