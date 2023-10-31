@@ -7,17 +7,19 @@
 Get notifications of your favorite streamers on your discord Dm's
 
 
-## Easy setup
-**For easy setup you only need to join my server and send command ,watch streamername or link to create your watchlist  
-Or invite it to your discord server and do the same**
-#### Simply invite this bot
-[Invite TwitchStreamChecker](https://discord.com/api/oauth2/authorize?client_id=1124891382595727460&permissions=8&scope=bot)  
-**OR (Recommended)**
-  
-[Join TwitchStreamChecker server so you don't have to invite him](https://discord.gg/gbdPCxNavc)  
+## Setting up the bot as a user  
+If you simply wish to use the bot without any setup or hosting necessary simply Join my server and ping the bot either on bot's dm's or on the discord server,  
+he will reply with the prefix and use the command Help to know what you can do.  
+[Join TwitchStreamChecker Server](https://discord.gg/gbdPCxNavc)
+#### **OR**  
+[Invite TwitchStreamChecker](https://discord.com/api/oauth2/authorize?client_id=1124891382595727460&permissions=8&scope=bot) 
+
+## Setting up the bot as a host  
+You will need to make an application on twitch and gets it's client id and client secret aswell as making it's Auth redirect link to **"https://twitchapps.com/tokengen/"**
 
 ## **Important links if you self host**
-Twitch Clientid (Application): https://dev.twitch.tv/console/apps   
+Twitch Client_id  and Client_secret(Application): https://dev.twitch.tv/console/apps  
+### Bot now gets the Auth token automatically but if it fails use:   
 **(OAuth redirect link must be "https://twitchapps.com/tokengen/")**  
 Twitch OAuth key: https://twitchapps.com/tokengen/  
 ![OAuth](https://i.imgur.com/fuHBvHK.png)  
