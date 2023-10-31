@@ -365,7 +365,6 @@ class TwitchDiscordBot:
                         "Streamers": self.processed_streamers}
                 self.ch.save_to_temp_json(data)
                 python = sys.executable
-                print(python)
                 os.execl(python, python, *sys.argv)
             await asyncio.sleep(600)
 

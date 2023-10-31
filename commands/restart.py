@@ -37,7 +37,6 @@ class Restart(commands.Cog):
         await ctx.send(embed=embed)
 
         python = sys.executable
-        print(python)
         os.execl(python, python, *sys.argv)
 
 
