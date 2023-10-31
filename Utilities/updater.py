@@ -16,7 +16,7 @@ chj = JsonConfigHandler(os.path.join(cwd, "UI\\config.json"))
 def search_for_updates(autoupdate=False):
     try:
         current_version = ch.get_version()
-        online_version = "v" + Functions.others.get_version()
+        online_version = Functions.others.get_version()
         Functions.others.set_console_title("Checking For Updates. . .")
         if online_version != current_version:
             Functions.others.set_console_title("New Update Found!")
