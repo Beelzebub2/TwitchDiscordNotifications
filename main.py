@@ -427,6 +427,7 @@ class TwitchDiscordBot:
             s for s in self.processed_streamers if s.lower() not in items_to_remove
         ]
 
+    # TODO fix replit .env directory from appdata to local cwd
     def create_env(self):
         if os.path.exists(".env"):
             return
@@ -461,7 +462,7 @@ class TwitchDiscordBot:
 
         if os.path.exists(env_file_path):
             print(
-                "Secrets missing! Created successfully. Please change filler text in .env or host secrets."
+                f"Secrets missing! Created successfully. Please change filler text in .env on {env_folder} "
             )
             os._exit(0)
 
