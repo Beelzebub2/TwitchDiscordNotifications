@@ -6,7 +6,7 @@ from Functions.Sql_handler import SQLiteHandler
 import re
 import Functions.others
 
-ch = SQLiteHandler("data.db")
+ch = SQLiteHandler()
 
 
 class UnWatch(commands.Cog):

@@ -2,7 +2,8 @@ from discord.ext import commands
 import discord
 from Functions.Sql_handler import SQLiteHandler
 
-ch = SQLiteHandler("data.db")
+ch = SQLiteHandler()
+
 
 class Configs(commands.Cog):
     def __init__(self, bot):

@@ -1,0 +1,11 @@
+{
+    "config": {
+        "version": "v2.7",
+        "debug": false,
+        "autoupdates": true,
+        "default_prefix": ",",
+        "max_lines": 1000,
+        "bot_PID": 6096,
+        "start_time": "2023-10-31 01:51:36.237145"
+    }
+}

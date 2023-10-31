@@ -1,47 +1,69 @@
 import re
 import os
 import datetime
+import tempfile
 from colorama import Fore
 import sys
 import pickle
 import requests
 import Utilities.custom_decorators
+from Functions.Json_config_hanldler import JsonConfigHandler
+from tzlocal import get_localzone
 
 
-def pickle_variable(data, filename="variables.pkl"):
+def pickle_variable(data, folder="TwitchDiscordNotifications", filename="variables.pkl"):
     """
     Pickle one or more variables and save them to a file with a default filename.
 
     Args:
-        *args: One or more variables to be pickled.
+        data: One or more variables to be pickled.
+        folder (str, optional): The name of the folder where the pickle file will be saved.
+            Default is 'TwitchDiscordNotifications'.
         filename (str, optional): The name of the pickle file to save the variables to.
-            Default is 'data.pkl'.
+            Default is 'variables.pkl'.
 
     Returns:
         None
     """
-    with open(filename, 'wb') as file:
+    temp_dir = tempfile.gettempdir()
+
+    folder_path = os.path.join(temp_dir, folder)
+    os.makedirs(folder_path, exist_ok=True)
+    file_path = os.path.join(folder_path, filename)
+
+    with open(file_path, 'wb') as file:
         pickle.dump(data, file)
 
 
-def unpickle_variable(filename="variables.pkl"):
+def unpickle_variable(folder="TwitchDiscordNotifications", filename="variables.pkl"):
     """
     Load a variable from a pickle file with a default filename and return it.
 
     Args:
+        folder (str, optional): The name of the folder where the pickle file is located.
+            Default is 'TwitchDiscordNotifications'.
         filename (str, optional): The name of the pickle file to load the variable from.
-            Default is 'data.pkl'.
+            Default is 'variables.pkl'.
 
     Returns:
         object: The unpickled variable.
     """
-    with open(filename, 'rb') as file:
+    temp_dir = tempfile.gettempdir()
+    folder_path = os.path.join(temp_dir, folder)
+    file_path = os.path.join(folder_path, filename)
+
+    with open(file_path, 'rb') as file:
         loaded_data = pickle.load(file)
     return loaded_data
 
 
-def log_print(message, log_file_name="log.txt", max_lines=1000, show_message=True):
+def log_print(message, log_file_name="log.txt", show_message=True):
+    cwd = os.getcwd()
+    chj = JsonConfigHandler(
+        os.path.join(cwd, "UI\\config.json"))
     console_width = unpickle_variable()["console_width"]
+    max_lines = chj.get_max_lines()
+    log_file_name = os.path.join(cwd, f"Logs\\{log_file_name}")
 
     def remove_color_codes(text):
         color_pattern = re.compile(r"(\x1b\[[0-9;]*m)|(\033\[K)")
@@ -84,9 +106,14 @@ def get_timestamp():
     return timestr
 
 
+def get_current_timezone():
+    current_timezone = get_localzone()
+    return str(current_timezone)
+
+
 def generate_timestamp_string(started_at):
-    started_datetime = datetime.datetime.fromisoformat(started_at.rstrip("Z"))
-    unix_timestamp = int(started_datetime.timestamp()) + 3600
+    dt = datetime.datetime.fromisoformat(started_at.replace("Z", "+00:00"))
+    unix_timestamp = int(dt.timestamp())
     timestamp_string = f"<t:{unix_timestamp}:T>"
     return timestamp_string
 
@@ -171,8 +198,24 @@ def get_changelog(repo_url):
 def holders(type):
     match type:
         case 1:
-            return "[SUCCESS] "
+            return f"{Fore.LIGHTGREEN_EX} [SUCCESS] "
         case 2:
-            return "[ERROR] "
+            return f"{Fore.LIGHTRED_EX} [ERROR] "
         case 3:
-            return "[INFO] "
+            return f"{Fore.LIGHTYELLOW_EX} [INFO] "
+
+
+def format_elapsed_time(elapsed_time):
+    if elapsed_time < 1:
+        elapsed_time_ms = int(elapsed_time * 1000)
+        return f"{elapsed_time_ms:2} ms"
+    elif elapsed_time < 60:
+        return f"{elapsed_time:.2f} seconds"
+    else:
+        minutes = int(elapsed_time // 60)
+        seconds = int(elapsed_time % 60)
+        return f"{minutes:2} min {seconds:2} sec"
+
+
+def get_current_pid():
+    return os.getpid()

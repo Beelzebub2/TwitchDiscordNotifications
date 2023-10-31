@@ -1,17 +1,11 @@
 from discord.ext import commands
 import Functions.others
 import discord
-import aiohttp
-import asyncio
 from colorama import Fore
-import math
-from PIL import Image, ImageDraw, ImageFont
-import requests
-import io
-import os
+
 import datetime
 from Functions.Sql_handler import SQLiteHandler
-ch = SQLiteHandler("data.db")
+ch = SQLiteHandler()
 
 
 class ListStreamers(commands.Cog):
@@ -81,96 +75,19 @@ class ListStreamers(commands.Cog):
                     + f" requested their streamers: {len(streamer_list)}",
                     show_message=False
                 )
-                pfps = []
-                names = []
-                async with aiohttp.ClientSession() as session:
-                    await asyncio.gather(
-                        *[
-                            self.fetch_streamer_data(
-                                session, streamer, pfps, names)
-                            for streamer in streamer_list
-                        ]
-                    )
-
-                num_pfps = len(pfps)
-                max_images_per_row = 5
-                image_width = 100
-                image_height = 100
-                num_rows = math.ceil(num_pfps / max_images_per_row)
-
-                name_box_width = image_width
-                name_box_height = 20
-                name_box_color = (0, 0, 0)
-                name_text_color = (255, 255, 255)
-                font_size = 9
-                font = ImageFont.truetype("arialbd.ttf", font_size)
-
-                if num_pfps <= max_images_per_row:
-                    combined_image_width = num_pfps * image_width
-                else:
-                    combined_image_width = max_images_per_row * image_width
-
-                combined_image_height = num_rows * \
-                    (image_height + name_box_height)
-
-                combined_image = Image.new(
-                    "RGB", (combined_image_width, combined_image_height)
-                )
-
-                x_offset = 0
-                y_offset = name_box_height
-
-                for i, (pfp_url, name) in enumerate(zip(pfps, names)):
-                    pfp_response = requests.get(pfp_url)
-                    pfp_image = Image.open(io.BytesIO(pfp_response.content))
-                    pfp_image.thumbnail((image_width, image_height))
-
-                    name_x = x_offset
-                    name_y = y_offset - name_box_height
-
-                    combined_image.paste(pfp_image, (x_offset, y_offset))
-
-                    name_box = Image.new(
-                        "RGB", (name_box_width, name_box_height), name_box_color
-                    )
-
-                    draw = ImageDraw.Draw(name_box)
-                    text_bbox = draw.textbbox((0, 0), name, font=font)
-                    text_width = text_bbox[2] - text_bbox[0]
-                    text_height = text_bbox[3] - text_bbox[1]
-                    text_x = (name_box_width - text_width) // 2
-                    text_y = (name_box_height - text_height) // 2
-                    draw.text((text_x, text_y), name,
-                              fill=name_text_color, font=font)
-
-                    combined_image.paste(name_box, (name_x, name_y))
-
-                    x_offset += image_width
-
-                    if x_offset >= combined_image_width:
-                        x_offset = 0
-                        y_offset += image_height + name_box_height
-
-                combined_image.save("combined_image.png")
 
                 embed = discord.Embed(
                     title=f"Your Streamers {ctx.author.name}",
-                    description=f"**You are currently watching the following streamers:**",
                     color=10242047,
                     timestamp=datetime.datetime.now()
                 )
                 embed.set_footer(text=f"{self.VERSION} | Made by Beelzebub2")
-                embed.set_image(url="attachment://combined_image.png")
 
-                with open("combined_image.png", "rb") as img_file:
-                    file = discord.File(img_file)
-                    await ctx.channel.send(file=file, embed=embed)
-                os.remove("combined_image.png")
+                embed.add_field(
+                    name="Currently in your watchlist", value=streamer_names)
 
-                return streamer_names, combined_image
-
+                await ctx.send(embed=embed)
             else:
-
                 self.others.log_print(
                     Fore.CYAN
                     + self.others.get_timestamp()
@@ -188,9 +105,8 @@ class ListStreamers(commands.Cog):
                     timestamp=datetime.datetime.now()
                 )
                 embed.set_footer(text=f"{self.VERSION} | Made by Beelzebub2")
-                await ctx.channel.send(embed=embed)
+                await ctx.send(embed=embed)
         else:
-
             self.others.log_print(
                 Fore.CYAN
                 + self.others.get_timestamp()
@@ -208,7 +124,7 @@ class ListStreamers(commands.Cog):
                 timestamp=datetime.datetime.now()
             )
             embed.set_footer(text=f"{self.VERSION} | Made by Beelzebub2")
-            await ctx.channel.send(embed=embed)
+            await ctx.send(embed=embed)
 
 
 async def setup(bot):

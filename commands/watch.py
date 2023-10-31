@@ -1,19 +1,14 @@
 import datetime
-import os
 from discord.ext import commands
 import aiohttp
 from colorama import Fore
 import discord
-import requests
 from Functions.Sql_handler import SQLiteHandler
 import Functions.others
 import re
-from PIL import Image, ImageDraw, ImageFont
-import io
-import math
 import asyncio
 
-ch = SQLiteHandler("data.db")
+ch = SQLiteHandler()
 
 
 class Watch(commands.Cog):
@@ -40,6 +35,7 @@ class Watch(commands.Cog):
         failed_streamers = set()
         already_in_list = []
         not_registered = []
+        streamer_names_added = []
 
         async def process_streamer(session, streamer_name_or_link):
             if "https://www.twitch.tv/" in streamer_name_or_link:
@@ -60,6 +56,7 @@ class Watch(commands.Cog):
                 }
                 async with session.get(url, headers=headers) as response:
                     data = await response.json()
+                print(data)
 
                 if not data["data"]:
                     Functions.others.log_print(
@@ -68,7 +65,7 @@ class Watch(commands.Cog):
                         + Fore.RESET
                         + " "
                         + Fore.RED
-                        + "[ERROR] "
+                        + Functions.others.holders(2)
                         + f"{Fore.CYAN + streamer_name + Fore.RESET} Twitch profile not found."
                         + Fore.RESET,
                         show_message=False
@@ -83,13 +80,15 @@ class Watch(commands.Cog):
                 if streamer_name not in streamer_list:
                     ch.add_streamer_to_user(user_id, streamer_name.strip())
                     streamer_list.append(streamer_name.strip())
+                    if streamer_name not in streamer_names_added:
+                        streamer_names_added.append(streamer_name)
                     Functions.others.log_print(
                         Fore.CYAN
                         + Functions.others.get_timestamp()
                         + Fore.RESET
                         + " "
                         + Fore.LIGHTGREEN_EX
-                        + "[SUCCESS] "
+                        + Functions.others.holders(1)
                         + f"Added {Fore.CYAN + streamer_name + Fore.RESET} to user {Fore.CYAN + ctx.author.name + Fore.RESET}'s watchlist."
                         + Fore.RESET,
                         show_message=False
@@ -129,9 +128,10 @@ class Watch(commands.Cog):
                     + Fore.RESET
                     + " "
                     + Fore.LIGHTGREEN_EX
-                    + "[SUCCESS] "
+                    + Functions.others.holders(1)
                     + f"Created a new watchlist for user {Fore.CYAN + ctx.author.name + Fore.RESET}."
-                    + Fore.RESET
+                    + Fore.RESET,
+                    show_message=False
                 )
                 not_registered.append(True)
 
@@ -145,65 +145,6 @@ class Watch(commands.Cog):
         if not streamer_data and not streamers_data and not already_in_list and not failed_streamers:
             return
 
-        if streamers_data:
-            num_pfps = len(streamers_data)
-            max_images_per_row = 5
-            image_width = 100
-            image_height = 100
-            num_rows = math.ceil(num_pfps / max_images_per_row)
-
-            name_box_width = image_width
-            name_box_height = 20
-            name_box_color = (0, 0, 0)
-            name_text_color = (255, 255, 255)
-            font_size = 9
-            font = ImageFont.truetype("arialbd.ttf", font_size)
-
-            if num_pfps <= max_images_per_row:
-                combined_image_width = num_pfps * image_width
-            else:
-                combined_image_width = max_images_per_row * image_width
-
-            combined_image_height = num_rows * (image_height + name_box_height)
-
-            combined_image = Image.new(
-                "RGB", (combined_image_width, combined_image_height))
-
-            x_offset = 0
-            y_offset = name_box_height
-
-            for i, streamer_data in enumerate(streamers_data):
-                pfp_response = requests.get(streamer_data["pfp"])
-                pfp_image = Image.open(io.BytesIO(pfp_response.content))
-                pfp_image.thumbnail((image_width, image_height))
-
-                name_x = x_offset
-                name_y = y_offset - name_box_height
-
-                combined_image.paste(pfp_image, (x_offset, y_offset))
-
-                name_box = Image.new(
-                    "RGB", (name_box_width, name_box_height), name_box_color)
-
-                draw = ImageDraw.Draw(name_box)
-                name = streamer_data["streamer_name"]
-                text_bbox = draw.textbbox((0, 0), name, font=font)
-                text_width = text_bbox[2] - text_bbox[0]
-                text_height = text_bbox[3] - text_bbox[1]
-                text_x = (name_box_width - text_width) // 2
-                text_y = (name_box_height - text_height) // 2
-                draw.text((text_x, text_y), name,
-                          fill=name_text_color, font=font)
-
-                combined_image.paste(name_box, (name_x, name_y))
-
-                x_offset += image_width
-
-                if x_offset >= combined_image_width:
-                    x_offset = 0
-                    y_offset += image_height + name_box_height
-
-            combined_image.save("combined_image.png")
         title = description = color = None
         if not_registered:
             title = f"Created a new watchlist for {ctx.author.name} and added the streamers! "
@@ -211,7 +152,8 @@ class Watch(commands.Cog):
             color = 65280  # green color for success
         elif streamers_data:
             title = f"Added streamers to your watchlist! {ctx.author.name}"
-            description = "**Added the following streamers:**"
+            # Include the names
+            description = f"**Added the following streamers:**\n{', '.join(streamer_names_added)}"
             color = 65280  # green color for success
         elif already_in_list and not failed_streamers:
             title = "No streamers added"
@@ -246,11 +188,7 @@ class Watch(commands.Cog):
                             value=f"\n{already_in_list_str}")
 
         if streamers_data:
-            with open("combined_image.png", "rb") as img_file:
-                file = discord.File(img_file)
-                embed.set_image(url="attachment://combined_image.png")
-                await ctx.send(file=file, embed=embed)
-            os.remove("combined_image.png")
+            await ctx.send(embed=embed)
         else:
             await ctx.send(embed=embed)
 

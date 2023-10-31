@@ -4,7 +4,7 @@ import discord
 import datetime
 from Functions.Sql_handler import SQLiteHandler
 
-ch = SQLiteHandler("data.db")
+ch = SQLiteHandler()
 
 
 class Reload(commands.Cog):

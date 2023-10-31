@@ -1,4 +1,5 @@
 import datetime
+import traceback
 from discord.ext import commands
 import discord
 from colorama import Fore
@@ -6,7 +7,7 @@ from Functions.Sql_handler import SQLiteHandler
 import Functions.others
 
 
-ch = SQLiteHandler("data.db")
+ch = SQLiteHandler()
 
 
 class Events(commands.Cog):
@@ -76,7 +77,7 @@ class Events(commands.Cog):
                 + Fore.RESET
                 + " "
                 + Fore.RED
-                + "[ERROR] "
+                + Functions.others.holders(2)
                 + f"Command {Fore.CYAN + command + Fore.RESET} doesn't exist."
                 + Fore.RESET,
                 show_message=False
@@ -101,6 +102,9 @@ class Events(commands.Cog):
             await ctx.send(embed=embed)
 
         else:
+            traceback_info = traceback.format_exception(
+                type(error), error, error.__traceback__)
+            error_message = "".join(traceback_info)
 
             Functions.others.log_print(
                 Fore.CYAN
@@ -108,8 +112,8 @@ class Events(commands.Cog):
                 + Fore.RESET
                 + " "
                 + Fore.RED
-                + "[ERROR] "
-                + f"Error: {error}"
+                + Functions.others.holders(2)
+                + f"Error: {error}\n{error_message}"
                 + Fore.RESET
             )
 

@@ -1,5 +1,5 @@
 # **TwitchDiscordNotifications**
-![Static Badge](https://img.shields.io/badge/Version-v2.6-8ebff1?style=for-the-badge&logo=v)
+![Static Badge](https://img.shields.io/badge/Version-v2.7-8ebff1?style=for-the-badge&logo=v)
 ![Static Badge](https://img.shields.io/badge/Language-python-3776ab?style=for-the-badge&logo=python)
 ![Static Badge](https://img.shields.io/badge/License-GNU%20GPL%20v3-blue.svg?style=for-the-badge)  
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/S6S8HV2DY)
@@ -49,6 +49,20 @@ Discord bot: https://discord.com/developers/applications/
 
 ## Changes
 ```diff
+
+### v2.7 21/10/2023
+
+
+-   Removed image generation from List and Watch for optimization
++   Made commands case insensitive 
++   If Auth token expires bot will get a new one by itself
++   Fixed timestamp function
++   Added UI for bot config v1.0
++   Improved Performance decorator
++   Improved Stats command
++   Fixed some small bugs
++   Organized files
+
 
 ### v2.6 21/10/2023
 

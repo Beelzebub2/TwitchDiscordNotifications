@@ -7,7 +7,7 @@ from Functions.Sql_handler import SQLiteHandler
 import Functions.others
 
 
-ch = SQLiteHandler("data.db")
+ch = SQLiteHandler()
 
 
 class Restart(commands.Cog):

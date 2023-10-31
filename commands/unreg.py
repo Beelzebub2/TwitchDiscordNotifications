@@ -5,7 +5,7 @@ import discord
 from Functions.Sql_handler import SQLiteHandler
 import Functions.others
 
-ch = SQLiteHandler("data.db")
+ch = SQLiteHandler()
 
 
 class UnRegister(commands.Cog):
@@ -29,7 +29,7 @@ class UnRegister(commands.Cog):
                 + Fore.RESET
                 + " "
                 + Fore.LIGHTGREEN_EX
-                + "[SUCCESS] "
+                + Functions.others.holders(1)
                 + f"{Fore.CYAN + ctx.author.name + Fore.RESET} Unregistered from bot."
                 + Fore.RESET,
                 show_message=False
@@ -50,7 +50,7 @@ class UnRegister(commands.Cog):
                 + Fore.RESET
                 + " "
                 + Fore.YELLOW
-                + "[ERROR] "
+                + Functions.others.holders(2)
                 + f"{Fore.RED + ctx.author.name + Fore.RESET} Tried to unregister from bot but wasn't registered to begin with."
                 + Fore.RESET,
                 show_message=False

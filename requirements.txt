@@ -2,8 +2,12 @@ requests
 urllib3
 colorama
 discord.py
-Pillow==10.0.0
 python-dotenv
 aiohttp
 pickle
 psutil
+tzlocal
+json
+customtkinter
+CTkMessagebox
+pywinstyless

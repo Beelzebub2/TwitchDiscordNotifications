@@ -10,5 +10,5 @@ data.db
 tests.py
 __pycache__
 Tests/
-UI.py
-Utilities/banner.png
+temp.py
+Performance_debug.txt

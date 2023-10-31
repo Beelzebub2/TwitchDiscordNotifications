@@ -8,13 +8,18 @@ import Utilities.custom_decorators
 
 class SQLiteHandler:
     def __init__(self, db_file=None, conn=None):
+        app_data_dir = os.getenv('APPDATA')
+        default_db_file = os.path.join(
+            app_data_dir, "TwitchDiscordNotifications", "data.db")
+
         if db_file:
             self.db_file = db_file
-            self.conn = sqlite3.connect(db_file)
+            self.conn = sqlite3.connect(default_db_file)
         elif conn:
             self.conn = conn
         else:
-            raise ValueError("Either db_file or conn must be provided.")
+            self.db_file = default_db_file
+            self.conn = sqlite3.connect(default_db_file)
 
         self.create_tables()
         self.create_indexes()
@@ -143,6 +148,7 @@ class SQLiteHandler:
 
         return False
 
+    @Utilities.custom_decorators.performance_tracker
     def get_streamers_for_user(self, discord_id):
         cursor = self.conn.cursor()
         cursor.execute(
@@ -151,6 +157,7 @@ class SQLiteHandler:
 
         return streamers_string[0].split(',') if streamers_string else []
 
+    @Utilities.custom_decorators.performance_tracker
     def get_all_streamers(self):
         cursor = self.conn.cursor()
         cursor.execute("SELECT DISTINCT streamer FROM users")
@@ -163,6 +170,7 @@ class SQLiteHandler:
         unique_streamers_list = list(unique_streamers_set)
         return unique_streamers_list
 
+    @Utilities.custom_decorators.performance_tracker
     def get_user_ids_with_streamers(self):
         cursor = self.conn.cursor()
         cursor.execute("SELECT discord_id, streamer FROM users")
@@ -184,6 +192,7 @@ class SQLiteHandler:
 
         return user_ids_with_streamers
 
+    @Utilities.custom_decorators.performance_tracker
     def get_all_user_ids(self):
         cursor = self.conn.cursor()
         cursor.execute("SELECT DISTINCT discord_id FROM users")
@@ -320,6 +329,7 @@ class SQLiteHandler:
         with open(file_path, "w") as file:
             json.dump(data, file)
 
+    @Utilities.custom_decorators.performance_tracker
     def check_restart_status(self):
         temp_dir = tempfile.gettempdir()
         file_path = os.path.join(temp_dir, "temp_restart_data.json")
