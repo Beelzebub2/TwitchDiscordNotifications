@@ -63,7 +63,11 @@ def log_print(message, log_file_name="log.txt", show_message=True):
         os.path.join(cwd, "UI\\config.json"))
     console_width = unpickle_variable()["console_width"]
     max_lines = chj.get_max_lines()
-    log_file_name = os.path.join(cwd, f"Logs\\{log_file_name}")
+    logs_folder = os.path.join(cwd, "Logs")
+    log_file_name = os.path.join(logs_folder, log_file_name)
+
+    if not os.path.exists(logs_folder):
+        os.makedirs("Logs")
 
     def remove_color_codes(text):
         color_pattern = re.compile(r"(\x1b\[[0-9;]*m)|(\033\[K)")
