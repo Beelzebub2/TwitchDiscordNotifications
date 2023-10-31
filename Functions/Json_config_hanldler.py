@@ -8,24 +8,21 @@ class JsonConfigHandler:
 
     def load_config(self):
         try:
-            with open(self.config_file, 'r') as file:
+            with open(self.config_file, "r") as file:
                 return json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
             default_config = {
-                "config": {
-                    "version": "v2.6",
-                    "debug": False,
-                    "autoupdates": True
-                }
+                "config": {"version": "v2.6", "debug": False, "autoupdates": True}
             }
             self.save_config(default_config)
             return default_config
 
     def save_config(self, config):
-        with open(self.config_file, 'w') as file:
+        with open(self.config_file, "w") as file:
             json.dump(config, file, indent=4)
 
     def get_version(self):
+        self.config = self.load_config()
         return self.config["config"]["version"]
 
     def set_version(self, version):
@@ -33,6 +30,7 @@ class JsonConfigHandler:
         self.save_config(self.config)
 
     def get_debug(self):
+        self.config = self.load_config()
         return self.config["config"]["debug"]
 
     def set_debug(self, debug):
@@ -40,6 +38,7 @@ class JsonConfigHandler:
         self.save_config(self.config)
 
     def get_autoupdates(self):
+        self.config = self.load_config()
         return self.config["config"]["autoupdates"]
 
     def set_autoupdates(self, autoupdates):
@@ -47,6 +46,7 @@ class JsonConfigHandler:
         self.save_config(self.config)
 
     def get_prefix(self):
+        self.config = self.load_config()
         return self.config["config"]["default_prefix"]
 
     def set_prefix(self, prefix):
@@ -54,6 +54,7 @@ class JsonConfigHandler:
         self.save_config(self.config)
 
     def get_max_lines(self):
+        self.config = self.load_config()
         return int(self.config["config"]["max_lines"])
 
     def set_max_lines(self, max_lines):
