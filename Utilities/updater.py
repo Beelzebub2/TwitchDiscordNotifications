@@ -6,16 +6,17 @@ from zipfile import ZipFile
 from colorama import Fore, Style
 import Functions.Sql_handler
 import Functions.others
+from Functions.Json_config_hanldler import JsonConfigHandler
 
-ch = Functions.Sql_handler.SQLiteHandler("data.db")
+ch = Functions.Sql_handler.SQLiteHandler()
+cwd = os.getcwd()
+chj = JsonConfigHandler(os.path.join(cwd, "UI\\config.json"))
 
 
 def search_for_updates(autoupdate=False):
     try:
         current_version = ch.get_version()
-        online_version = "v" + \
-            Functions.others.get_version(
-                "https://github.com/Beelzebub2/TwitchDiscordNotifications")
+        online_version = "v" + Functions.others.get_version()
         Functions.others.set_console_title("Checking For Updates. . .")
         if online_version != current_version:
             Functions.others.set_console_title("New Update Found!")
@@ -39,11 +40,13 @@ def search_for_updates(autoupdate=False):
                     shutil.copytree(cwd, os.getcwd(), dirs_exist_ok=True)
                     shutil.rmtree(cwd)
                     ch.set_version(online_version)
+                    chj.set_version(online_version)
                     Functions.others.clear_console()
                     Functions.others.set_console_title(
                         f"Update Successfully Finished!")
                     Functions.others.log_print(
-                        f"{Functions.others.get_timestamp()}{Functions.others.holders(1)}{Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
+                        f"{Functions.others.get_timestamp()}{Functions.others.holders(1)}{Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}"
+                    )
                     print("Attempting to start bot...")
                     time.sleep(2)
                     return (True, current_version, online_version)
@@ -60,11 +63,13 @@ def search_for_updates(autoupdate=False):
                 shutil.copytree(cwd, os.getcwd(), dirs_exist_ok=True)
                 shutil.rmtree(cwd)
                 ch.set_version(online_version)
+                chj.set_version(online_version)
                 Functions.others.clear_console()
                 Functions.others.set_console_title(
                     f"Update Successfully Finished!")
                 Functions.others.log_print(
-                    f"{Functions.others.get_timestamp()} {Fore.LIGHTGREEN_EX}{Functions.others.holders(1)}{Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}")
+                    f"{Functions.others.get_timestamp()} {Fore.LIGHTGREEN_EX}{Functions.others.holders(1)}{Fore.LIGHTWHITE_EX}Updated bot from version {Fore.LIGHTYELLOW_EX + current_version + Fore.RESET} to { Fore.LIGHTGREEN_EX + online_version}"
+                )
                 return (True, current_version, online_version)
         else:
             return False

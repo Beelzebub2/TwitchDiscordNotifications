@@ -10,6 +10,7 @@ import Utilities.custom_decorators
 from Functions.Json_config_hanldler import JsonConfigHandler
 from tzlocal import get_localzone
 
+cwd = os.getcwd()
 chj = JsonConfigHandler(
     os.path.join(cwd, "UI\\config.json"))
 
