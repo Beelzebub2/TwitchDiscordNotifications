@@ -132,7 +132,6 @@ class TwitchDiscordBot:
             if 'access_token' in response_data:
                 access_token = response_data['access_token']
                 self.AUTHORIZATION = access_token
-
                 os.environ['authorization'] = access_token
                 dotenv.set_key(env_file, 'authorization', access_token)
 
@@ -144,6 +143,7 @@ class TwitchDiscordBot:
             else:
                 self.others.log_print(self.others.holders(
                     2) + 'Failed to obtain an access token from Twitch.')
+                sys.exit(0)
         except Exception as e:
             self.others.log_print(self.others.holders(
                 2) + 'An error occurred while obtaining the access token:', str(e))
