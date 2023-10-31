@@ -327,7 +327,11 @@ class SQLiteHandler:
 
     def save_to_temp_json(self, data):
         temp_dir = tempfile.gettempdir()
-        file_path = os.path.join(temp_dir, "temp_restart_data.json")
+        folder_name = "TwitchDiscordNotifications"
+        file_path = os.path.join(
+            temp_dir, folder_name, "temp_restart_data.json")
+
+        os.makedirs(os.path.join(temp_dir, folder_name), exist_ok=True)
 
         with open(file_path, "w") as file:
             json.dump(data, file)
@@ -335,7 +339,9 @@ class SQLiteHandler:
     @Utilities.custom_decorators.performance_tracker
     def check_restart_status(self):
         temp_dir = tempfile.gettempdir()
-        file_path = os.path.join(temp_dir, "temp_restart_data.json")
+        folder_name = "TwitchDiscordNotifications"
+        file_path = os.path.join(
+            temp_dir, folder_name, "temp_restart_data.json")
 
         try:
             with open(file_path, "r") as file:
