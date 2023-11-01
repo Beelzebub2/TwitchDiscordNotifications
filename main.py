@@ -32,7 +32,8 @@ class TwitchDiscordBot:
         self.cwd = os.getcwd()
         self.ch = SQLiteHandler()
         self.chj = Json_config_hanldler.JsonConfigHandler(
-            os.path.join(self.cwd, "UI\\config.json"))
+            os.path.join(self.cwd, "UI\\config.json")
+        )
         self.autoupdate = self.chj.get_autoupdates()
         self.VERSION = self.chj.get_version()
         self.chj.set_pid(self.others.get_current_pid())
@@ -47,11 +48,12 @@ class TwitchDiscordBot:
         self.bot = commands.Bot(
             command_prefix=commands.when_mentioned_or(self.ch.get_prefix()),
             intents=intents,
-            case_insensitive=True
+            case_insensitive=True,
         )
         self.temp_dir = tempfile.gettempdir()
         self.heartbeat_file_path = os.path.join(
-            self.temp_dir, "TwitchDiscordNotifications\\heartbeat.txt")
+            self.temp_dir, "TwitchDiscordNotifications\\heartbeat.txt"
+        )
         self.bot.add_listener(self.on_ready)
         try:
             self.console_width = shutil.get_terminal_size().columns
@@ -116,37 +118,45 @@ class TwitchDiscordBot:
             return False
 
     def get_twitch_access_token(self, client_id, client_secret):
-        oauth_url = 'https://id.twitch.tv/oauth2/token'
+        oauth_url = "https://id.twitch.tv/oauth2/token"
 
         params = {
-            'grant_type': 'client_credentials',
-            'client_id': client_id,
-            'client_secret': client_secret,
-            'scope': 'user:read:email'
+            "grant_type": "client_credentials",
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "scope": "user:read:email",
         }
 
         try:
             response = requests.post(oauth_url, params=params)
             response_data = response.json()
 
-            if 'access_token' in response_data:
-                access_token = response_data['access_token']
+            if "access_token" in response_data:
+                access_token = response_data["access_token"]
                 self.AUTHORIZATION = access_token
-                os.environ['authorization'] = access_token
-                dotenv.set_key(env_file, 'authorization', access_token)
 
-                self.others.log_print(self.others.get_timestamp() + self.others.holders(1) +
-                                      f'Authorization token invalid. Generated new authorization token. Restarting Bot{Fore.RESET}')
+                os.environ["authorization"] = access_token
+                dotenv.set_key(env_file, "authorization", access_token)
+
+                self.others.log_print(
+                    self.others.get_timestamp()
+                    + self.others.holders(1)
+                    + f"Authorization token invalid. Generated new authorization token. Restarting Bot{Fore.RESET}"
+                )
 
                 python = sys.executable
                 os.execl(python, python, *sys.argv)
             else:
-                self.others.log_print(self.others.holders(
-                    2) + 'Failed to obtain an access token from Twitch.')
-                sys.exit(0)
+                self.others.log_print(
+                    self.others.holders(2)
+                    + "Failed to obtain an access token from Twitch."
+                )
         except Exception as e:
-            self.others.log_print(self.others.holders(
-                2) + 'An error occurred while obtaining the access token:', str(e))
+            self.others.log_print(
+                self.others.holders(2)
+                + "An error occurred while obtaining the access token:",
+                str(e),
+            )
 
     @Utilities.custom_decorators.performance_tracker
     async def send_notification(self, streamer_name, data):
@@ -161,7 +171,6 @@ class TwitchDiscordBot:
                 for streamer in streamers:
                     if streamer_name == streamer.strip():
                         if "data" not in data or not data["data"]:
-
                             self.others.log_print(
                                 f"{self.others.get_timestamp()}{self.others.holders(2)}{streamer_name} is no longer streaming."
                             )
@@ -231,7 +240,6 @@ class TwitchDiscordBot:
                                 show_message=False,
                             )
                         except discord.errors.Forbidden:
-
                             self.others.log_print(
                                 f"{self.others.get_timestamp()}"
                                 f"{self.others.holders(2)}Cannot send a message to user {member.name}. "
@@ -321,7 +329,6 @@ class TwitchDiscordBot:
             elapsed_time = end_time - start_time
             self.remove_old_streamers(streamers)
             if len(self.processed_streamers) != 0:
-
                 print(
                     f"{Fore.CYAN}{self.others.get_timestamp()}{Fore.RESET}{Fore.LIGHTGREEN_EX}{self.others.holders(1)}"
                     f"Currently streaming {Fore.LIGHTWHITE_EX}{len(self.processed_streamers)}{Fore.RESET} "
@@ -330,7 +337,6 @@ class TwitchDiscordBot:
                     end="\r",
                 )
             else:
-
                 print(
                     f"{Fore.CYAN}{self.others.get_timestamp()}{Fore.RESET}{Fore.LIGHTGREEN_EX}{self.others.holders(1)}"
                     f"Checked {len(streamers)} streamers. Time taken: {elapsed_time:.2f} seconds",
@@ -355,9 +361,7 @@ class TwitchDiscordBot:
                 embed.add_field(name="From", value=result[1])
                 embed.add_field(name="To", value=result[2])
                 embed.add_field(
-                    name="Changelog",
-                    value=f"```{change_log}```",
-                    inline=False
+                    name="Changelog", value=f"```diff\n{change_log}```", inline=False
                 )
                 await self.owner.send(embed=embed)
                 self.others.pickle_variable(self.shared_variables)
@@ -382,7 +386,10 @@ class TwitchDiscordBot:
 
             async with aiohttp.ClientSession() as session:
                 await asyncio.gather(
-                    *[self.fetch_and_cache_streamer_data(session, streamer) for streamer in streamer_list]
+                    *[
+                        self.fetch_and_cache_streamer_data(session, streamer)
+                        for streamer in streamer_list
+                    ]
                 )
             self.others.pickle_variable(self.shared_variables)
             await asyncio.sleep(60)
@@ -403,7 +410,6 @@ class TwitchDiscordBot:
                     self.streamer_data_cache[streamer_name] = streamer_data
 
     def custom_interrupt_handler(self, signum, frame):
-
         if len(self.processed_streamers) > 0:
             self.others.log_print(
                 f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} Saving currently streaming streamers and exiting..."
@@ -434,11 +440,21 @@ class TwitchDiscordBot:
             return
 
         if "REPLIT_DB_URL" in os.environ:
-            if not self.CLIENT_ID or not self.AUTHORIZATION or not self.TOKEN or not self.CLIENT_SECRET:
+            if (
+                not self.CLIENT_ID
+                or not self.AUTHORIZATION
+                or not self.TOKEN
+                or not self.CLIENT_SECRET
+            ):
                 print("Running on Replit")
 
         if "DYNO" in os.environ:
-            if not self.CLIENT_ID or not self.AUTHORIZATION or not self.TOKEN or not self.CLIENT_SECRET:
+            if (
+                not self.CLIENT_ID
+                or not self.AUTHORIZATION
+                or not self.TOKEN
+                or not self.CLIENT_SECRET
+            ):
                 print("Running on Heroku")
 
         env_keys = {
@@ -448,7 +464,7 @@ class TwitchDiscordBot:
             "token": "Your discord bot token",
         }
 
-        app_data_dir = os.getenv('APPDATA')
+        app_data_dir = os.getenv("APPDATA")
 
         env_folder = os.path.join(app_data_dir, "TwitchDiscordNotifications")
         os.makedirs(env_folder, exist_ok=True)
@@ -501,7 +517,8 @@ class TwitchDiscordBot:
         start_time = time.perf_counter()
 
         self.max_extension_width = max(
-            len(filename[:-3]) for filename in extension_files)
+            len(filename[:-3]) for filename in extension_files
+        )
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
             results = await asyncio.gather(
@@ -553,9 +570,8 @@ class TwitchDiscordBot:
 
 if __name__ == "__main__":
     sys.dont_write_bytecode = True
-    app_data_dir = os.getenv('APPDATA')
-    env_file = os.path.join(
-        app_data_dir, "TwitchDiscordNotifications\\.env")
+    app_data_dir = os.getenv("APPDATA")
+    env_file = os.path.join(app_data_dir, "TwitchDiscordNotifications\\.env")
     dotenv.load_dotenv(env_file)
     bot_instance = TwitchDiscordBot()
     asyncio.run(bot_instance.load_and_start())

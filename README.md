@@ -67,6 +67,7 @@ Discord bot: https://discord.com/developers/applications/
 +   Added more information to the .env error
 +   Improved on_error event
 +   Fixed get_version and get_changelog
++   Improved Changelog embed
 
 ### v2.6 21/10/2023
 
