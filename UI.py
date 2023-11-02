@@ -6,7 +6,6 @@ import tempfile
 import time
 import tkinter
 import customtkinter
-import psutil
 from Functions import Json_config_hanldler, others, Sql_handler
 import screeninfo
 from CTkMessagebox import CTkMessagebox
@@ -130,7 +129,7 @@ class MyApp(customtkinter.CTk):
                     self.save_entry_value()
                     self.quit()
                     sys.exit(0)
-                elif answer == None or answer == "No":
+                elif answer == "No":
                     try:
                         del self.exit_program
                     except:
