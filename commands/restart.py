@@ -18,8 +18,7 @@ class Restart(commands.Cog):
         name="restart",
         aliases=["rr"],
         help="Restarts Bot.",
-        usage="restart",
-        hidden=True,
+        usage="restart"
     )
     @commands.is_owner()
     async def restart(self, ctx):

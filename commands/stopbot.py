@@ -10,7 +10,6 @@ class StopBot(commands.Cog):
         name='stop',
         description='Stop the bot (bot owner only)',
         usage='stop',
-        hidden=True
     )
     @commands.is_owner()
     async def stop_bot(self, ctx):
