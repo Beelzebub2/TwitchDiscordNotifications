@@ -49,6 +49,7 @@ class TwitchDiscordBot:
             command_prefix=commands.when_mentioned_or(self.ch.get_prefix()),
             intents=intents,
             case_insensitive=True,
+
         )
         self.temp_dir = tempfile.gettempdir()
         self.heartbeat_file_path = os.path.join(
@@ -502,7 +503,7 @@ class TwitchDiscordBot:
             return success_message, filename
         except Exception as e:
             error_message = (
-                f"{self.others.get_timestamp()} {Fore.LIGHTRED_EX}{self.others.holders(2)}Failed to load "
+                f"{self.others.get_timestamp()}{Fore.LIGHTRED_EX}{self.others.holders(2)}Failed to load "
                 f"{Fore.LIGHTYELLOW_EX}{filename}{Fore.RESET}: {e}"
             )
             return error_message, filename
@@ -535,6 +536,8 @@ class TwitchDiscordBot:
             if len(parts) >= 2 and parts[3] == "Loaded":
                 self.Loaded_commands.append(result)
             else:
+                self.others.log_print(
+                    result, show_message=False, log_file_name="Failed Commands Log.txt")
                 self.Failed_commands.append(filename[:-3])
         self.others.pickle_variable(self.shared_variables)
 

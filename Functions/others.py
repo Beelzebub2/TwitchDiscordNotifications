@@ -144,60 +144,65 @@ def clear_console():
 
 
 def get_version():
-
     url = "https://github.com/Beelzebub2/TwitchDiscordNotifications/raw/main/UI/config.json"
-    response = requests.get(url)
 
-    if response.status_code == 200:
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
         config_data = response.json()
-    else:
-        return "Version not found"
 
-    if "config" in config_data and "version" in config_data["config"]:
-        version = config_data["config"]["version"]
-        return version
-    else:
+        if "config" in config_data and "version" in config_data["config"]:
+            version = config_data["config"]["version"]
+            return version
+        else:
+            return "Version not found"
+
+    except requests.RequestException:
         return "Version not found"
 
 
 def get_changelog():
-    version = chj.get_version()
+    version = get_version()
     repo_url = "https://github.com/Beelzebub2/TwitchDiscordNotifications"
 
     if version is None:
         return "Changelog not found"
 
     raw_readme_url = f"{repo_url}/raw/main/README.md"
-    response = requests.get(raw_readme_url)
 
-    if response.status_code == 200:
+    try:
+        response = requests.get(raw_readme_url)
+        response.raise_for_status()
         readme_content = response.text
-    else:
-        return "Changelog not found"
 
-    changelog = ""
-    version_found = False
+        changelog = ""
+        version_found = False
 
-    for line in readme_content.split('\n'):
-        if line.startswith(f"### {version}"):
-            version_found = True
-        elif line.startswith("### v"):
-            version_found = False
+        for line in readme_content.split('\n'):
+            if line.startswith(f"### {version}"):
+                version_found = True
+            elif line.startswith("### v"):
+                version_found = False
 
-        if version_found:
-            changelog += line + "\n"
+            if version_found:
+                changelog += line + "\n"
 
-    if changelog:
-        changelog = re.sub(r'\d{2}/\d{2}/\d{4}\n', '', changelog)
-        changelog = re.sub(fr'###\s*{re.escape(version)}', '', changelog)
-        return changelog.strip()
-    else:
-        return f"Changelog for version {version} not found"
+        if changelog:
+            changelog = re.sub(r'\d{2}/\d{2}/\d{4}\n', '', changelog)
+            changelog = re.sub(fr'###\s*{re.escape(version)}', '', changelog)
+            return changelog.strip()
+        else:
+            return f"Changelog for version {version} not found"
 
-# TODO Im way to lazy to change all the prints to use this i'll do it eventually
+    except requests.RequestException:
+        return "Failed to get changelog"
 
-
-def holders(type):
+def holders(type: int):
+    """
+    1: SUCCESS
+    2: ERROR
+    3: INFO
+    """
     match type:
         case 1:
             return f"{Fore.LIGHTGREEN_EX} [SUCCESS] "

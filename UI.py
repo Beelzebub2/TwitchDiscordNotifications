@@ -26,7 +26,6 @@ def get_monitor_from_coord(x, y):
 
 customtkinter.set_default_color_theme("blue")
 
-
 class MyApp(customtkinter.CTk):
     def __init__(self):
         super().__init__()
@@ -397,6 +396,8 @@ class MyApp(customtkinter.CTk):
 
     # TODO logs page
     # TODO Allow .env changes from UI
+    # TODO Buttons to go to the default data.db and restarted_data.json location
+    # TODO Allow the change of the default locations
 
 
 if __name__ == "__main__":

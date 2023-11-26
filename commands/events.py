@@ -52,7 +52,7 @@ class Events(commands.Cog):
                     await member.add_roles(role)
 
                     Functions.others.log_print(
-                        f"{Functions.others.get_timestamp()} Assigned role named {role.name} to {member.display_name} in the target guild."
+                        f"{Functions.others.get_timestamp()}{Functions.others.holders(3)} Assigned role named {role.name} to {member.display_name} in the target guild.", show_message=False
                     )
             else:
                 await general_channel.send(
@@ -63,64 +63,51 @@ class Events(commands.Cog):
     '''On Command Error'''
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        variables = Functions.others.unpickle_variable()
         if isinstance(error, commands.CommandNotFound):
-            command = ctx.message.content.split()
-            if len(command) >= 2:
-                command = ctx.message.content.split(" ")[1]
-            else:
-                command = ctx.message.content.split(" ")[0]
+            full_command = ctx.message.content
+            error_message = f"Command '{full_command}' is not valid."
+            embed_title = "Command not found"
+            embed_description = f"Command '{full_command}' is not valid. Use {ctx.prefix}help for more info."
 
-            Functions.others.log_print(
-                Fore.CYAN
-                + Functions.others.get_timestamp()
-                + Fore.RESET
-                + " "
-                + Fore.RED
-                + Functions.others.holders(2)
-                + f"Command {Fore.CYAN + command + Fore.RESET} doesn't exist."
-                + Fore.RESET,
-                show_message=False
-            )
-            embed = discord.Embed(
-                title="Command not found",
-                description=f"Command **__{command}__** does not exist. Use {ctx.prefix}help for more info.",
-                color=discord.Color.red(),
-                timestamp=datetime.datetime.now()
-            )
-            embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
-            await ctx.send(embed=embed)
+        elif isinstance(error, commands.MissingRequiredArgument):
+            param_name = error.param.name
+            error_message = f"Parameter '{param_name}' is missing for the command."
+            embed_title = "Missing Parameter"
+            embed_description = f"Parameter '{param_name}' is required for the command. Use {ctx.prefix}help for more info."
+
+        elif isinstance(error, commands.BadArgument):
+            error_message = f"Invalid parameter: {error}"
+            embed_title = "Invalid Parameter"
+            embed_description = f"Invalid parameter: {error}. Use {ctx.prefix}help for more info."
 
         elif isinstance(error, commands.CommandOnCooldown):
             remaining_time = round(error.retry_after)
-            embed = discord.Embed(
-                title="Command on Cooldown",
-                description=f"Please wait {remaining_time} seconds before trying again.",
-                color=0xFF0000
-            )
-            embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
-            await ctx.send(embed=embed)
+            error_message = f"Command on Cooldown: Please wait {remaining_time} seconds before trying again."
+            embed_title = "Command on Cooldown"
+            embed_description = error_message
 
         else:
             traceback_info = traceback.format_exception(
                 type(error), error, error.__traceback__)
-            error_message = "".join(traceback_info)
+            error_message = f"Error: {error}\n{''.join(traceback_info)}"
 
-            Functions.others.log_print(
-                Fore.CYAN
-                + Functions.others.get_timestamp()
-                + Fore.RESET
-                + " "
-                + Fore.RED
-                + Functions.others.holders(2)
-                + f"Error: {error}\n{error_message}"
-                + Fore.RESET
-            )
+        Functions.others.log_print(
+            f"{Fore.CYAN}{Functions.others.get_timestamp()}{Fore.RESET} {Fore.RED}{Functions.others.holders(2)} {error_message}{Fore.RESET}",
+            show_message=False
+        )
+
+        embed = discord.Embed(
+            title=embed_title,
+            description=embed_description,
+            color=discord.Color.red() if "Command not found" in embed_title else 0xFF0000,
+            timestamp=datetime.datetime.now()
+        )
+        embed.set_thumbnail(url="https://i.imgur.com/lmVQboe.png")
+        await ctx.send(embed=embed)
 
     '''On Message'''
     @commands.Cog.listener()
     async def on_message(self, message):
-        import discord
         if message.author == self.bot.user:
             return
 
@@ -145,10 +132,6 @@ class Events(commands.Cog):
                     timestamp=datetime.datetime.now()
                 )
             await message.channel.send(embed=embed)
-
-    @commands.Cog.listener()
-    async def on_bot_exit(self):
-        Functions.others.custom_interrupt_handler()
 
 
 async def setup(bot):

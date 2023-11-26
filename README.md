@@ -44,11 +44,18 @@ Discord bot: https://discord.com/developers/applications/
 **Stats** - Shows bots stats.  
 **Restart** - Restarts the bot (available only to bot host).  
 **Reload** - Reloads all the commands (available only to bot host)
+**Stop** - Stops the bot (available only to bot host)
 #### Replit
 **It should create the secrets automatically so just change the filler text in there**
 
 ## Changes
 ```diff
+
+### v2.8 26/11/2023
+
++   Fixed a bug with autoupdater that would crash the bot
++   Improved error handler
++   Added Stop bot command
 
 
 ### v2.7 31/10/2023

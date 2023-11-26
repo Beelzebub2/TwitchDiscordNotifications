@@ -13,3 +13,4 @@ Tests/
 temp.py
 Performance_debug.txt
 .vscode
+Logs/Failed Commands Log.txt
