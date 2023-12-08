@@ -337,14 +337,20 @@ class TwitchDiscordBot:
 
             streamers = self.ch.get_all_streamers()
             self.ids_with_streamers = self.ch.get_user_ids_with_streamers().items()
-            async with aiohttp.ClientSession() as session:
-                await asyncio.gather(
-                    *[self.check_stream(session, streamer) for streamer in streamers]
-                )
+
+            try:
+                async with aiohttp.ClientSession() as session:
+                    await asyncio.gather(
+                        *[self.check_stream(session, streamer) for streamer in streamers]
+                    )
+
+            except aiohttp.ClientConnectorError:
+                continue
 
             end_time = time.perf_counter()
             elapsed_time = end_time - start_time
             self.remove_old_streamers(streamers)
+
             if len(self.processed_streamers) != 0:
                 print(
                     f"{Fore.CYAN}{self.others.get_timestamp()}{Fore.RESET}{Fore.LIGHTGREEN_EX}{self.others.holders(1)}"
