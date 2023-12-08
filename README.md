@@ -54,7 +54,7 @@ Discord bot: https://discord.com/developers/applications/
 ### v2.9 08/12/2023
 
 +   Fixed bug with exit window on UI
-+   Made send notification retry 3 times if it fails due to discord server issues
++   Made send notification retry 3 times if it fails due to discord server issues (might be a litle unstable)
 +   Organized some code
 +   Bot now creates a backup of the database every hour with a limit of 12 files
 
