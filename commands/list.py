@@ -67,7 +67,6 @@ class ListStreamers(commands.Cog):
                     + Fore.CYAN
                     + self.others.get_timestamp()
                     + Fore.RESET
-                    + " "
                     + Fore.LIGHTYELLOW_EX
                     + self.others.holders(3)
                     + ctx.author.name
@@ -92,7 +91,7 @@ class ListStreamers(commands.Cog):
                     Fore.CYAN
                     + self.others.get_timestamp()
                     + Fore.RESET
-                    + " "
+                    + self.others.holders(2)
                     + Fore.YELLOW
                     + f"{Fore.CYAN + ctx.author.name + Fore.RESET} requested their streamers, but the watchlist is empty."
                     + Fore.RESET,
@@ -111,7 +110,7 @@ class ListStreamers(commands.Cog):
                 Fore.CYAN
                 + self.others.get_timestamp()
                 + Fore.RESET
-                + " "
+                + self.others.holders(2)
                 + Fore.RED
                 + f"{Fore.CYAN + ctx.author.name + Fore.RESET} requested their streamers, but they don't have a watchlist yet."
                 + Fore.RESET,

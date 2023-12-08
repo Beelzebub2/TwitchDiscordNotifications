@@ -26,6 +26,7 @@ def get_monitor_from_coord(x, y):
 
 customtkinter.set_default_color_theme("blue")
 
+
 class MyApp(customtkinter.CTk):
     def __init__(self):
         super().__init__()
@@ -109,32 +110,31 @@ class MyApp(customtkinter.CTk):
     @Utilities.custom_decorators.run_in_thread
     def exit(self, message=None, save_changes=None):
         if not hasattr(self, "exit_program"):
-            try:
-                self.exit_program = CTkMessagebox(
-                    title="Exit",
-                    message="Are you sure you want to exit?" if not message else message,
-                    icon="question",
-                    option_2="Yes",
-                    option_1="No",
-                    option_3=None if not save_changes else save_changes,
-                    option_focus="Yes",
-                    justify="center",
-                )
-                answer = self.exit_program.get()
-                if answer == "Yes":
+            self.exit_program = CTkMessagebox(
+                title="Exit",
+                message="Are you sure you want to exit?" if not message else message,
+                icon="question",
+                option_1="Yes",
+                option_2="No",
+                option_3=None if not save_changes else save_changes,
+                option_focus="Yes",
+                justify="center",
+            )
+            answer = self.exit_program.get()
+            match answer:
+                case "Yes":
                     self.quit()
                     sys.exit(0)
-                elif answer == save_changes and answer is not None:
+                case "Exit and save":
                     self.save_entry_value()
                     self.quit()
                     sys.exit(0)
-                elif answer == "No":
-                    try:
-                        del self.exit_program
-                    except:
-                        pass
-            except tkinter.TclError:
-                pass
+                case "No":
+                    self.exit_program.destroy()
+                    del self.exit_program
+                case None:
+                    self.exit_program.destroy()
+                    del self.exit_program
 
     def show_logs_page(self):
         try:

@@ -230,23 +230,38 @@ class TwitchDiscordBot:
                             name="Stream Start Time (local)", value=start_time_str
                         )
 
-                        try:
-                            await dm_channel.send(mention, embed=embed)
+                        max_retry_attempts = 3
+                        for attempt in range(max_retry_attempts):
+                            try:
+                                await dm_channel.send(mention, embed=embed)
+                                self.others.log_print(
+                                    f"{self.others.get_timestamp()}"
+                                    f"{self.others.holders(1)}Notification sent successfully for "
+                                    f"{Fore.CYAN}{streamer_name}. {Fore.LIGHTGREEN_EX}to member "
+                                    f"{Fore.LIGHTCYAN_EX + member.name + Fore.RESET}",
+                                    show_message=False,
+                                )
+                                break
+                            except discord.errors.DiscordServerError:
+                                self.others.log_print(
+                                    f"{self.others.get_timestamp()}"
+                                    f"{self.others.holders(3)}Attempt {attempt + 1} - Discord server error",
+                                    show_message=False)
+                                if attempt == max_retry_attempts - 1:
+                                    self.others.log_print(
+                                        f"{self.others.get_timestamp()}"
+                                        f"{self.others.holders(2)}Max retry attempts reached. Could not send notification.",
+                                        show_message=False)
+                                else:
+                                    await asyncio.sleep(1)
 
-                            self.others.log_print(
-                                f"{self.others.get_timestamp()}"
-                                f"{self.others.holders(1)}Notification sent successfully for "
-                                f"{Fore.CYAN}{streamer_name}. {Fore.LIGHTGREEN_EX}to member "
-                                f"{Fore.LIGHTCYAN_EX + member.name + Fore.RESET}",
-                                show_message=False,
-                            )
-                        except discord.errors.Forbidden:
-                            self.others.log_print(
-                                f"{self.others.get_timestamp()}"
-                                f"{self.others.holders(2)}Cannot send a message to user {member.name}. "
-                                f"Missing permissions or DMs disabled.",
-                                show_message=False,
-                            )
+                            except discord.errors.Forbidden:
+                                self.others.log_print(
+                                    f"{self.others.get_timestamp()}"
+                                    f"{self.others.holders(2)}Cannot send a message to user {member.name}. "
+                                    f"Missing permissions or DMs disabled.",
+                                    show_message=False,
+                                )
             except discord.errors.NotFound:
                 self.others.log_print(
                     f"{self.others.get_timestamp()}{self.others.holders(2)}User with ID {user_id} not found.",
@@ -260,6 +275,7 @@ class TwitchDiscordBot:
         self.bot.loop.create_task(self.check_for_updates())
         self.bot.loop.create_task(self.cache_streamer_data())
         self.bot.loop.create_task(self.heart_beat())
+        self.bot.loop.create_task(self.create_backup())
         if not self.ch.check_restart_status():
             bot_owner_id = self.ch.get_bot_owner_id()
             if not bot_owner_id:
@@ -381,6 +397,31 @@ class TwitchDiscordBot:
             await asyncio.sleep(2)
 
     @Utilities.custom_decorators.performance_tracker
+    async def create_backup(self):
+        while True:
+            os.makedirs(backup_folder, exist_ok=True)
+            self.db_folder = os.path.join(
+                app_data_dir, "TwitchDiscordNotifications")
+            self.default_db_file = os.path.join(self.db_folder, "data.db")
+
+            current_time = time.strftime("%Y-%m-%d_%H-%M-%S")
+            backup_file_name = f"backup_{current_time}.db"
+            backup_file_path = os.path.join(backup_folder, backup_file_name)
+
+            if not os.path.exists(backup_file_path):
+                shutil.copy(self.default_db_file, backup_file_path)
+                self.others.log_print(
+                    f"{self.others.get_timestamp()}{self.others.holders(1)}Created Backup file! {backup_file_name} saved in {self.db_folder}", show_message=False
+                )
+
+            backup_files = sorted(os.listdir(backup_folder), reverse=True)
+            if len(backup_files) > 12:
+                files_to_delete = backup_files[12:]
+                for file in files_to_delete:
+                    os.remove(os.path.join(backup_folder, file))
+            await asyncio.sleep(3600)
+
+    @Utilities.custom_decorators.performance_tracker
     async def cache_streamer_data(self):
         while True:
             streamer_list = self.ch.get_all_streamers()
@@ -413,14 +454,14 @@ class TwitchDiscordBot:
     def custom_interrupt_handler(self, signum, frame):
         if len(self.processed_streamers) > 0:
             self.others.log_print(
-                f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} Saving currently streaming streamers and exiting..."
+                f"{self.others.get_timestamp()} {Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} Saving currently streaming streamers and exiting..."
             )
             data = {"Restarted": True, "Streamers": self.processed_streamers}
             self.ch.save_to_temp_json(data)
             os._exit(0)
 
         self.others.log_print(
-            f"{Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} No streamers currently streaming. exiting..."
+            f"{self.others.get_timestamp()} {Fore.LIGHTYELLOW_EX}[{Fore.RESET + Fore.LIGHTGREEN_EX}KeyboardInterrupt{Fore.LIGHTYELLOW_EX}]{Fore.RESET}{Fore.LIGHTWHITE_EX} No streamers currently streaming. exiting..."
         )
         os._exit(0)
 
@@ -574,6 +615,8 @@ class TwitchDiscordBot:
 if __name__ == "__main__":
     sys.dont_write_bytecode = True
     app_data_dir = os.getenv("APPDATA")
+    backup_folder = os.path.join(
+        app_data_dir, "TwitchDiscordNotifications\\TDNBackups")
     env_file = os.path.join(app_data_dir, "TwitchDiscordNotifications\\.env")
     dotenv.load_dotenv(env_file)
     bot_instance = TwitchDiscordBot()

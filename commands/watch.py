@@ -62,7 +62,6 @@ class Watch(commands.Cog):
                         Fore.CYAN
                         + Functions.others.get_timestamp()
                         + Fore.RESET
-                        + " "
                         + Fore.RED
                         + Functions.others.holders(2)
                         + f"{Fore.CYAN + streamer_name + Fore.RESET} Twitch profile not found."
@@ -85,7 +84,6 @@ class Watch(commands.Cog):
                         Fore.CYAN
                         + Functions.others.get_timestamp()
                         + Fore.RESET
-                        + " "
                         + Fore.LIGHTGREEN_EX
                         + Functions.others.holders(1)
                         + f"Added {Fore.CYAN + streamer_name + Fore.RESET} to user {Fore.CYAN + ctx.author.name + Fore.RESET}'s watchlist."
@@ -101,8 +99,7 @@ class Watch(commands.Cog):
                         Fore.CYAN
                         + Functions.others.get_timestamp()
                         + Fore.RESET
-                        + " "
-                        + f"{Fore.CYAN + streamer_name + Fore.RESET} is already in user {Fore.CYAN + ctx.author.name + Fore.RESET}'s watchlist.",
+                        + f"{Functions.others.holders(3)}{Fore.CYAN + streamer_name + Fore.RESET} is already in user {Fore.CYAN + ctx.author.name + Fore.RESET}'s watchlist.",
                         show_message=False
                     )
                     already_in_list.append({
@@ -124,8 +121,7 @@ class Watch(commands.Cog):
                 Functions.others.log_print(
                     Fore.CYAN
                     + Functions.others.get_timestamp()
-                    + Fore.RESET
-                    + " "
+                    + Fore.RESET                   
                     + Fore.LIGHTGREEN_EX
                     + Functions.others.holders(1)
                     + f"Created a new watchlist for user {Fore.CYAN + ctx.author.name + Fore.RESET}."

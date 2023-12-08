@@ -27,7 +27,6 @@ class UnRegister(commands.Cog):
                 Fore.CYAN
                 + Functions.others.get_timestamp()
                 + Fore.RESET
-                + " "
                 + Fore.LIGHTGREEN_EX
                 + Functions.others.holders(1)
                 + f"{Fore.CYAN + ctx.author.name + Fore.RESET} Unregistered from bot."
@@ -48,7 +47,6 @@ class UnRegister(commands.Cog):
                 Fore.CYAN
                 + Functions.others.get_timestamp()
                 + Fore.RESET
-                + " "
                 + Fore.YELLOW
                 + Functions.others.holders(2)
                 + f"{Fore.RED + ctx.author.name + Fore.RESET} Tried to unregister from bot but wasn't registered to begin with."

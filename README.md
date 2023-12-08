@@ -1,5 +1,5 @@
 # **TwitchDiscordNotifications**
-![Static Badge](https://img.shields.io/badge/Version-v2.7-8ebff1?style=for-the-badge&logo=v)
+![Static Badge](https://img.shields.io/badge/Version-v2.9-8ebff1?style=for-the-badge&logo=v)
 ![Static Badge](https://img.shields.io/badge/Language-python-3776ab?style=for-the-badge&logo=python)
 ![Static Badge](https://img.shields.io/badge/License-GNU%20GPL%20v3-blue.svg?style=for-the-badge)  
 
@@ -50,6 +50,13 @@ Discord bot: https://discord.com/developers/applications/
 
 ## Changes
 ```diff
+
+### v2.9 08/12/2023
+
++   Fixed bug with exit window on UI
++   Made send notification retry 3 times if it fails due to discord server issues
++   Organized some code
++   Bot now creates a backup of the database every hour with a limit of 12 files
 
 ### v2.8 26/11/2023
 
