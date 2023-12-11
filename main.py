@@ -404,6 +404,7 @@ class TwitchDiscordBot:
 
     @Utilities.custom_decorators.performance_tracker
     async def create_backup(self):
+        #TODO  only if backups are enabled
         while True:
             os.makedirs(backup_folder, exist_ok=True)
             self.db_folder = os.path.join(

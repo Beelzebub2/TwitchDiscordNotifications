@@ -1,4 +1,3 @@
-import time
 import requests
 import os
 import shutil
@@ -7,6 +6,7 @@ from colorama import Fore, Style
 import Functions.Sql_handler
 import Functions.others
 from Functions.Json_config_hanldler import JsonConfigHandler
+from urllib3.exceptions import MaxRetryError
 
 ch = Functions.Sql_handler.SQLiteHandler()
 cwd = os.getcwd()
@@ -19,11 +19,17 @@ def search_for_updates(autoupdate=False):
         online_version = Functions.others.get_version()
         Functions.others.set_console_title("Checking For Updates. . .")
         if online_version != current_version:
-            Functions.others.set_console_title(f"New Update Found! New Version:{online_version}")
+            Functions.others.set_console_title(
+                f"New Update Found! New Version:{online_version}")
             if autoupdate:
-                new = requests.get(
-                    f"https://github.com/Beelzebub2/TwitchDiscordNotifications/archive/refs/heads/main.zip"
-                )
+                try:
+                    new = requests.get(
+                        'https://github.com/Beelzebub2/TwitchDiscordNotifications/archive/refs/heads/main.zip')
+                except requests.exceptions.ConnectTimeout or MaxRetryError:
+                    Functions.others.log_print(
+                        f"{Functions.others.get_timestamp()}{Functions.others.holders(2)}Failed to download update", show_message=False)
+                    return False
+
                 with open("TwitchDiscordNotifications.zip", "wb") as zipfile:
                     zipfile.write(new.content)
                 with ZipFile("TwitchDiscordNotifications.zip", "r") as filezip:

@@ -1,6 +1,6 @@
 {
     "config": {
-        "version": "v2.9",
+        "version": "v3.0",
         "debug": false,
         "autoupdates": true,
         "default_prefix": ",",

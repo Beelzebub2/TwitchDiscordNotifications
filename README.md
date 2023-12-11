@@ -1,5 +1,5 @@
 # **TwitchDiscordNotifications**
-![Static Badge](https://img.shields.io/badge/Version-v2.9-8ebff1?style=for-the-badge&logo=v)
+![Static Badge](https://img.shields.io/badge/Version-v3.0-8ebff1?style=for-the-badge&logo=v)
 ![Static Badge](https://img.shields.io/badge/Language-python-3776ab?style=for-the-badge&logo=python)
 ![Static Badge](https://img.shields.io/badge/License-GNU%20GPL%20v3-blue.svg?style=for-the-badge)  
 
@@ -50,6 +50,11 @@ Discord bot: https://discord.com/developers/applications/
 
 ## Changes
 ```diff
+
+### v3.0 11/12/2023
+
++   Fixed a bug that would crash bot when checking for updates
+
 
 ### v2.9 08/12/2023
 
