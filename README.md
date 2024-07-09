@@ -8,7 +8,7 @@ Get notifications of your favorite streamers on your discord Dm's
 
 ## Setting up the bot as a user  
 If you simply wish to use the bot without any setup or hosting necessary simply Join my server and ping the bot either on bot's dm's or on the discord server, he will reply with the prefix. Use the command Help to know what you can do.  
-[Join TwitchStreamChecker Server](https://discord.gg/gbdPCxNavc)
+[Join TwitchStreamChecker Server](https://discord.gg/gbdPCxNavc) **No longer up host your own bot**
 #### **OR**  
 [Invite TwitchStreamChecker](https://discord.com/api/oauth2/authorize?client_id=1124891382595727460&permissions=8&scope=bot) 
 
